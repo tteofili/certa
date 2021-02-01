@@ -165,10 +165,12 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
         currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
                                                                class_to_explain)
         currPerturbedAttr = currentPerturbations.alteredAttributes.values
-        predictions = predict_fn(currentPerturbations, model, ['alteredAttributes', 'originalRightId'])
-        curr_flippedPredictions = currentPerturbations[(predictions[:, class_to_explain] < 0.5)]
+        predictions = predict_fn(currentPerturbations, model)
+        predictions = predictions.drop(columns=['alteredAttributes', 'originalRightId'])
+        proba = predictions[['nomatch_score', 'match_score']].values
+        curr_flippedPredictions = currentPerturbations[proba[:, class_to_explain] < 0.5]
         flippedPredictions.append(curr_flippedPredictions)
-        ranking = getAttributeRanking(predictions, currPerturbedAttr, class_to_explain)
+        ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
         rankings.append(ranking)
     try:
         flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
@@ -177,15 +179,18 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
     explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                            maxLenAttributeSet=maxLenAttributeSet)
 
-    sorted_attr_pairs = explanation.sort_values(ascending=False)
-    explanations = sorted_attr_pairs.loc[sorted_attr_pairs.values == sorted_attr_pairs.values.max()]
-    filtered = [i for i in explanations.keys() if
-                not any(all(c in i for c in b) and len(b) < len(i) for b in explanations.keys())]
-    filtered_exp = defaultdict(int)
-    for te in filtered:
-        filtered_exp[te] = explanations[te]
+    if len(explanation) > 0:
+        sorted_attr_pairs = explanation.sort_values(ascending=False)
+        explanations = sorted_attr_pairs.loc[sorted_attr_pairs.values == sorted_attr_pairs.values.max()]
+        filtered = [i for i in explanations.keys() if
+                    not any(all(c in i for c in b) and len(b) < len(i) for b in explanations.keys())]
+        filtered_exp = defaultdict(int)
+        for te in filtered:
+            filtered_exp[te] = explanations[te]
 
-    return filtered_exp, flippedPredictions_df
+        return filtered_exp, flippedPredictions_df
+    else:
+        return [], pd.DataFrame()
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1

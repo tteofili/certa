@@ -32,7 +32,7 @@ def text_to_vector(text):
     return Counter(words)
 
 
-def find_candidates(record, source, min_similarity, find_positives):
+def find_candidates(record, source, similarity_threshold, find_positives):
     record2text = " ".join([val for k, val in record.to_dict().items() if k not in ['id']])
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
@@ -44,10 +44,10 @@ def find_candidates(record, source, min_similarity, find_positives):
         currentRecord = " ".join(row)
         currentSimilarity = get_cosine(record2text, currentRecord)
         if find_positives:
-            if currentSimilarity >= min_similarity:
+            if currentSimilarity >= similarity_threshold:
                 candidates.append((record['id'], source_ids[idx]))
         else:
-            if currentSimilarity < min_similarity:
+            if currentSimilarity < similarity_threshold:
                 candidates.append((record['id'], source_ids[idx]))
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
@@ -71,9 +71,9 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
     return unlabeled_df
 
 
-def create_dataset_4local_explanation(r1: pd.DataFrame, r2: pd.DataFrame, model, lsource: pd.DataFrame,
-                                      rsource: pd.DataFrame, dataset_dir, theta_max: float,
-                                      theta_min: float, predict_fn, num_triangles=100):
+def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
+                  rsource: pd.DataFrame, dataset_dir, theta_min: float,
+                  theta_max: float, predict_fn, num_triangles=100):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -83,7 +83,7 @@ def create_dataset_4local_explanation(r1: pd.DataFrame, r2: pd.DataFrame, model,
     r1r2 = pd.concat([r1_df, r2_df], axis=1)
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
     r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    originalPrediction = predict_fn(r1r2, model)
+    originalPrediction = predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
 
     if originalPrediction[0] > originalPrediction[1]:
         findPositives = True
@@ -98,17 +98,17 @@ def create_dataset_4local_explanation(r1: pd.DataFrame, r2: pd.DataFrame, model,
     id4explanation.to_csv(os.path.join(dataset_dir, tmp_name), index=False)
     unlabeled_df = __generate_unlabeled(dataset_dir, tmp_name)
     os.remove(os.path.join(dataset_dir, tmp_name))
-    unlabeled_predictions = predict_fn(unlabeled_df, model, outputAttributes=True)
+    unlabeled_predictions = predict_fn(unlabeled_df, model)
     if findPositives:
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
     else:
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
     if len(neighborhood) > num_triangles:
         neighborhood = neighborhood.sample(n=num_triangles)
-    neighborhood['id'] = neighborhood.index
+    #neighborhood['id'] = neighborhood.index
     neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                      neighborhood.match_score.values))
-    neighborhood = neighborhood.drop(['match_score'], axis=1)
+    neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
     r1r2['label'] = np.argmax(originalPrediction)
     dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
     return dataset4explanation
