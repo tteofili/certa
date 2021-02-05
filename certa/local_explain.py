@@ -41,7 +41,7 @@ def find_candidates(record, source, similarity_threshold, find_positives):
     source_without_id = source_without_id.values
     candidates = []
     for idx, row in enumerate(source_without_id):
-        currentRecord = " ".join(row)
+        currentRecord = " ".join(row.astype(str))
         currentSimilarity = get_cosine(record2text, currentRecord)
         if find_positives:
             if currentSimilarity >= similarity_threshold:
@@ -105,7 +105,9 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
     if len(neighborhood) > num_triangles:
         neighborhood = neighborhood.sample(n=num_triangles)
-    #neighborhood['id'] = neighborhood.index
+    else:
+        print(f'could only find {len(neighborhood)} triangles of the {num_triangles} requested')
+
     neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                      neighborhood.match_score.values))
     neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
@@ -135,11 +137,11 @@ def find_similarities(test_df: pd.DataFrame, strict: bool):
     lpos_df = tuples_ls_df[tuples_ls_df[2] == 1]
     lneg_df = tuples_ls_df[tuples_ls_df[2] == 0]
 
-    theta_mean_std_max_strict = lpos_df[3].mean()
-    theta_mean_std_min_strict = lneg_df[3].mean()
+    theta_max = lpos_df[3].mean()
+    theta_min = lneg_df[3].mean()
 
     if strict:
-        theta_mean_std_max_strict = theta_mean_std_max_strict + lpos_df[3].std()
-        theta_mean_std_min_strict = theta_mean_std_min_strict - lneg_df[3].std()
+        theta_max = theta_max + lpos_df[3].std()
+        theta_min = theta_min - lneg_df[3].std()
 
-    return theta_mean_std_min_strict, theta_mean_std_max_strict
+    return min(theta_min, theta_max), max(theta_min, theta_max)

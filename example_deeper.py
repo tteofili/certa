@@ -7,7 +7,7 @@ from certa.local_explain import find_similarities
 from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
-
+import math
 
 def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table):
     dataset = pd.DataFrame(columns={col: table[col].dtype for col in copy_from_table})
@@ -67,7 +67,7 @@ def get_original_prediction(r1, r2):
     return predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
 
 
-datadir = 'datasets/beers/'
+datadir = 'datasets/itunes_amazon/'
 lsource = pd.read_csv(datadir + 'tableA.csv')
 rsource = pd.read_csv(datadir + 'tableB.csv')
 gt = pd.read_csv(datadir + 'train.csv')
@@ -87,25 +87,29 @@ emb_dim = len(embeddings_index['cat'])
 embeddings_model, tokenizer = dp.init_embeddings_model(embeddings_index)
 model = dp.init_DeepER_model(emb_dim)
 
+theta_min, theta_max = find_similarities(test_df, False)
 model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
 
-theta_min, theta_max = find_similarities(test_df, False)
 
-l_tuple = lsource.iloc[19]
-r_tuple = rsource.iloc[27]
-local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, theta_min, theta_max, predict_fn,
-                              num_triangles=10)
+l_tuple = lsource.iloc[4440]
+r_tuple = rsource.iloc[31090]
+for nt in [int(math.log(min(len(lsource), len(rsource)))), 10, 50, 100, 200, 500, 1000]:
+    print('running CERTA with nt='+str(nt))
+    local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, theta_min, theta_max, predict_fn,
+                                  num_triangles=nt)
 
-prediction = get_original_prediction(l_tuple, r_tuple)
-class_to_explain = np.argmax(prediction)
+    prediction = get_original_prediction(l_tuple, r_tuple)
+    class_to_explain = np.argmax(prediction)
 
-explanation, flipped_pred = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
-                                           class_to_explain=class_to_explain, maxLenAttributeSet=3)
-print(explanation)
+    explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
+                                               class_to_explain=class_to_explain, maxLenAttributeSet=4)
+    print(explanation)
 
-for exp in explanation:
-    e_attrs = exp.split('/')
-    e_score = explanation[exp]
-    expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
-                                r_tuple, predict_fn)
-    print(expl_evaluation.head())
+    for exp in explanation:
+        e_attrs = exp.split('/')
+        e_score = explanation[exp]
+        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
+                                    r_tuple, predict_fn)
+        print(expl_evaluation.head())
+        expl_evaluation.to_csv('expl-ia-'+str(nt)+'_'+str("_".join(e_attrs))+'_'+'.csv')
+    pd.DataFrame(triangles).to_csv('triangles-ia-'+str(nt)+'.csv')

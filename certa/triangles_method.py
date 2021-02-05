@@ -188,9 +188,9 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
         for te in filtered:
             filtered_exp[te] = explanations[te]
 
-        return filtered_exp, flippedPredictions_df
+        return filtered_exp, flippedPredictions_df, allTriangles
     else:
-        return [], pd.DataFrame()
+        return [], pd.DataFrame(), []
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1
