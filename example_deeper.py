@@ -8,6 +8,7 @@ from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
 import math
+import random
 
 def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table):
     dataset = pd.DataFrame(columns={col: table[col].dtype for col in copy_from_table})
@@ -74,7 +75,7 @@ gt = pd.read_csv(datadir + 'train.csv')
 valid = pd.read_csv(datadir + 'valid.csv')
 test = pd.read_csv(datadir + 'test.csv')
 
-train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
+train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
 valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 
@@ -87,29 +88,39 @@ emb_dim = len(embeddings_index['cat'])
 embeddings_model, tokenizer = dp.init_embeddings_model(embeddings_index)
 model = dp.init_DeepER_model(emb_dim)
 
-theta_min, theta_max = find_similarities(test_df, False)
 model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
 
+theta_min, theta_max = find_similarities(test_df, False)
+print(f'theta_min={theta_min}, theta_max={theta_max}')
 
-l_tuple = lsource.iloc[4440]
-r_tuple = rsource.iloc[31090]
-for nt in [int(math.log(min(len(lsource), len(rsource)))), 10, 50, 100, 200, 500, 1000]:
+theta_min_strict, theta_max_strict = find_similarities(test_df, True)
+print(f'theta_min_strict={theta_min_strict}, theta_max_strict={theta_max_strict}')
+
+rand_row = train_df.loc[random.randint(0, len(train_df) - 1)]
+l_id = int(rand_row['ltable_id'])
+l_tuple = lsource.iloc[l_id]
+r_id = int(rand_row['rtable_id'])
+r_tuple = rsource.iloc[r_id]
+
+prediction = get_original_prediction(l_tuple, r_tuple)
+class_to_explain = np.argmax(prediction)
+print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={rand_row["label"]}')
+for nt in [int(math.log(min(len(lsource), len(rsource)))), 10, 50, 100, 200]:
     print('running CERTA with nt='+str(nt))
-    local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, theta_min, theta_max, predict_fn,
-                                  num_triangles=nt)
+    for [min, max] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
+        local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, min, max, predict_fn,
+                                      num_triangles=nt)
 
-    prediction = get_original_prediction(l_tuple, r_tuple)
-    class_to_explain = np.argmax(prediction)
+        explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
+                                                   class_to_explain=class_to_explain, maxLenAttributeSet=4)
+        print(explanation)
 
-    explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
-                                               class_to_explain=class_to_explain, maxLenAttributeSet=4)
-    print(explanation)
-
-    for exp in explanation:
-        e_attrs = exp.split('/')
-        e_score = explanation[exp]
-        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
-                                    r_tuple, predict_fn)
-        print(expl_evaluation.head())
-        expl_evaluation.to_csv('expl-ia-'+str(nt)+'_'+str("_".join(e_attrs))+'_'+'.csv')
-    pd.DataFrame(triangles).to_csv('triangles-ia-'+str(nt)+'.csv')
+        for exp in explanation:
+            e_attrs = exp.split('/')
+            e_score = explanation[exp]
+            expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
+                                        r_tuple, predict_fn)
+            print(expl_evaluation.head())
+            expl_evaluation.to_csv('expl-ia-'+str(nt)+'_'+str("_".join(e_attrs))+'_'+str(min)+'-'+str(max)+'.csv')
+        if len(triangles) > 0:
+            pd.DataFrame(triangles).to_csv('triangles-ia-'+str(nt)+'_'+str(min)+'-'+str(max)+'.csv')
