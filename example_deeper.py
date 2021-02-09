@@ -16,7 +16,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
 
     for _, row in table.iterrows():
         leftid = row[left_prefix + 'id']
-        rightid = row[left_prefix + 'id']
+        rightid = row[right_prefix + 'id']
 
         new_row = {column: row[column] for column in copy_from_table}
 
@@ -97,6 +97,7 @@ theta_min_strict, theta_max_strict = find_similarities(test_df, True)
 print(f'theta_min_strict={theta_min_strict}, theta_max_strict={theta_max_strict}')
 
 labelled_match = train_df.loc[(train_df['label'] == 1)]
+labelled_match.to_csv('experiments/ia-lm.csv')
 for i in range(10):
     rand_row = labelled_match.iloc[random.randint(0, len(labelled_match) - 1)]
     l_id = int(rand_row['ltable_id'])
@@ -109,8 +110,8 @@ for i in range(10):
     print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={rand_row["label"]}')
     for nt in [int(math.log(min(len(lsource), len(rsource)))), 10, 50, 100, 200]:
         print('running CERTA with nt='+str(nt))
-        for [min, max] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
-            local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, min, max, predict_fn,
+        for [tmin, tmax] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
+            local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
                                           num_triangles=nt, class_to_explain=class_to_explain)
 
             explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
@@ -125,11 +126,11 @@ for i in range(10):
                 print(expl_evaluation.head())
                 expl_evaluation.to_csv('experiments/ia-'+str(l_id)+'_exp_'+str(nt)+'_'+str("_".join(e_attrs))+'_'+str(min)+'-'+str(max)+'.csv')
             if len(triangles) > 0:
-                pd.DataFrame(triangles).to_csv('experiments/ia-'+str(nt)+'_tri_'+str(min)+'-'+str(max)+'.csv')
+                pd.DataFrame(triangles).to_csv('experiments/ia-tri_'+str(l_id)+'_'+str(nt)+'_'+str(min)+'-'+str(max)+'.csv')
 
             cf_class = abs(1 - int(class_to_explain))
 
-            local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, min, max, predict_fn,
+            local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
                                           num_triangles=nt, class_to_explain=cf_class)
 
             explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples, [lsource, rsource], model, predict_fn,

@@ -68,7 +68,7 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
     unlabeled_df[rprefix + 'id'] = unlabeled_df[rprefix + 'id'].astype(str)
     unlabeled_df['id'] = "0@" + unlabeled_df[lprefix + 'id'] + "#" + "1@" + unlabeled_df[rprefix + 'id']
     unlabeled_df = unlabeled_df.drop(['id1', 'id2', lprefix + 'id', rprefix + 'id'], axis=1)
-    return unlabeled_df
+    return unlabeled_df.drop_duplicates()
 
 
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
