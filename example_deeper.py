@@ -76,6 +76,7 @@ valid = pd.read_csv(datadir + 'valid.csv')
 test = pd.read_csv(datadir + 'test.csv')
 
 train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
+train_df.to_csv('experiments/ia.csv')
 valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 
@@ -98,7 +99,8 @@ print(f'theta_min_strict={theta_min_strict}, theta_max_strict={theta_max_strict}
 
 labelled_match = train_df.loc[(train_df['label'] == 1)]
 labelled_match.to_csv('experiments/ia-lm.csv')
-for i in range(10):
+labelled_match = labelled_match.sample(frac=1)
+for i in range(50):
     rand_row = labelled_match.iloc[random.randint(0, len(labelled_match) - 1)]
     l_id = int(rand_row['ltable_id'])
     l_tuple = lsource.iloc[l_id]
@@ -107,39 +109,42 @@ for i in range(10):
 
     prediction = get_original_prediction(l_tuple, r_tuple)
     class_to_explain = np.argmax(prediction)
-    print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={rand_row["label"]}')
-    for nt in [int(math.log(min(len(lsource), len(rsource)))), 10, 50, 100, 200]:
-        print('running CERTA with nt='+str(nt))
-        for [tmin, tmax] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
-            local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
-                                          num_triangles=nt, class_to_explain=class_to_explain)
+    if 0 == class_to_explain:
+        print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={rand_row["label"]}')
+        for nt in [int(math.log(min(len(lsource), len(rsource)))), 20, 100]:
+            print('running CERTA with nt='+str(nt))
+            for [tmin, tmax] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
+                local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
+                                              num_triangles=nt, class_to_explain=class_to_explain)
+                if len(local_samples) > 2:
+                    explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
+                                                               class_to_explain=class_to_explain, maxLenAttributeSet=4)
+                    print(explanation)
 
-            explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
-                                                       class_to_explain=class_to_explain, maxLenAttributeSet=4)
-            print(explanation)
+                    for exp in explanation:
+                        e_attrs = exp.split('/')
+                        e_score = explanation[exp]
+                        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
+                                                    r_tuple, predict_fn)
+                        print(expl_evaluation.head())
+                        expl_evaluation.to_csv('experiments/ia-'+str(l_id)+'-'+str(r_id)+'_exp_'+str(nt)+'_'+str("_".join(e_attrs))+'_'+str(tmin)+'-'+str(tmax)+'.csv')
+                    if len(triangles) > 0:
+                        pd.DataFrame(triangles).to_csv('experiments/ia-tri_'+str(l_id)+'-'+str(r_id)+'_'+str(nt)+'_'+str(tmin)+'-'+str(tmax)+'.csv')
 
-            for exp in explanation:
-                e_attrs = exp.split('/')
-                e_score = explanation[exp]
-                expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
-                                            r_tuple, predict_fn)
-                print(expl_evaluation.head())
-                expl_evaluation.to_csv('experiments/ia-'+str(l_id)+'_exp_'+str(nt)+'_'+str("_".join(e_attrs))+'_'+str(min)+'-'+str(max)+'.csv')
-            if len(triangles) > 0:
-                pd.DataFrame(triangles).to_csv('experiments/ia-tri_'+str(l_id)+'_'+str(nt)+'_'+str(min)+'-'+str(max)+'.csv')
+                    cf_class = abs(1 - int(class_to_explain))
 
-            cf_class = abs(1 - int(class_to_explain))
+                    local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
+                                                  num_triangles=nt, class_to_explain=cf_class)
 
-            local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
-                                          num_triangles=nt, class_to_explain=cf_class)
+                    if len(local_samples_cf) > 2:
 
-            explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
-                                                                  class_to_explain=cf_class,
-                                                                  maxLenAttributeSet=4)
-            for exp_cf in explanation_cf:
-                e_attrs = exp_cf.split('/')
-                e_score = explanation[exp_cf]
-                cf_expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
-                                            r_tuple, predict_fn)
-                print(cf_expl_evaluation.head())
-                cf_expl_evaluation.to_csv('experiments/ia-'+str(l_id)+'_cf_exp_'+str(nt)+'_'+str("_".join(e_attrs))+'_'+str(min)+'-'+str(max)+'.csv')
+                        explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
+                                                                              class_to_explain=cf_class,
+                                                                              maxLenAttributeSet=4)
+                        for exp_cf in explanation_cf:
+                            e_attrs = exp_cf.split('/')
+                            e_score = explanation[exp_cf]
+                            cf_expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
+                                                        r_tuple, predict_fn)
+                            print(cf_expl_evaluation.head())
+                            cf_expl_evaluation.to_csv('experiments/ia-'+str(l_id)+'-'+str(r_id)+'_cf_exp_'+str(nt)+'_'+str("_".join(e_attrs))+'_'+str(tmin)+'-'+str(tmax)+'.csv')

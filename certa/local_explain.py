@@ -100,22 +100,25 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     id4explanation.to_csv(os.path.join(dataset_dir, tmp_name), index=False)
     unlabeled_df = __generate_unlabeled(dataset_dir, tmp_name)
     os.remove(os.path.join(dataset_dir, tmp_name))
-    unlabeled_predictions = predict_fn(unlabeled_df, model)
-    if findPositives:
-        neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
-    else:
-        neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
-    if len(neighborhood) > num_triangles:
-        neighborhood = neighborhood.sample(n=num_triangles)
-    else:
-        print(f'could only find {len(neighborhood)} triangles of the {num_triangles} requested')
+    if len(unlabeled_df) > 0:
+        unlabeled_predictions = predict_fn(unlabeled_df, model)
+        if findPositives:
+            neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
+        else:
+            neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
+        if len(neighborhood) > num_triangles:
+            neighborhood = neighborhood.sample(n=num_triangles)
+        else:
+            print(f'could only find {len(neighborhood)} triangles of the {num_triangles} requested')
 
-    neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
-                                     neighborhood.match_score.values))
-    neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
-    r1r2['label'] = np.argmax(originalPrediction)
-    dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
-    return dataset4explanation
+        neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
+                                         neighborhood.match_score.values))
+        neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
+        r1r2['label'] = np.argmax(originalPrediction)
+        dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
+        return dataset4explanation
+    else:
+        return pd.DataFrame()
 
 
 def find_similarities(test_df: pd.DataFrame, strict: bool):
