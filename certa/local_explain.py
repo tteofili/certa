@@ -114,7 +114,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     return dataset4explanation
 
 
-def find_similarities(test_df: pd.DataFrame, strict: bool):
+def find_thresholds(test_df: pd.DataFrame, m: float):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     ignore_columns = ['id']
@@ -135,11 +135,7 @@ def find_similarities(test_df: pd.DataFrame, strict: bool):
     lpos_df = tuples_ls_df[tuples_ls_df[2] == 1]
     lneg_df = tuples_ls_df[tuples_ls_df[2] == 0]
 
-    theta_mean_std_max_strict = lpos_df[3].mean()
-    theta_mean_std_min_strict = lneg_df[3].mean()
+    theta_max = lpos_df[3].mean() + m * lpos_df[3].std()
+    theta_min = lneg_df[3].mean() - m * lneg_df[3].std()
 
-    if strict:
-        theta_mean_std_max_strict = theta_mean_std_max_strict + lpos_df[3].std()
-        theta_mean_std_min_strict = theta_mean_std_min_strict - lneg_df[3].std()
-
-    return theta_mean_std_min_strict, theta_mean_std_max_strict
+    return theta_min, theta_max
