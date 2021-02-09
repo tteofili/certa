@@ -88,7 +88,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     if class_to_explain == None:
        findPositives = bool(originalPrediction[0] > originalPrediction[1])
     else:
-        findPositives = bool(1 == int(class_to_explain))
+        findPositives = bool(0 == int(class_to_explain))
     if findPositives:
         candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives)
         candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives)

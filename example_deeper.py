@@ -109,7 +109,7 @@ for i in range(10):
     print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={rand_row["label"]}')
     for nt in [int(math.log(min(len(lsource), len(rsource)))), 10, 50, 100, 200]:
         print('running CERTA with nt='+str(nt))
-        for [min, max] in [[0.4, 0.6], [theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
+        for [min, max] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]]:
             local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, min, max, predict_fn,
                                           num_triangles=nt, class_to_explain=class_to_explain)
 
