@@ -15,7 +15,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
 
     for _, row in table.iterrows():
         leftid = row[left_prefix + 'id']
-        rightid = row[left_prefix + 'id']
+        rightid = row[right_prefix + 'id']
 
         new_row = {column: row[column] for column in copy_from_table}
 
