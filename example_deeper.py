@@ -3,7 +3,7 @@ import numpy as np
 import os
 import gensim.downloader as api
 import models.DeepER as dp
-from certa.local_explain import find_similarities
+from certa.local_explain import find_thresholds
 from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
@@ -91,10 +91,10 @@ model = dp.init_DeepER_model(emb_dim)
 
 model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
 
-theta_min, theta_max = find_similarities(test_df, False)
+theta_min, theta_max = find_thresholds(test_df, -1)
 print(f'theta_min={theta_min}, theta_max={theta_max}')
 
-theta_min_strict, theta_max_strict = find_similarities(test_df, True)
+theta_min_strict, theta_max_strict = find_thresholds(test_df, 0)
 print(f'theta_min_strict={theta_min_strict}, theta_max_strict={theta_max_strict}')
 
 labelled_match = train_df.loc[(train_df['label'] == 1)]
