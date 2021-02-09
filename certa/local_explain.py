@@ -33,7 +33,7 @@ def text_to_vector(text):
 
 
 def find_candidates(record, source, similarity_threshold, find_positives):
-    record2text = " ".join([val for k, val in record.to_dict().items() if k not in ['id']])
+    record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
     source_ids = source.id.values
@@ -73,7 +73,7 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
 
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, dataset_dir, theta_min: float,
-                  theta_max: float, predict_fn, num_triangles=100):
+                  theta_max: float, predict_fn, num_triangles=100, class_to_explain=None):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -85,12 +85,14 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
     originalPrediction = predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
 
-    if originalPrediction[0] > originalPrediction[1]:
-        findPositives = True
+    if class_to_explain == None:
+       findPositives = bool(originalPrediction[0] > originalPrediction[1])
+    else:
+        findPositives = bool(1 == int(class_to_explain))
+    if findPositives:
         candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives)
         candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives)
     else:
-        findPositives = False
         candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives)
         candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives)
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
