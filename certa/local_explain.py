@@ -33,7 +33,7 @@ def text_to_vector(text):
 
 
 def find_candidates(record, source, similarity_threshold, find_positives):
-    record2text = " ".join([val for k, val in record.to_dict().items() if k not in ['id']])
+    record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
     source_ids = source.id.values
