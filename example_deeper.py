@@ -89,23 +89,32 @@ model = dp.init_DeepER_model(emb_dim)
 
 model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
 
-theta_min, theta_max = find_thresholds(test_df, -2)
+theta_min, theta_max = find_thresholds(train_df, -2)
 
 l_tuple = lsource.iloc[19]
 r_tuple = rsource.iloc[27]
-local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, theta_min, theta_max, predict_fn,
-                              num_triangles=10)
 
 prediction = get_original_prediction(l_tuple, r_tuple)
 class_to_explain = np.argmax(prediction)
+
+local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, theta_min, theta_max, predict_fn,
+                              num_triangles=10)
 
 explanation, flipped_pred = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
                                            class_to_explain=class_to_explain, maxLenAttributeSet=3)
 print(explanation)
 
+eval_data = []
 for exp in explanation:
     e_attrs = exp.split('/')
     e_score = explanation[exp]
     expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
                                 r_tuple, predict_fn)
     print(expl_evaluation.head())
+    impact_score = expl_evaluation["impact"].mean()
+    mean_drop = expl_evaluation["drop"].mean()
+    eval_data.append([impact_score, mean_drop])
+
+eval_data_df = pd.DataFrame(eval_data, columns=['impact-score', 'mean-drop'])
+print(f'aggregated impact-score:{eval_data_df["impact-score"].mean()}')
+print(f'aggregated mean-drop:{eval_data_df["mean-drop"].mean()}')
