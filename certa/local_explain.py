@@ -109,12 +109,15 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         if len(neighborhood) > num_triangles:
             neighborhood = neighborhood.sample(n=num_triangles)
         else:
-            print(f'could only find {len(neighborhood)} triangles of the {num_triangles} requested')
+            print(f'could only find {len(neighborhood)} neighbors of the {num_triangles} requested')
 
         neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                          neighborhood.match_score.values))
         neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
-        r1r2['label'] = np.argmax(originalPrediction)
+        if class_to_explain == None:
+            r1r2['label'] = np.argmax(originalPrediction)
+        else:
+            r1r2['label'] = class_to_explain
         dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
         return dataset4explanation
     else:
