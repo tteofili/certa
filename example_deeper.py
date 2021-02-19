@@ -120,7 +120,7 @@ for [tmin, tmax] in [[theta_min, theta_max],[theta_min_strict, theta_max_strict]
             print('running CERTA with nt='+str(nt))
             print(f'generating explanation')
             local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
-                                          num_triangles=nt, class_to_explain=class_to_explain)
+                                          num_triangles=nt, class_to_explain=class_to_explain, use_predict=True)
             if len(local_samples) > 2:
                 explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
                                                            class_to_explain=class_to_explain, maxLenAttributeSet=4)
