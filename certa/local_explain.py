@@ -52,6 +52,39 @@ def find_candidates(record, source, similarity_threshold, find_positives):
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
 
+def get_original_prediction(r1, r2, predict_fn):
+    lprefix = 'ltable_'
+    rprefix = 'rtable_'
+    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
+    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
+    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
+    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
+    r1r2 = pd.concat([r1_df, r2_df], axis=1)
+    #r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
+    #r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
+    return predict_fn(r1r2, None)[['nomatch_score', 'match_score']].values[0]
+
+
+def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn):
+    source_without_id = source.copy()
+    source_without_id = source_without_id.drop(['id'], axis=1)
+    record_without_id = record.copy().drop(['id'])
+    source_ids = source.id.values
+    # for a faster iteration
+    #source_without_id = source_without_id.values
+    candidates = []
+    for idx in range(len(source_without_id)):
+        row = source_without_id.iloc[idx]
+        prediction = get_original_prediction(record_without_id, row, predict_fn)
+        if find_positives:
+            if prediction[1] >= similarity_threshold:
+                candidates.append((record['id'], source_ids[idx]))
+        else:
+            if prediction[1] < similarity_threshold:
+                candidates.append((record['id'], source_ids[idx]))
+    return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
+
+
 def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rprefix='rtable_'):
     df_tableA = pd.read_csv(os.path.join(dataset_dir, 'tableA.csv'), dtype=str)
     df_tableB = pd.read_csv(os.path.join(dataset_dir, 'tableB.csv'), dtype=str)
@@ -73,7 +106,7 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
 
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, dataset_dir, theta_min: float,
-                  theta_max: float, predict_fn, num_triangles=100, class_to_explain=None):
+                  theta_max: float, predict_fn, num_triangles=100, class_to_explain = None, use_predict: bool = None):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -90,11 +123,19 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     else:
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
-        candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives)
-        candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives)
+        if use_predict:
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn)
+        else:
+            candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives)
+            candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives)
     else:
-        candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives)
-        candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives)
+        if use_predict:
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn)
+        else:
+            candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives)
+            candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives)
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     id4explanation.to_csv(os.path.join(dataset_dir, tmp_name), index=False)
