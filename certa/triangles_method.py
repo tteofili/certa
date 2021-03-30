@@ -32,6 +32,7 @@ def _powerset(xs, minlen, maxlen):
 
 
 def getMixedTriangles(dataset, sources):
+    # a triangle is a triple <u, v, w> where <u, v> is a match and <v, w> is a non-match
     triangles = []
     # to not alter original dataset
     dataset_c = dataset.copy()
@@ -45,7 +46,7 @@ def getMixedTriangles(dataset, sources):
         dataset_c['rtable_id'] = list(map(lambda lrid: str(lrid).split("#")[1], dataset_c.id.values))
     positives = dataset_c[dataset_c.label == 1]  # match classified samples
     negatives = dataset_c[dataset_c.label == 0]  # no-match classified samples
-    l_pos_ids = positives.ltable_id.astype('str').values  # left ids of positive smples
+    l_pos_ids = positives.ltable_id.astype('str').values  # left ids of positive samples
     r_pos_ids = positives.rtable_id.astype('str').values  # right ids of positive samples
     for lid, rid in zip(l_pos_ids, r_pos_ids):  # iterate through l_id, r_id pairs
         if np.count_nonzero(
@@ -74,7 +75,6 @@ def getNegativeTriangles(dataset, sources):
     r_neg_ids = negatives.rtable_id.values
     for lid, rid in zip(l_neg_ids, r_neg_ids):
         if np.count_nonzero(r_neg_ids == rid) >= 2:
-
             relatedTuples = negatives[negatives.rtable_id == rid]
             for curr_lid in relatedTuples.ltable_id.values:
                 if curr_lid != lid:

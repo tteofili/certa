@@ -2,6 +2,7 @@ import pandas as pd
 import math, re, os, random, string
 from collections import Counter
 import numpy as np
+from certa.edit_dna import Sequence
 
 '''
 N.B. For now this script can only work using deepmatcher
@@ -80,7 +81,7 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
             if prediction[1] >= similarity_threshold:
                 candidates.append((record['id'], source_ids[idx]))
         else:
-            if prediction[1] < similarity_threshold:
+            if prediction[1] <= similarity_threshold:
                 candidates.append((record['id'], source_ids[idx]))
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
@@ -104,9 +105,51 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
     return unlabeled_df.drop_duplicates()
 
 
+def copy_EDIT(series, n, d):
+    copy = series.copy()
+    if n == -1:
+        l_idx = random.randint(0, int(len(series)/2))
+        r_idx = l_idx + int(len(series)/2)
+        o_l_val = str(copy.get(l_idx))
+        l_val = o_l_val
+        while l_val == o_l_val:
+            l_val = copy_EDIT_match([o_l_val], d)[0]
+        o_r_val = str(copy.get(r_idx))
+        r_val = o_r_val
+        while o_r_val == r_val:
+            r_val = copy_EDIT_match([o_r_val], d)[0]
+        copy.update(pd.Series([l_val, r_val], index=[l_idx, r_idx]))
+    else:
+        o_r_val = str(copy.get(n))
+        r_val = o_r_val
+        while o_r_val == r_val:
+            changed = copy_EDIT_match([o_r_val], d)
+            r_val = changed[0]
+        copy[n] = r_val
+    return copy
+
+
+def copy_EDIT_match(tupla, d):
+    copy_tup = []
+
+    for i in range(len(tupla)):
+        attr = Sequence(tupla[i])
+        if len(tupla[i]) > 1:
+            n = 3  # number of strings in result
+            mutates = attr.mutate(d, n)
+            copy_tup.append(str(mutates[1]))
+        else:
+            copy_tup.append(tupla[i])
+
+    if copy_tup == tupla:
+        copy_tup = copy_EDIT_match(tupla, d)
+    # print(copy_tup)
+    return copy_tup
+
+
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, dataset_dir, theta_min: float,
-                  theta_max: float, predict_fn, num_triangles=100, class_to_explain = None, use_predict: bool = None):
+                  theta_max: float, predict_fn, num_triangles=100, class_to_explain=None, use_predict: bool = None):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -141,17 +184,34 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     id4explanation.to_csv(os.path.join(dataset_dir, tmp_name), index=False)
     unlabeled_df = __generate_unlabeled(dataset_dir, tmp_name)
     os.remove(os.path.join(dataset_dir, tmp_name))
+    neighborhood = pd.DataFrame()
     if len(unlabeled_df) > 0:
-        unlabeled_predictions = predict_fn(unlabeled_df, model)
-        if findPositives:
-            neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
-        else:
-            neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
+        neighborhood = get_neighbors(findPositives, model, predict_fn, unlabeled_df)
         if len(neighborhood) > num_triangles:
             neighborhood = neighborhood.sample(n=num_triangles)
         else:
-            print(f'could only find {len(neighborhood)} neighbors of the {num_triangles} requested')
+            print(f'could find {len(neighborhood)} neighbors of the {num_triangles} requested')
 
+    if len(neighborhood) < num_triangles:
+        r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
+        r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
+        r1_df.columns = list(map(lambda col: 'ltable_' + col, r1_df.columns))
+        r2_df.columns = list(map(lambda col: 'rtable_' + col, r2_df.columns))
+        r1r2c = pd.concat([r1_df, r2_df], axis=1)
+        original = r1r2c.iloc[0].copy()
+        for i in range(1, num_triangles):
+            t_len = len(r1r2c.columns)
+            for n in range(int(t_len / 2) + 1, t_len):
+                copy = original.copy()
+                mp = len(str(copy.get(n)))
+                for t in range(1, mp - 1):
+                    edit = copy_EDIT(copy, n, t)
+                    r1r2c = r1r2c.append(edit, ignore_index=True)
+        r1r2c['id'] = "0@" + r1r2c[lprefix+'id'].astype(str) + "#" + "1@" + r1r2c[rprefix+'id'].astype(str)
+        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, r1r2c)], axis=0)
+        print(f'copy-edit neighborhood: {len(neighborhood)}')
+
+    if len(neighborhood) > 0:
         neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                          neighborhood.match_score.values))
         neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
@@ -163,6 +223,15 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         return dataset4explanation
     else:
         return pd.DataFrame()
+
+
+def get_neighbors(findPositives, model, predict_fn, r1r2c):
+    unlabeled_predictions = predict_fn(r1r2c, model)
+    if findPositives:
+        neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
+    else:
+        neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
+    return neighborhood
 
 
 def find_thresholds(test_df: pd.DataFrame, m: float):
