@@ -70,7 +70,7 @@ root_datadir = 'datasets/'
 generate_cf = False
 
 for subdir, dirs, files in os.walk(root_datadir):
-    for dir in dirs[8:]:
+    for dir in dirs:
         if dir == 'temporary':
             continue
         print(f'working on {dir}')
@@ -99,7 +99,7 @@ for subdir, dirs, files in os.walk(root_datadir):
         model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
 
         tmin = 0.5
-        tmax = 0.5
+        tmax = -0.5
 
         evals = pd.DataFrame()
         cf_evals = pd.DataFrame()
@@ -119,7 +119,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                 print('running CERTA with nt='+str(nt))
                 print(f'generating explanation')
                 local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
-                                              num_triangles=nt, class_to_explain=class_to_explain, use_predict=True)
+                                              num_triangles=nt, class_to_explain=class_to_explain, use_predict=False)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
                     explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model,

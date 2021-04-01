@@ -133,8 +133,7 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
             newRecord = triangle[1].copy()  # copy the r1 tuple
             rightRecordId = triangleIds[1]
             for att in subset:
-                newRecord[att] = triangle[2][
-                    att]  # copy the value for the given attribute from no-match l2 tuple into r1
+                newRecord[att] = triangle[2][att]  # copy the value for the given attribute from no-match l2 tuple into r1
             perturbations.append(newRecord)  # append the new record
         else:
             newRecord = triangle[2].copy()  # copy the l2 tuple
@@ -155,6 +154,25 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     return allPerturbations
 
 
+def check_transitivity(triangle, sourcesMap, predict_fn, model):
+    u = pd.DataFrame(sourcesMap.get(int(triangle[0].split('@')[0])).iloc[int(triangle[0].split('@')[1])]).transpose()
+    v = pd.DataFrame(sourcesMap.get(int(triangle[1].split('@')[0])).iloc[int(triangle[1].split('@')[1])]).transpose()
+    v1 = v.copy()
+    w = pd.DataFrame(sourcesMap.get(int(triangle[2].split('@')[0])).iloc[int(triangle[2].split('@')[1])]).transpose()
+    _renameColumnsWithPrefix('ltable_', u)
+    _renameColumnsWithPrefix('rtable_', v)
+    _renameColumnsWithPrefix('ltable_', v1)
+    _renameColumnsWithPrefix('rtable_', w)
+    return check_transitivity_text(model, predict_fn, u, v, v1, w)
+
+
+def check_transitivity_text(model, predict_fn, u, v, v1, w):
+    p1 = predict_fn(pd.concat([u.reset_index(), v.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
+    p2 = predict_fn(pd.concat([v1.reset_index(), w.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
+    p3 = predict_fn(pd.concat([u.reset_index(), w.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
+    return p1[1] >= 0.5 and p2[0] >= 0.5 and p3[0] >= 0.5
+
+
 def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,
                    class_to_explain: int, maxLenAttributeSet: int):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
@@ -162,6 +180,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
     rankings = []
     flippedPredictions = []
     for triangle in tqdm(allTriangles):
+        pre_good = check_transitivity(triangle, sourcesMap, predict_fn, model)
         currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
                                                                class_to_explain)
         currPerturbedAttr = currentPerturbations.alteredAttributes.values
