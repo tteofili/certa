@@ -120,7 +120,7 @@ for subdir, dirs, files in os.walk(root_datadir):
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
             cuts = []
-            for c in range(1):
+            for c in range(2):
                 cuts.append((1+c)*int(up_bound / 100))
 
             for nt in cuts:
@@ -134,6 +134,10 @@ for subdir, dirs, files in os.walk(root_datadir):
                                                                           predict_fn, class_to_explain,
                                                                           maxLenAttributeSet, True)
                     print(explanation)
+                    triangles_df = pd.DataFrame()
+                    if len(triangles) > 0:
+                        triangles_df = pd.DataFrame(triangles)
+                        triangles_df.to_csv('experiments/' + dir + '/deeper-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                     for exp in explanation:
                         e_attrs = exp.split('/')
                         e_score = explanation[exp]
@@ -143,11 +147,14 @@ for subdir, dirs, files in os.walk(root_datadir):
                         expl_evaluation['t_requested'] = nt
                         expl_evaluation['t_obtained'] = len(triangles)
                         expl_evaluation['label'] = label
+                        n_good = triangles_df[3].apply(lambda x: int(x)).sum()
+                        expl_evaluation['t_good'] = n_good
+                        expl_evaluation['t_bad'] = len(triangles_df) - n_good
+
                         evals = evals.append(expl_evaluation, ignore_index=True)
                         os.makedirs('experiments/'+dir, exist_ok=True)
                         evals.to_csv('experiments/'+dir+'/deeper-eval.csv')
-                    if len(triangles) > 0:
-                        pd.DataFrame(triangles).to_csv('experiments/'+dir+'/deeper-tri_'+str(l_id)+'-'+str(r_id)+'_'+str(nt)+'_'+str(tmin)+'-'+str(tmax)+'.csv')
+
 
                     if generate_cf:
                         print(f'generating cf explanation')

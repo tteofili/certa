@@ -32,7 +32,7 @@ def _powerset(xs, minlen, maxlen):
 
 
 def getMixedTriangles(dataset, sources):
-    # a triangle is a triple <u, v, w> where <u, v> is a match and <v, w> is a non-match
+    # a triangle is a triple <u, v, w> where <u, v> is a match and <v, w> is a non-match (<u,w> should be a non-match)
     triangles = []
     # to not alter original dataset
     dataset_c = dataset.copy()
@@ -166,11 +166,28 @@ def check_transitivity(triangle, sourcesMap, predict_fn, model):
     return check_transitivity_text(model, predict_fn, u, v, v1, w)
 
 
-def check_transitivity_text(model, predict_fn, u, v, v1, w):
+def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = True):
     p1 = predict_fn(pd.concat([u.reset_index(), v.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
     p2 = predict_fn(pd.concat([v1.reset_index(), w.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
     p3 = predict_fn(pd.concat([u.reset_index(), w.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
-    return p1[1] >= 0.5 and p2[0] >= 0.5 and p3[0] >= 0.5
+    if strict:
+        return p1[1] >= 0.5 and p2[0] >= 0.5 and p3[0] >= 0.5
+    else :
+        matches = 0
+        non_matches = 0
+        if p1[1] >= 0.5:
+            matches += 1
+        else:
+            non_matches +=1
+        if p2[1] >= 0.5:
+            matches += 1
+        else:
+            non_matches +=1
+        if p3[1] >= 0.5:
+            matches += 1
+        else:
+            non_matches +=1
+        return matches == 3 or non_matches == 3 or (matches == 1 and non_matches == 2)
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,

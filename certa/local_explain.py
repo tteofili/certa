@@ -60,6 +60,13 @@ def find_candidates(record, source, similarity_threshold, find_positives, lj=Tru
 
 
 def get_original_prediction(r1, r2, predict_fn):
+    r1r2 = get_row(r1, r2)
+    #r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
+    #r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
+    return predict_fn(r1r2, None)[['nomatch_score', 'match_score']].values[0]
+
+
+def get_row(r1, r2):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -67,35 +74,25 @@ def get_original_prediction(r1, r2, predict_fn):
     r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
     r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
     r1r2 = pd.concat([r1_df, r2_df], axis=1)
-    #r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    #r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    return predict_fn(r1r2, None)[['nomatch_score', 'match_score']].values[0]
+    return r1r2
 
 
 def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True):
-    source_without_id = source.copy()
-    source_without_id = source_without_id.drop(['id'], axis=1)
-    record_without_id = record.copy().drop(['id'])
-    source_ids = source.id.values
-    # for a faster iteration
-    #source_without_id = source_without_id.values
-    candidates = []
-    for idx in range(len(source_without_id)):
-        row = source_without_id.iloc[idx]
-        prediction = get_original_prediction(record_without_id, row, predict_fn)
-        if find_positives:
-            if prediction[1] >= similarity_threshold:
-                if lj:
-                    candidates.append((record['id'], source_ids[idx]))
-                else:
-                    candidates.append((source_ids[idx], record['id']))
+    temp = []
+    for i in range(len(source)):
+        if lj:
+            row = get_row(record, source.iloc[i].copy())
+            temp.append(row)
         else:
-            if prediction[1] <= similarity_threshold:
-                if lj:
-                    candidates.append((record['id'], source_ids[idx]))
-                else:
-                    candidates.append((source_ids[idx], record['id']))
-    return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
+            row = get_row(source.iloc[i].copy(), record)
+            temp.append(row)
+
+    predicted = predict_fn(pd.concat(temp, axis=0), None)
+    if find_positives:
+        result = predicted[predicted["match_score"] > similarity_threshold][['ltable_id', 'rtable_id']]
+    else:
+        result = predicted[predicted["match_score"] < similarity_threshold][['ltable_id', 'rtable_id']]
+    return result
 
 
 def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rprefix='rtable_'):
