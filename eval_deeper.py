@@ -120,8 +120,8 @@ for subdir, dirs, files in os.walk(root_datadir):
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
             cuts = []
-            for c in range(10):
-                cuts.append((1+c)*int(up_bound / 10))
+            for c in range(1):
+                cuts.append((1+c)*int(up_bound / 100))
 
             for nt in cuts:
                 print('running CERTA with nt='+str(nt))
@@ -131,8 +131,8 @@ for subdir, dirs, files in os.walk(root_datadir):
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
                     explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model,
-                                                                          predict_fn, class_to_explain=class_to_explain,
-                                                                          maxLenAttributeSet=maxLenAttributeSet, True)
+                                                                          predict_fn, class_to_explain,
+                                                                          maxLenAttributeSet, True)
                     print(explanation)
                     for exp in explanation:
                         e_attrs = exp.split('/')

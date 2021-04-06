@@ -33,7 +33,7 @@ def text_to_vector(text):
     return Counter(words)
 
 
-def find_candidates(record, source, similarity_threshold, find_positives):
+def find_candidates(record, source, similarity_threshold, find_positives, lj=True):
     record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
@@ -46,10 +46,16 @@ def find_candidates(record, source, similarity_threshold, find_positives):
         currentSimilarity = get_cosine(record2text, currentRecord)
         if find_positives:
             if currentSimilarity >= similarity_threshold:
-                candidates.append((record['id'], source_ids[idx]))
+                if lj:
+                    candidates.append((record['id'], source_ids[idx]))
+                else:
+                    candidates.append((source_ids[idx], record['id']))
         else:
             if currentSimilarity < similarity_threshold:
-                candidates.append((record['id'], source_ids[idx]))
+                if lj:
+                    candidates.append((record['id'], source_ids[idx]))
+                else:
+                    candidates.append((source_ids[idx], record['id']))
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
 
@@ -66,7 +72,7 @@ def get_original_prediction(r1, r2, predict_fn):
     return predict_fn(r1r2, None)[['nomatch_score', 'match_score']].values[0]
 
 
-def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn):
+def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True):
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
     record_without_id = record.copy().drop(['id'])
@@ -79,10 +85,16 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
         prediction = get_original_prediction(record_without_id, row, predict_fn)
         if find_positives:
             if prediction[1] >= similarity_threshold:
-                candidates.append((record['id'], source_ids[idx]))
+                if lj:
+                    candidates.append((record['id'], source_ids[idx]))
+                else:
+                    candidates.append((source_ids[idx], record['id']))
         else:
             if prediction[1] <= similarity_threshold:
-                candidates.append((record['id'], source_ids[idx]))
+                if lj:
+                    candidates.append((record['id'], source_ids[idx]))
+                else:
+                    candidates.append((source_ids[idx], record['id']))
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
 
@@ -149,7 +161,8 @@ def copy_EDIT_match(tupla, d):
 
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, dataset_dir, theta_min: float,
-                  theta_max: float, predict_fn, num_triangles=100, class_to_explain=None, use_predict: bool = None):
+                  theta_max: float, predict_fn, num_triangles: int = 100, class_to_explain: int = None,
+                  use_predict: bool = True, generate_perturb: bool = False):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -167,18 +180,18 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn)
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False)
         else:
-            candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives)
-            candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives)
+            candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
+            candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False)
     else:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn)
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False)
         else:
-            candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives)
-            candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives)
+            candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)
+            candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False)
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     id4explanation.to_csv(os.path.join(dataset_dir, tmp_name), index=False)
@@ -192,7 +205,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         else:
             print(f'could find {len(neighborhood)} neighbors of the {num_triangles} requested')
 
-    if len(neighborhood) < num_triangles:
+    if generate_perturb and len(neighborhood) < num_triangles:
         r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
         r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
         r1_df.columns = list(map(lambda col: 'ltable_' + col, r1_df.columns))
