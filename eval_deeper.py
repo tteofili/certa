@@ -120,7 +120,7 @@ for subdir, dirs, files in os.walk(root_datadir):
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
             cuts = []
-            for c in range(2):
+            for c in range(1):
                 cuts.append((1+c)*int(up_bound / 100))
 
             for nt in cuts:
