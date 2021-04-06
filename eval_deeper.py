@@ -159,8 +159,7 @@ for subdir, dirs, files in os.walk(root_datadir):
 
                             if len(local_samples_cf) > 2:
                                 explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
-                                                                                      class_to_explain=cf_class,
-                                                                                      maxLenAttributeSet=maxLenAttributeSet)
+                                                                                      cf_class, maxLenAttributeSet, True)
                                 for exp_cf in explanation_cf:
                                     e_attrs = exp_cf.split('/')
                                     e_score = explanation_cf[exp_cf]
