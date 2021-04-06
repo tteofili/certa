@@ -85,7 +85,7 @@ for subdir, dirs, files in os.walk(root_datadir):
         train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
         train_df.to_csv('experiments/ia.csv')
         valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
-        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
+        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
 
         if not os.path.exists('models/glove.6B.50d.txt'):
             word_vectors = api.load("glove-wiki-gigaword-50")
@@ -99,12 +99,13 @@ for subdir, dirs, files in os.walk(root_datadir):
         model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
 
         tmin = 0.5
-        tmax = -0.5
+        tmax = 0.5
 
         evals = pd.DataFrame()
         cf_evals = pd.DataFrame()
-        for i in range(250):
-            rand_row = train_df.iloc[random.randint(0, len(train_df) - 1)]
+        for i in range(len(test_df)):
+            #rand_row = train_df.iloc[random.randint(0, len(train_df) - 1)]
+            rand_row = test_df.iloc[i]
             l_id = int(rand_row['ltable_id'])
             l_tuple = lsource.iloc[l_id]
             r_id = int(rand_row['rtable_id'])
@@ -115,16 +116,23 @@ for subdir, dirs, files in os.walk(root_datadir):
 
             label = rand_row["label"]
             print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={label}')
-            for nt in [10, 50, 100, 250, 500, 1000]:
+
+            # get triangle 'cuts' depending on the length of the sources
+            up_bound = min(len(lsource), len(rsource))
+            cuts = []
+            for c in range(10):
+                cuts.append((1+c)*int(up_bound / 10))
+
+            for nt in cuts:
                 print('running CERTA with nt='+str(nt))
                 print(f'generating explanation')
                 local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
-                                              num_triangles=nt, class_to_explain=class_to_explain, use_predict=False)
+                                              num_triangles=nt, class_to_explain=class_to_explain, use_predict=True)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
                     explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model,
                                                                           predict_fn, class_to_explain=class_to_explain,
-                                                                          maxLenAttributeSet=maxLenAttributeSet)
+                                                                          maxLenAttributeSet=maxLenAttributeSet, True)
                     print(explanation)
                     for exp in explanation:
                         e_attrs = exp.split('/')

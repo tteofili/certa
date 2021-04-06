@@ -174,13 +174,14 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w):
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,
-                   class_to_explain: int, maxLenAttributeSet: int):
+                   class_to_explain: int, maxLenAttributeSet: int, check_transitivity: bool):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     rankings = []
     flippedPredictions = []
     for triangle in tqdm(allTriangles):
-        pre_good = check_transitivity(triangle, sourcesMap, predict_fn, model)
+        if check_transitivity:
+            pre_good = check_transitivity(triangle, sourcesMap, predict_fn, model)
         currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
                                                                class_to_explain)
         currPerturbedAttr = currentPerturbations.alteredAttributes.values
