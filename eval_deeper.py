@@ -71,6 +71,7 @@ generate_cf = False
 
 for subdir, dirs, files in os.walk(root_datadir):
     for dir in dirs:
+        os.makedirs('experiments/' + dir, exist_ok=True)
         if dir == 'temporary':
             continue
         print(f'working on {dir}')
@@ -152,7 +153,6 @@ for subdir, dirs, files in os.walk(root_datadir):
                         expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                         evals = evals.append(expl_evaluation, ignore_index=True)
-                        os.makedirs('experiments/'+dir, exist_ok=True)
                         evals.to_csv('experiments/'+dir+'/deeper-eval.csv')
 
 
