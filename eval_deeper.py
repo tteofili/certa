@@ -6,7 +6,7 @@ import models.DeepER as dp
 from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
-import random
+
 
 def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table):
     dataset = pd.DataFrame(columns={col: table[col].dtype for col in copy_from_table})
@@ -105,7 +105,6 @@ for subdir, dirs, files in os.walk(root_datadir):
         evals = pd.DataFrame()
         cf_evals = pd.DataFrame()
         for i in range(len(test_df)):
-            #rand_row = train_df.iloc[random.randint(0, len(train_df) - 1)]
             rand_row = test_df.iloc[i]
             l_id = int(rand_row['ltable_id'])
             l_tuple = lsource.iloc[l_id]
@@ -121,13 +120,14 @@ for subdir, dirs, files in os.walk(root_datadir):
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
             cuts = []
-            for c in range(1):
-                cuts.append((1+c)*int(up_bound / 100))
+            for c in range(5):
+                cuts.append((1 + c) * int(up_bound / 100))
 
             for nt in cuts:
-                print('running CERTA with nt='+str(nt))
+                print('running CERTA with nt=' + str(nt))
                 print(f'generating explanation')
-                local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
+                local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax,
+                                              predict_fn,
                                               num_triangles=nt, class_to_explain=class_to_explain, use_predict=True)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
@@ -138,11 +138,14 @@ for subdir, dirs, files in os.walk(root_datadir):
                     triangles_df = pd.DataFrame()
                     if len(triangles) > 0:
                         triangles_df = pd.DataFrame(triangles)
-                        triangles_df.to_csv('experiments/' + dir + '/deeper-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
+                        triangles_df.to_csv(
+                            'experiments/' + dir + '/deeper-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                     for exp in explanation:
                         e_attrs = exp.split('/')
                         e_score = explanation[exp]
-                        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
+                        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model,
+                                                    prediction, rsource,
                                                     r_tuple, predict_fn)
                         print(expl_evaluation.head())
                         expl_evaluation['t_requested'] = nt
@@ -153,25 +156,29 @@ for subdir, dirs, files in os.walk(root_datadir):
                         expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                         evals = evals.append(expl_evaluation, ignore_index=True)
-                        evals.to_csv('experiments/'+dir+'/deeper-eval.csv')
-
+                        evals.to_csv('experiments/' + dir + '/deeper-eval.csv')
 
                     if generate_cf:
                         print(f'generating cf explanation')
                         try:
                             cf_class = abs(1 - int(class_to_explain))
 
-                            local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax, predict_fn,
-                                                          num_triangles=nt, class_to_explain=cf_class)
+                            local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin,
+                                                             tmax, predict_fn,
+                                                             num_triangles=nt, class_to_explain=cf_class)
 
                             if len(local_samples_cf) > 2:
-                                explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples, [lsource, rsource], model, predict_fn,
-                                                                                      cf_class, maxLenAttributeSet, True)
+                                explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples,
+                                                                                               [lsource, rsource],
+                                                                                               model, predict_fn,
+                                                                                               cf_class,
+                                                                                               maxLenAttributeSet, True)
                                 for exp_cf in explanation_cf:
                                     e_attrs = exp_cf.split('/')
                                     e_score = explanation_cf[exp_cf]
-                                    cf_expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model, prediction, rsource,
-                                                                r_tuple, predict_fn)
+                                    cf_expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple,
+                                                                   model, prediction, rsource,
+                                                                   r_tuple, predict_fn)
                                     cf_expl_evaluation['t_requested'] = nt
                                     cf_expl_evaluation['t_obtained'] = len(triangles_cf)
                                     cf_expl_evaluation['label'] = label
@@ -180,10 +187,11 @@ for subdir, dirs, files in os.walk(root_datadir):
                                     cf_evals.to_csv('experiments/ia-eval-cf.csv')
                                 if len(triangles_cf) > 0:
                                     pd.DataFrame(triangles_cf).to_csv(
-                                        'experiments/ia-tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(nt) + '_' + str(
+                                        'experiments/ia-tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                            nt) + '_' + str(
                                             tmin) + '-' + str(tmax) + '.csv')
                         except:
                             pass
-        evals.to_csv("experiments/"+dir+"_eval_"+str(tmin)+'-'+str(tmax)+'.csv')
+        evals.to_csv("experiments/" + dir + "deeper_eval_" + str(tmin) + '-' + str(tmax) + '.csv')
         if generate_cf:
-            cf_evals.to_csv("experiments/"+dir+"_eval_cf_"+str(tmin)+'-'+str(tmax)+'.csv')
+            cf_evals.to_csv("experiments/" + dir + "_eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')

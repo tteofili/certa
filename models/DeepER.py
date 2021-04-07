@@ -193,7 +193,7 @@ def train_model_ER(data, model, embeddings_model, tokenizer, pretraining=False, 
     model.fit([x1, x2], labels, batch_size=param_batch_size, epochs=64, validation_split=0.2, callbacks=[es, mc])
 
     # Carica il miglior modello checkpointed
-    model = load_model(f'{model_name}_best_model{end}.h5')
+    #model = load_model(f'{model_name}_best_model{end}.h5')
 
     return model
 
