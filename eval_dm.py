@@ -6,6 +6,7 @@ import models.DeepER as dp
 from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
+from models.dm import DMERModel
 
 
 def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table):
@@ -88,16 +89,8 @@ for subdir, dirs, files in os.walk(root_datadir):
         valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
         test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
 
-        if not os.path.exists('models/glove.6B.50d.txt'):
-            word_vectors = api.load("glove-wiki-gigaword-50")
-            word_vectors.save_word2vec_format('models/glove.6B.50d.txt', binary=False)
-
-        embeddings_index = dp.init_embeddings_index('models/glove.6B.50d.txt')
-        emb_dim = len(embeddings_index['cat'])
-        embeddings_model, tokenizer = dp.init_embeddings_model(embeddings_index)
-        model = dp.init_DeepER_model(emb_dim)
-
-        model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
+        model = DMERModel()
+        model.classic_training(train_df, valid, dir)
 
         tmin = 0.5
         tmax = 0.5
@@ -144,22 +137,19 @@ for subdir, dirs, files in os.walk(root_datadir):
                     for exp in explanation:
                         e_attrs = exp.split('/')
                         e_score = explanation[exp]
-                        try:
-                            expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model,
-                                                        prediction, rsource,
-                                                        r_tuple, predict_fn)
-                            print(expl_evaluation.head())
-                            expl_evaluation['t_requested'] = nt
-                            expl_evaluation['t_obtained'] = len(triangles)
-                            expl_evaluation['label'] = label
-                            n_good = triangles_df[3].apply(lambda x: int(x)).sum()
-                            expl_evaluation['t_good'] = n_good
-                            expl_evaluation['t_bad'] = len(triangles_df) - n_good
+                        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model,
+                                                    prediction, rsource,
+                                                    r_tuple, predict_fn)
+                        print(expl_evaluation.head())
+                        expl_evaluation['t_requested'] = nt
+                        expl_evaluation['t_obtained'] = len(triangles)
+                        expl_evaluation['label'] = label
+                        n_good = triangles_df[3].apply(lambda x: int(x)).sum()
+                        expl_evaluation['t_good'] = n_good
+                        expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
-                            evals = evals.append(expl_evaluation, ignore_index=True)
-                            evals.to_csv('experiments/' + dir + '/deeper-eval.csv')
-                        except:
-                            pass
+                        evals = evals.append(expl_evaluation, ignore_index=True)
+                        evals.to_csv('experiments/' + dir + '/deeper-eval.csv')
 
                     if generate_cf:
                         print(f'generating cf explanation')
