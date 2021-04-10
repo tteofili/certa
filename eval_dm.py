@@ -47,11 +47,7 @@ def to_deeper_data(df: pd.DataFrame):
 
 
 def predict_fn(x, m, ignore_columns=['ltable_id', 'rtable_id', 'label']):
-    data = to_deeper_data(x.drop([c for c in ignore_columns if c in x.columns], axis=1))
-    out = dp.predict(data, model, embeddings_model, tokenizer)
-    out_df = pd.DataFrame(out, columns=['nomatch_score', 'match_score'])
-    out_df.index = x.index
-    return pd.concat([x.copy(), out_df], axis=1)
+    return model.predict(x)
 
 
 def get_original_prediction(r1, r2):
@@ -71,12 +67,13 @@ root_datadir = 'datasets/'
 generate_cf = False
 
 for subdir, dirs, files in os.walk(root_datadir):
-    for dir in dirs:
+    for dir in dirs[1:]:
         os.makedirs('experiments/' + dir, exist_ok=True)
         if dir == 'temporary':
             continue
         print(f'working on {dir}')
         datadir = os.path.join(root_datadir, dir)
+        print(f'reading data from {datadir}')
 
         lsource = pd.read_csv(datadir + '/tableA.csv')
         rsource = pd.read_csv(datadir + '/tableB.csv')
@@ -84,13 +81,20 @@ for subdir, dirs, files in os.walk(root_datadir):
         valid = pd.read_csv(datadir + '/valid.csv')
         test = pd.read_csv(datadir + '/test.csv')
 
-        train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
-        train_df.to_csv('experiments/ia.csv')
-        valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
-        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
+        print('merging sources')
+        train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
+        valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
+        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()
 
+        print('training model')
+        os.makedirs('models/dm/' + dir, exist_ok=True)
+        save_path = 'models/dm/' + dir + '.pth'
         model = DMERModel()
-        model.classic_training(train_df, valid, dir)
+        try:
+            model.load(save_path)
+        except:
+            model.classic_training(train_df, valid_df, dir)
+            model.save(save_path)
 
         tmin = 0.5
         tmax = 0.5

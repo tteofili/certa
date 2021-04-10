@@ -10,7 +10,7 @@ import os
 import string
 
 
-def wrapDm(test_df,model,ignore_columns=['label'],outputAttributes=False,batch_size=32):
+def wrapDm(test_df,model,ignore_columns=['label', 'id'],outputAttributes=True,batch_size=32):
     data = test_df.copy().drop([c for c in ignore_columns if c in test_df.columns],axis=1)
     if not('id' in data.columns):
         data['id'] = np.arange(len(data))
@@ -18,14 +18,18 @@ def wrapDm(test_df,model,ignore_columns=['label'],outputAttributes=False,batch_s
     data.to_csv(tmp_name,index=False)
     with open(os.devnull, 'w') as devnull:
         with contextlib.redirect_stdout(devnull):
-            data_processed = dm.data.process_unlabeled(tmp_name, trained_model = model, ignore_columns=['ltable_id', 'rtable_id', 'target'])
+            data_processed = dm.data.process_unlabeled(tmp_name, trained_model = model, ignore_columns=['ltable_id', 'rtable_id', 'label', 'id'])
             predictions = model.run_prediction(data_processed, output_attributes= outputAttributes,\
                                               batch_size=batch_size)
             out_proba = predictions['match_score'].values
     multi_proba = np.dstack((1-out_proba, out_proba)).squeeze()
     os.remove(tmp_name)
     if outputAttributes:
-        return predictions
+        names = list(test_df.columns)
+        names.extend(['nomatch_score', 'match_score'])
+        full_df = pd.concat([test_df, pd.DataFrame(multi_proba).transpose()], axis=1, ignore_index=True, names=names)
+        full_df.columns = names
+        return full_df
     else:
         return multi_proba
 
@@ -180,7 +184,7 @@ def pair_str_to_df(pair_str, columns, lprefix, rprefix):
 class DMERModel():
 
     def __init__(self):
-        super(DMERModel, self).__init__()
+        #super(DMERModel, self).__init__()
         self.model = dm.MatchingModel(attr_summarizer='hybrid')
 
     def initialize_models(self, data):
@@ -193,13 +197,14 @@ class DMERModel():
         label_valid.to_csv(valid_file, index=False)
 
         # read dataset
-        trainLab, validationLab = dm.data.process(cache=dataset_name+'.pth', path='', train=train_file,
-                                                  validation=valid_file, left_prefix='ltable_', right_prefix='rtable_',)
+        trainLab, validationLab = dm.data.process(cache=dataset_name + '.pth', path='', train=train_file,
+                                                  validation=valid_file, left_prefix='ltable_',
+                                                  right_prefix='rtable_', )
         self.initialize_models(trainLab)
 
         print("TRAINING with " + str(len(trainLab)) + " samples")
         # train default model with standard dataset
-        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth')
+        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth', epochs=3)
 
         stats = self.model.run_eval(validationLab)
 
