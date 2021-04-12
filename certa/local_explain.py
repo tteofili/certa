@@ -87,7 +87,8 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
             row = get_row(source.iloc[i].copy(), record)
             temp.append(row)
 
-    predicted = predict_fn(pd.concat(temp, axis=0), None)
+    samples = pd.concat(temp, axis=0)
+    predicted = predict_fn(samples, None)
     if find_positives:
         result = predicted[predicted["match_score"] > similarity_threshold][['ltable_id', 'rtable_id']]
     else:

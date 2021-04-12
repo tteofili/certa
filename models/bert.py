@@ -1,6 +1,8 @@
 import os
 import string
 import random
+import pandas as pd
+import numpy as np
 
 import emt.model
 import emt.config
@@ -154,7 +156,15 @@ class EMTERModel():
         simple_accuracy, f1, classification_report, predictions = emt.prediction.predict(self.model, device,
                                                                                          test_data_loader)
         os.remove(tmpf)
-        return predictions
+
+        names = list(x.columns)
+        names.extend(['classes', 'labels', 'nomatch_score', 'match_score'])
+        x.index = np.arange(len(x))
+        predictions.index = np.arange(len(predictions))
+        full_df = pd.concat([x, predictions], axis=1, names=names)
+        full_df.columns = names
+        print(full_df.head())
+        return full_df
 
     def load(self, path):
         self.model, self.tokenizer = emt.model.load_model(path, True)

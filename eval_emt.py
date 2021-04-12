@@ -30,20 +30,6 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
     return dataset
 
 
-def to_deeper_data(df: pd.DataFrame):
-    res = []
-    for r in range(len(df)):
-        row = df.iloc[r]
-        lpd = row.filter(regex='^ltable_')
-        rpd = row.filter(regex='^rtable_')
-        if 'label' in row:
-            label = row['label']
-            res.append((lpd.values.astype('str'), rpd.values.astype('str'), label))
-        else:
-            res.append((lpd.values.astype('str'), rpd.values.astype('str')))
-    return res
-
-
 def predict_fn(x, m, ignore_columns=['ltable_id', 'rtable_id', 'label']):
     return model.predict(x)
 
@@ -58,7 +44,8 @@ def get_original_prediction(r1, r2):
     r1r2 = pd.concat([r1_df, r2_df], axis=1)
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
     r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    return predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
+    res = predict_fn(r1r2, model)
+    return res[['nomatch_score', 'match_score']].values[0]
 
 
 root_datadir = 'datasets/'
