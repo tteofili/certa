@@ -121,7 +121,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                     if len(triangles) > 0:
                         triangles_df = pd.DataFrame(triangles)
                         triangles_df.to_csv(
-                            'experiments/' + dir + '/deeper-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                            'experiments/' + dir + '/emt-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                 nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                     for exp in explanation:
                         e_attrs = exp.split('/')
@@ -138,7 +138,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                         expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                         evals = evals.append(expl_evaluation, ignore_index=True)
-                        evals.to_csv('experiments/' + dir + '/deeper-eval.csv')
+                        evals.to_csv('experiments/' + dir + '/emt-eval.csv')
 
                     if generate_cf:
                         print(f'generating cf explanation')
@@ -174,6 +174,6 @@ for subdir, dirs, files in os.walk(root_datadir):
                                             tmin) + '-' + str(tmax) + '.csv')
                         except:
                             pass
-        evals.to_csv("experiments/" + dir + "deeper_eval_" + str(tmin) + '-' + str(tmax) + '.csv')
+        evals.to_csv("experiments/" + dir + "emt_eval_" + str(tmin) + '-' + str(tmax) + '.csv')
         if generate_cf:
-            cf_evals.to_csv("experiments/" + dir + "_eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
+            cf_evals.to_csv("experiments/" + dir + "emt_eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')

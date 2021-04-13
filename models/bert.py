@@ -16,7 +16,7 @@ import emt.prediction
 
 BATCH_SIZE = 8
 
-MAX_SEQ_LENGTH = 128
+MAX_SEQ_LENGTH = 250
 
 class EMTERModel():
 
@@ -53,7 +53,7 @@ class EMTERModel():
             num_epochs = 7
             num_train_steps = len(training_data_loader) * num_epochs
 
-            learning_rate = 1e-5
+            learning_rate = 2e-5
             adam_eps = 1e-8
             warmup_steps = 1
             weight_decay = 0
