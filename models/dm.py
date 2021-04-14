@@ -18,7 +18,9 @@ def wrapDm(test_df,model,ignore_columns=['label', 'id'],outputAttributes=True,ba
     data.to_csv(tmp_name,index=False)
     with open(os.devnull, 'w') as devnull:
         with contextlib.redirect_stdout(devnull):
-            data_processed = dm.data.process_unlabeled(tmp_name, trained_model = model, ignore_columns=['ltable_id', 'rtable_id', 'label', 'id'])
+            data_processed = dm.data.process_unlabeled(tmp_name, trained_model = model,
+                                                       ignore_columns=['ltable_id', 'rtable_id', 'label', 'id',
+                                                                       'originalRightId', 'alteredAttributes'])
             predictions = model.run_prediction(data_processed, output_attributes= outputAttributes,\
                                               batch_size=batch_size)
             out_proba = predictions['match_score'].values
@@ -27,7 +29,11 @@ def wrapDm(test_df,model,ignore_columns=['label', 'id'],outputAttributes=True,ba
     if outputAttributes:
         names = list(test_df.columns)
         names.extend(['nomatch_score', 'match_score'])
-        full_df = pd.concat([test_df, pd.DataFrame(multi_proba).transpose()], axis=1, ignore_index=True, names=names)
+        multi_proba_df = pd.DataFrame(multi_proba)
+        if multi_proba_df.shape[0] != test_df.shape[0]:
+            multi_proba_df = multi_proba_df.transpose()
+        multi_proba_df.index = test_df.index
+        full_df = pd.concat([test_df, multi_proba_df], axis=1, ignore_index=True, names=names)
         full_df.columns = names
         return full_df
     else:
@@ -204,7 +210,7 @@ class DMERModel():
 
         print("TRAINING with " + str(len(trainLab)) + " samples")
         # train default model with standard dataset
-        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth', epochs=3)
+        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth')
 
         stats = self.model.run_eval(validationLab)
 
