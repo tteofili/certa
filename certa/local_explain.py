@@ -113,7 +113,7 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
     unlabeled_df[lprefix + 'id'] = unlabeled_df[lprefix + 'id'].astype(str)
     unlabeled_df[rprefix + 'id'] = unlabeled_df[rprefix + 'id'].astype(str)
     unlabeled_df['id'] = "0@" + unlabeled_df[lprefix + 'id'] + "#" + "1@" + unlabeled_df[rprefix + 'id']
-    unlabeled_df = unlabeled_df.drop(['id1', 'id2', lprefix + 'id', rprefix + 'id'], axis=1)
+    unlabeled_df = unlabeled_df.drop(['id1', 'id2'], axis=1)
     return unlabeled_df.drop_duplicates()
 
 
@@ -200,8 +200,10 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     if len(unlabeled_df) > 0:
         neighborhood = get_neighbors(findPositives, model, predict_fn, unlabeled_df)
 
+    generated_records_df = pd.DataFrame()
     if generate_perturb and len(neighborhood) < num_triangles:
         generated_df = pd.DataFrame()
+        new_copies = []
         for record in [r1, r2]:
             r1_df = pd.DataFrame(data=[record.values], columns=record.index)
             r2_df = pd.DataFrame(data=[record.values], columns=record.index)
@@ -218,10 +220,18 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                     new_val = " ".join(values[cut:])
                     new_copy = original.copy()
                     new_copy[t] = new_val
+                    new_left_record = pd.DataFrame(new_copy).transpose().filter(regex='^'+lprefix).iloc[0]
+                    new_id = len(lsource) + len(new_copies)#str(new_left_record['ltable_id'])+'_'+str(t)+'_'+str(cut)
+                    new_left_record['ltable_id'] = new_id
+                    new_copy['ltable_id'] = new_id
+                    #new_copy.rename(columns=lambda x: x.strip(lprefix))
+                    new_copies.append(new_left_record)
+
                     r1r2c = r1r2c.append(new_copy, ignore_index=True)
             generated_df = pd.concat([generated_df, r1r2c], axis=0)
             #generated_df.columns = r1r2c.columns
 
+        generated_records_df = pd.DataFrame(new_copies).rename(columns=lambda x: x[len(lprefix):])
         generated_df['id'] = "0@" + generated_df[lprefix+'id'].astype(str) + "#" + "1@" + generated_df[rprefix+'id'].astype(str)
         neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, generated_df)], axis=0)
         print(f'+perturbed neighborhood: {len(neighborhood)}')
@@ -240,10 +250,10 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         else:
             r1r2['label'] = class_to_explain
         dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
-        return dataset4explanation
+        return dataset4explanation, generated_records_df
     else:
         print('no triangles found')
-        return pd.DataFrame()
+        return pd.DataFrame(), generated_records_df
 
 
 def get_neighbors(findPositives, model, predict_fn, r1r2c):

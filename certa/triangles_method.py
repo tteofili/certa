@@ -40,12 +40,12 @@ def getMixedTriangles(dataset, sources):
     # the id is so composed: lsourcenumber@id#rsourcenumber@id
     for i in range(len(sources)):
         sourcesmap[i] = sources[i]
-    if not 'ltable_id' in dataset_c.columns:
-        dataset_c['ltable_id'] = list(map(lambda lrid: str(lrid).split("#")[0], dataset_c.id.values))
-    if not 'rtable_id' in dataset_c.columns:
-        dataset_c['rtable_id'] = list(map(lambda lrid: str(lrid).split("#")[1], dataset_c.id.values))
-    positives = dataset_c[dataset_c.label == 1]  # match classified samples
-    negatives = dataset_c[dataset_c.label == 0]  # no-match classified samples
+    #if not 'ltable_id' in dataset_c.columns:
+    dataset_c['ltable_id'] = list(map(lambda lrid: str(lrid).split("#")[0], dataset_c.id.values))
+    #if not 'rtable_id' in dataset_c.columns:
+    dataset_c['rtable_id'] = list(map(lambda lrid: str(lrid).split("#")[1], dataset_c.id.values))
+    positives = dataset_c[dataset_c.label == 1].astype('str')  # match classified samples
+    negatives = dataset_c[dataset_c.label == 0].astype('str')  # no-match classified samples
     l_pos_ids = positives.ltable_id.astype('str').values  # left ids of positive samples
     r_pos_ids = positives.rtable_id.astype('str').values  # right ids of positive samples
     for lid, rid in zip(l_pos_ids, r_pos_ids):  # iterate through l_id, r_id pairs
@@ -155,10 +155,13 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
 
 
 def check_transitivity(triangle, sourcesMap, predict_fn, model):
-    u = pd.DataFrame(sourcesMap.get(int(triangle[0].split('@')[0])).iloc[int(triangle[0].split('@')[1])]).transpose()
-    v = pd.DataFrame(sourcesMap.get(int(triangle[1].split('@')[0])).iloc[int(triangle[1].split('@')[1])]).transpose()
+    t1 = triangle[0].split('@')
+    t2 = triangle[1].split('@')
+    t3 = triangle[2].split('@')
+    u = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
+    v = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
     v1 = v.copy()
-    w = pd.DataFrame(sourcesMap.get(int(triangle[2].split('@')[0])).iloc[int(triangle[2].split('@')[1])]).transpose()
+    w = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
     _renameColumnsWithPrefix('ltable_', u)
     _renameColumnsWithPrefix('rtable_', v)
     _renameColumnsWithPrefix('ltable_', v1)
@@ -166,7 +169,7 @@ def check_transitivity(triangle, sourcesMap, predict_fn, model):
     return check_transitivity_text(model, predict_fn, u, v, v1, w)
 
 
-def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = True):
+def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False):
     p1 = predict_fn(pd.concat([u.reset_index(), v.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
     p2 = predict_fn(pd.concat([v1.reset_index(), w.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]
     p3 = predict_fn(pd.concat([u.reset_index(), w.reset_index()], axis=1), model)[['nomatch_score', 'match_score']].values[0]

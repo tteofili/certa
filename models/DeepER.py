@@ -171,7 +171,8 @@ def replace_last_layer(model, new_layer):
 
 # InPut: Una lista di triple [(tup1, tup2, label), ...], il modello da addestrare...
 # Output: Il modello addestrato
-def train_model_ER(data, model, embeddings_model, tokenizer, pretraining=False, metric='val_accuracy', end=''):
+def train_model_ER(data, model, embeddings_model, tokenizer, pretraining=False, metric='val_accuracy', end='',
+                   save_path=None):
 
     if pretraining:
         model_name = 'VinSim'
@@ -186,7 +187,7 @@ def train_model_ER(data, model, embeddings_model, tokenizer, pretraining=False, 
     # Early stopping (arresta l'apprendimento se non ci sono miglioramenti)
     es = EarlyStopping(monitor=metric, min_delta=0, verbose=1, patience=7)
     # Model checkpointing (salva il miglior modello fin'ora)
-    mc = ModelCheckpoint(f'/models/deeper/{model_name}_best_model_{end}.h5', monitor=metric, verbose=1, save_best_only=True)
+    mc = ModelCheckpoint(f'models/deeper/{model_name}_best_model_{end}.h5', monitor=metric, verbose=1, save_best_only=True)
     # Addestramento modello
     param_batch_size = round(len(data) * 0.015) + 1
     print('Batch size:', param_batch_size)
@@ -194,7 +195,8 @@ def train_model_ER(data, model, embeddings_model, tokenizer, pretraining=False, 
 
     # Carica il miglior modello checkpointed
     #model = load_model(f'{model_name}_best_model{end}.h5')
-
+    if save_path is not None:
+        save(model, save_path)
     return model
 
 

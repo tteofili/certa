@@ -62,8 +62,7 @@ def get_original_prediction(r1, r2):
     r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
     r1r2 = pd.concat([r1_df, r2_df], axis=1)
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    return predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
+    return predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1), model)[['nomatch_score', 'match_score']].values[0]
 
 
 root_datadir = 'datasets/'
@@ -84,7 +83,6 @@ for subdir, dirs, files in os.walk(root_datadir):
         test = pd.read_csv(datadir + '/test.csv')
 
         train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
-        train_df.to_csv('experiments/ia.csv')
         valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
         test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
 
@@ -95,13 +93,13 @@ for subdir, dirs, files in os.walk(root_datadir):
         embeddings_index = dp.init_embeddings_index('models/glove.6B.50d.txt')
         emb_dim = len(embeddings_index['cat'])
         embeddings_model, tokenizer = dp.init_embeddings_model(embeddings_index)
+        path = 'models/deeper/'+dir
         try:
-            path = 'models/deeper/DeepER_best_model_'+dir+'.h5'
-            os.makedirs('models/deeper', exist_ok=True)
+            os.makedirs(path, exist_ok=True)
             model = dp.load_model(path)
         except:
             model = dp.init_DeepER_model(emb_dim)
-            model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer, end=dir)
+            model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer, end=dir, save_path=path)
 
         tmin = 0.5
         tmax = 0.5
@@ -123,20 +121,21 @@ for subdir, dirs, files in os.walk(root_datadir):
 
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
-            cuts = []
-            for c in range(3):
-                cuts.append((1 + c) * int(up_bound / 100))
+            cuts = [100]
+            '''for c in range(3):
+                cuts.append((1 + c) * int(up_bound / 100))'''
 
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
                 print(f'generating explanation')
-                local_samples = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax,
+                local_samples, generated_records_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax,
                                               predict_fn,
                                               num_triangles=nt, class_to_explain=class_to_explain, use_predict=True)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
-                    explanation, flipped_pred, triangles = explainSamples(local_samples, [lsource, rsource], model,
-                                                                          predict_fn, class_to_explain,
+                    explanation, flipped_pred, triangles = explainSamples(local_samples, [pd.concat([lsource, generated_records_df]),
+                                                                                          rsource],
+                                                                          model, predict_fn, class_to_explain,
                                                                           maxLenAttributeSet, True)
                     print(explanation)
                     triangles_df = pd.DataFrame()
