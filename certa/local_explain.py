@@ -77,7 +77,7 @@ def get_row(r1, r2):
     return r1r2
 
 
-def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True):
+def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True, max=-1):
     temp = []
     for i in range(len(source)):
         if lj:
@@ -88,6 +88,8 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
             temp.append(row)
 
     samples = pd.concat(temp, axis=0)
+    if max > 0:
+        samples = samples.sample(frac=1)[:max]
     predicted = predict_fn(samples, None)
     if find_positives:
         result = predicted[predicted["match_score"] > similarity_threshold][['ltable_id', 'rtable_id']]
@@ -160,7 +162,7 @@ def copy_EDIT_match(tupla, d):
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, dataset_dir, theta_min: float,
                   theta_max: float, predict_fn, num_triangles: int = 100, class_to_explain: int = None,
-                  use_predict: bool = True, generate_perturb: bool = True):
+                  use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -169,8 +171,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
     r1r2 = pd.concat([r1_df, r2_df], axis=1)
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    originalPrediction = predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
+    originalPrediction = predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1), model)[['nomatch_score', 'match_score']].values[0]
 
     if class_to_explain == None:
        findPositives = bool(originalPrediction[0] > originalPrediction[1])
@@ -178,15 +179,15 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False)
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True, max=max_predict)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False, max=max_predict)
         else:
             candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
             candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False)
     else:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False)
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True, max=max_predict)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False, max=max_predict)
         else:
             candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)
             candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False)

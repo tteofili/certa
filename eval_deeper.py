@@ -95,9 +95,13 @@ for subdir, dirs, files in os.walk(root_datadir):
         embeddings_index = dp.init_embeddings_index('models/glove.6B.50d.txt')
         emb_dim = len(embeddings_index['cat'])
         embeddings_model, tokenizer = dp.init_embeddings_model(embeddings_index)
-        model = dp.init_DeepER_model(emb_dim)
-
-        model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer)
+        try:
+            path = 'models/deeper/DeepER_best_model_'+dir+'.h5'
+            os.makedirs('models/deeper', exist_ok=True)
+            model = dp.load_model(path)
+        except:
+            model = dp.init_DeepER_model(emb_dim)
+            model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer, end=dir)
 
         tmin = 0.5
         tmax = 0.5
@@ -120,7 +124,7 @@ for subdir, dirs, files in os.walk(root_datadir):
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
             cuts = []
-            for c in range(5):
+            for c in range(3):
                 cuts.append((1 + c) * int(up_bound / 100))
 
             for nt in cuts:

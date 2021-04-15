@@ -186,7 +186,7 @@ def train_model_ER(data, model, embeddings_model, tokenizer, pretraining=False, 
     # Early stopping (arresta l'apprendimento se non ci sono miglioramenti)
     es = EarlyStopping(monitor=metric, min_delta=0, verbose=1, patience=7)
     # Model checkpointing (salva il miglior modello fin'ora)
-    mc = ModelCheckpoint(f'{model_name}_best_model{end}.h5', monitor=metric, verbose=1, save_best_only=True)
+    mc = ModelCheckpoint(f'/models/deeper/{model_name}_best_model_{end}.h5', monitor=metric, verbose=1, save_best_only=True)
     # Addestramento modello
     param_batch_size = round(len(data) * 0.015) + 1
     print('Batch size:', param_batch_size)
