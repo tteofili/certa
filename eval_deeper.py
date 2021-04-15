@@ -95,7 +95,6 @@ for subdir, dirs, files in os.walk(root_datadir):
         embeddings_model, tokenizer = dp.init_embeddings_model(embeddings_index)
         path = 'models/deeper/'+dir
         try:
-            os.makedirs(path, exist_ok=True)
             model = dp.load_model(path)
         except:
             model = dp.init_DeepER_model(emb_dim)
