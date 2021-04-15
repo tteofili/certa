@@ -106,7 +106,7 @@ for subdir, dirs, files in os.walk(root_datadir):
 
         evals = pd.DataFrame()
         cf_evals = pd.DataFrame()
-        for i in range(len(test_df)):
+        for i in range(len(test_df[:50])):
             rand_row = test_df.iloc[i]
             l_id = int(rand_row['ltable_id'])
             l_tuple = lsource.iloc[l_id]
@@ -128,9 +128,10 @@ for subdir, dirs, files in os.walk(root_datadir):
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
                 print(f'generating explanation')
-                local_samples, generated_records_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin, tmax,
-                                              predict_fn,
-                                              num_triangles=nt, class_to_explain=class_to_explain, use_predict=True)
+                local_samples, generated_records_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
+                                                                    tmin, tmax, predict_fn, num_triangles=nt,
+                                                                    class_to_explain=class_to_explain, use_predict=True,
+                                                                    max_predict=1000)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
                     explanation, flipped_pred, triangles = explainSamples(local_samples, [pd.concat([lsource, generated_records_df]),
