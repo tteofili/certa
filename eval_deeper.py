@@ -71,6 +71,8 @@ generate_cf = False
 for subdir, dirs, files in os.walk(root_datadir):
     for dir in dirs[1:]:
         os.makedirs('experiments/' + dir, exist_ok=True)
+        os.makedirs('experiments/' + dir + '/deeper/', exist_ok=True)
+
         if dir == 'temporary':
             continue
         print(f'working on {dir}')
@@ -143,7 +145,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                     if len(triangles) > 0:
                         triangles_df = pd.DataFrame(triangles)
                         triangles_df.to_csv(
-                            'experiments/' + dir + '/deeper-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                            'experiments/' + dir + '/deeper/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                 nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                     for exp in explanation:
                         e_attrs = exp.split('/')
@@ -161,7 +163,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                             expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                             evals = evals.append(expl_evaluation, ignore_index=True)
-                            evals.to_csv('experiments/' + dir + '/deeper-eval.csv')
+                            evals.to_csv('experiments/' + dir + '/deeper/eval.csv')
                         except:
                             pass
 
@@ -191,14 +193,14 @@ for subdir, dirs, files in os.walk(root_datadir):
                                     cf_expl_evaluation['label'] = label
                                     print(cf_expl_evaluation.head())
                                     cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
-                                    cf_evals.to_csv('experiments/ia-eval-cf.csv')
+                                    cf_evals.to_csv('experiments/'+dir+'/deeper/eval-cf.csv')
                                 if len(triangles_cf) > 0:
                                     pd.DataFrame(triangles_cf).to_csv(
-                                        'experiments/ia-tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                        'experiments/'+dir+'/deeper/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                             nt) + '_' + str(
                                             tmin) + '-' + str(tmax) + '.csv')
                         except:
                             pass
-        evals.to_csv("experiments/" + dir + "deeper_eval_" + str(tmin) + '-' + str(tmax) + '.csv')
+        evals.to_csv("experiments/" + dir + "/deeper/eval_" + str(tmin) + '-' + str(tmax) + '.csv')
         if generate_cf:
-            cf_evals.to_csv("experiments/" + dir + "_eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
+            cf_evals.to_csv("experiments/" + dir + "/deeper/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
