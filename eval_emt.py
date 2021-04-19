@@ -52,7 +52,7 @@ root_datadir = 'datasets/'
 generate_cf = False
 
 for subdir, dirs, files in os.walk(root_datadir):
-    for dir in dirs[1:]:
+    for dir in dirs:
         os.makedirs('experiments/' + dir, exist_ok=True)
         os.makedirs('experiments/' + dir + '/emt', exist_ok=True)
         if dir == 'temporary':
