@@ -67,18 +67,18 @@ for subdir, dirs, files in os.walk(root_datadir):
         valid = pd.read_csv(datadir + '/valid.csv')
         test = pd.read_csv(datadir + '/test.csv')
 
-        print('merging sources')
-        train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
-        valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
         test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()
 
-        print('training model')
         os.makedirs('models/bert/' + dir, exist_ok=True)
         save_path = 'models/bert/' + dir
         model = EMTERModel()
         try:
+            print(f'loading model from {save_path}')
             model.load(save_path)
         except:
+            print('training model')
+            train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
+            valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
             model.classic_training(train_df, valid_df, dir)
             model.save(save_path)
 
@@ -102,9 +102,9 @@ for subdir, dirs, files in os.walk(root_datadir):
 
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
-            cuts = []
-            for c in range(5):
-                cuts.append((1 + c) * int(up_bound / 100))
+            cuts = [100]
+            '''for c in range(5):
+                cuts.append((1 + c) * int(up_bound / 100))'''
 
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
