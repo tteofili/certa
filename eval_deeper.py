@@ -69,7 +69,7 @@ root_datadir = 'datasets/'
 generate_cf = False
 
 for subdir, dirs, files in os.walk(root_datadir):
-    for dir in dirs:
+    for dir in dirs[1:]:
         os.makedirs('experiments/' + dir, exist_ok=True)
         if dir == 'temporary':
             continue
@@ -120,21 +120,22 @@ for subdir, dirs, files in os.walk(root_datadir):
 
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
-            cuts = [100]
-            '''for c in range(3):
-                cuts.append((1 + c) * int(up_bound / 100))'''
+            cuts = []
+            for c in range(5):
+                cuts.append((1 + c) * int(up_bound / 100))
 
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
                 print(f'generating explanation')
-                local_samples, generated_records_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
-                                                                    tmin, tmax, predict_fn, num_triangles=nt,
-                                                                    class_to_explain=class_to_explain, use_predict=True,
-                                                                    max_predict=1000)
+                local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
+                                                                   tmin, tmax, predict_fn, num_triangles=nt,
+                                                                   class_to_explain=class_to_explain, use_predict=True,
+                                                                   max_predict=5000)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
-                    explanation, flipped_pred, triangles = explainSamples(local_samples, [pd.concat([lsource, generated_records_df]),
-                                                                                          rsource],
+                    explanation, flipped_pred, triangles = explainSamples(local_samples,
+                                                                          [pd.concat([lsource, gleft_df, gright_df]),
+                                                                           pd.concat([rsource, gright_df, gleft_df])],
                                                                           model, predict_fn, class_to_explain,
                                                                           maxLenAttributeSet, True)
                     print(explanation)

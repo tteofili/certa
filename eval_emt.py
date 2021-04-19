@@ -108,14 +108,15 @@ for subdir, dirs, files in os.walk(root_datadir):
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
                 print(f'generating explanation')
-                local_samples, generated_records_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
+                local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
                                                                     tmin, tmax, predict_fn, num_triangles=nt,
                                                                     class_to_explain=class_to_explain, use_predict=True,
                                                                     max_predict=500)
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
-                    explanation, flipped_pred, triangles = explainSamples(local_samples, [pd.concat([lsource, generated_records_df]),
-                                                                                          rsource],
+                    explanation, flipped_pred, triangles = explainSamples(local_samples,
+                                                                          [pd.concat([lsource, gleft_df, gright_df]),
+                                                                           pd.concat([rsource, gright_df, gleft_df])],
                                                                           model, predict_fn, class_to_explain,
                                                                           maxLenAttributeSet, True)
                     print(explanation)
