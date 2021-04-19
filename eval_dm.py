@@ -69,6 +69,7 @@ generate_cf = False
 for subdir, dirs, files in os.walk(root_datadir):
     for dir in dirs:
         os.makedirs('experiments/' + dir, exist_ok=True)
+        os.makedirs('experiments/' + dir + '/dm', exist_ok=True)
         if dir == 'temporary':
             continue
         print(f'working on {dir}')
@@ -116,9 +117,9 @@ for subdir, dirs, files in os.walk(root_datadir):
 
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
-            cuts = [100]
-            '''for c in range(3):
-                cuts.append((1 + c) * int(up_bound / 100))'''
+            cuts = []
+            for c in range(5):
+                cuts.append((1 + c) * int(up_bound / 100))
 
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
@@ -139,7 +140,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                     if len(triangles) > 0:
                         triangles_df = pd.DataFrame(triangles)
                         triangles_df.to_csv(
-                            'experiments/' + dir + '/dm-tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                            'experiments/' + dir + '/dm/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                 nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                     for exp in explanation:
                         e_attrs = exp.split('/')
@@ -156,7 +157,7 @@ for subdir, dirs, files in os.walk(root_datadir):
                         expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                         evals = evals.append(expl_evaluation, ignore_index=True)
-                        evals.to_csv('experiments/' + dir + '/dm-eval.csv')
+                        evals.to_csv('experiments/' + dir + '/dm/eval.csv')
 
                     if generate_cf:
                         print(f'generating cf explanation')
@@ -184,14 +185,14 @@ for subdir, dirs, files in os.walk(root_datadir):
                                     cf_expl_evaluation['label'] = label
                                     print(cf_expl_evaluation.head())
                                     cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
-                                    cf_evals.to_csv('experiments/'+dir+'/dm-eval-cf.csv')
+                                    cf_evals.to_csv('experiments/'+dir+'/dm/eval-cf.csv')
                                 if len(triangles_cf) > 0:
                                     pd.DataFrame(triangles_cf).to_csv(
-                                        'experiments/'+dir+'/dm-tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                        'experiments/'+dir+'/dm/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                             nt) + '_' + str(
                                             tmin) + '-' + str(tmax) + '.csv')
                         except:
                             pass
-        evals.to_csv("experiments/" + dir + "dm_eval_" + str(tmin) + '-' + str(tmax) + '.csv')
+        evals.to_csv("experiments/" + dir + "/dm/eval_" + str(tmin) + '-' + str(tmax) + '.csv')
         if generate_cf:
-            cf_evals.to_csv("experiments/" + dir + "dm_eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
+            cf_evals.to_csv("experiments/" + dir + "/dm/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')

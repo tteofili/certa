@@ -203,61 +203,8 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     generated_records_left_df = pd.DataFrame()
     generated_records_right_df = pd.DataFrame()
     if generate_perturb and len(neighborhood) < num_triangles:
-        generated_df = pd.DataFrame()
-        new_copies_left = []
-        new_copies_right = []
-        left = True
-        for record in [r1, r2]:
-            r1_df = pd.DataFrame(data=[record.values], columns=record.index)
-            r2_df = pd.DataFrame(data=[record.values], columns=record.index)
-            r1_df.columns = list(map(lambda col: 'ltable_' + col, r1_df.columns))
-            r2_df.columns = list(map(lambda col: 'rtable_' + col, r2_df.columns))
-            r1r2c = pd.concat([r1_df, r2_df], axis=1)
-            original = r1r2c.iloc[0].copy()
-            t_len = int(len(r1r2c.columns) / 2)
-            copy = original.copy()
-            for t in range(t_len):
-                if left:
-                    t = t_len + t
-                attr_value = str(copy.get(t))
-                values = attr_value.split()
-                for cut in range(1, len(values)):
-                    new_val = " ".join(values[cut:])
-                    new_copy = original.copy()
-                    new_copy[t] = new_val
-                    if not left:
-                        prefix = lprefix
-                        osl = len(lsource)
-                        idn = 'ltable_id'
-                        new_copies = new_copies_left
-                    else:
-                        prefix = rprefix
-                        osl = len(rsource)
-                        idn = 'rtable_id'
-                        new_copies = new_copies_right
-                    new_record = pd.DataFrame(new_copy).transpose().filter(regex='^'+prefix).iloc[0]
-                    new_id = osl + len(new_copies)
-                    new_record[idn] = new_id
-                    new_copy[idn] = new_id
-                    #new_copy.rename(columns=lambda x: x.strip(lprefix))
-                    if left:
-                        new_copies_left.append(new_record)
-                    else:
-                        new_copies_right.append(new_record)
-                    r1r2c = r1r2c.append(new_copy, ignore_index=True)
-            if left:
-                r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
-                    rprefix + 'id'].astype(str)
-                left = False
-            else:
-                r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
-                    rprefix + 'id'].astype(str)
-
-
-            generated_df = pd.concat([generated_df, r1r2c], axis=0)
-
-        generated_records_left_df = pd.DataFrame(new_copies_left).rename(columns=lambda x: x[len(lprefix):])
-        generated_records_right_df = pd.DataFrame(new_copies_right).rename(columns=lambda x: x[len(rprefix):])
+        generated_df, generated_records_left_df, generated_records_right_df = generate_neighbors(lprefix, lsource, r1,
+                                                                                                 r2, rprefix, rsource)
 
         neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, generated_df)], axis=0)
         print(f'+perturbed neighborhood: {len(neighborhood)}')
@@ -280,6 +227,63 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     else:
         print('no triangles found')
         return pd.DataFrame(), generated_records_left_df, generated_records_right_df
+
+
+def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
+    generated_df = pd.DataFrame()
+    new_copies_left = []
+    new_copies_right = []
+    left = True
+    for record in [r1, r2]:
+        r1_df = pd.DataFrame(data=[record.values], columns=record.index)
+        r2_df = pd.DataFrame(data=[record.values], columns=record.index)
+        r1_df.columns = list(map(lambda col: 'ltable_' + col, r1_df.columns))
+        r2_df.columns = list(map(lambda col: 'rtable_' + col, r2_df.columns))
+        r1r2c = pd.concat([r1_df, r2_df], axis=1)
+        original = r1r2c.iloc[0].copy()
+        t_len = int(len(r1r2c.columns) / 2)
+        copy = original.copy()
+        for t in range(t_len):
+            if left:
+                t = t_len + t
+            attr_value = str(copy.get(t))
+            values = attr_value.split()
+            for cut in range(1, len(values)):
+                new_val = " ".join(values[cut:])
+                new_copy = original.copy()
+                new_copy[t] = new_val
+                if not left:
+                    prefix = lprefix
+                    osl = len(lsource)
+                    idn = 'ltable_id'
+                    new_copies = new_copies_left
+                else:
+                    prefix = rprefix
+                    osl = len(rsource)
+                    idn = 'rtable_id'
+                    new_copies = new_copies_right
+                new_record = pd.DataFrame(new_copy).transpose().filter(regex='^' + prefix).iloc[0]
+                new_id = osl + len(new_copies)
+                new_record[idn] = new_id
+                new_copy[idn] = new_id
+                if left:
+                    new_copies_left.append(new_record)
+                else:
+                    new_copies_right.append(new_record)
+                r1r2c = r1r2c.append(new_copy, ignore_index=True)
+        if left:
+            r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
+                rprefix + 'id'].astype(str)
+            left = False
+        else:
+            r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
+                rprefix + 'id'].astype(str)
+
+        generated_df = pd.concat([generated_df, r1r2c], axis=0)
+    generated_records_left_df = pd.DataFrame(new_copies_left).rename(columns=lambda x: x[len(lprefix):])
+    generated_records_right_df = pd.DataFrame(new_copies_right).rename(columns=lambda x: x[len(rprefix):])
+
+    return generated_df, generated_records_left_df, generated_records_right_df
 
 
 def get_neighbors(findPositives, model, predict_fn, r1r2c):
