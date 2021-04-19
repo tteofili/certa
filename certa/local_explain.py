@@ -249,28 +249,28 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
             attr_value = str(copy.get(t))
             values = attr_value.split()
             for cut in range(1, len(values)):
-                new_val = " ".join(values[cut:])
-                new_copy = original.copy()
-                new_copy[t] = new_val
-                if not left:
-                    prefix = lprefix
-                    osl = len(lsource)
-                    idn = 'ltable_id'
-                    new_copies = new_copies_left
-                else:
-                    prefix = rprefix
-                    osl = len(rsource)
-                    idn = 'rtable_id'
-                    new_copies = new_copies_right
-                new_record = pd.DataFrame(new_copy).transpose().filter(regex='^' + prefix).iloc[0]
-                new_id = osl + len(new_copies)
-                new_record[idn] = new_id
-                new_copy[idn] = new_id
-                if left:
-                    new_copies_left.append(new_record)
-                else:
-                    new_copies_right.append(new_record)
-                r1r2c = r1r2c.append(new_copy, ignore_index=True)
+                for new_val in [" ".join(values[cut:]), " ".join(values[:cut])]:
+                    new_copy = original.copy()
+                    new_copy[t] = new_val
+                    if not left:
+                        prefix = lprefix
+                        osl = len(lsource)
+                        idn = 'ltable_id'
+                        new_copies = new_copies_left
+                    else:
+                        prefix = rprefix
+                        osl = len(rsource)
+                        idn = 'rtable_id'
+                        new_copies = new_copies_right
+                    new_record = pd.DataFrame(new_copy).transpose().filter(regex='^' + prefix).iloc[0]
+                    new_id = osl + len(new_copies)
+                    new_record[idn] = new_id
+                    new_copy[idn] = new_id
+                    if left:
+                        new_copies_left.append(new_record)
+                    else:
+                        new_copies_right.append(new_record)
+                    r1r2c = r1r2c.append(new_copy, ignore_index=True)
         if left:
             r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
                 rprefix + 'id'].astype(str)
