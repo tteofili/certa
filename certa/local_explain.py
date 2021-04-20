@@ -254,23 +254,20 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
                     new_copy[t] = new_val #substitute the new value with missing prefix / suffix on the target attribute
                     if left:
                         prefix = rprefix
-                        osl = len(rsource)
+                        new_id = len(new_copies_left) + len(rsource)
                         idn = 'rtable_id'
-                        new_copies = new_copies_right
                     else:
                         prefix = lprefix
-                        osl = len(lsource)
                         idn = 'ltable_id'
-                        new_copies = new_copies_left
+                        new_id = len(new_copies_right) + len(lsource)
 
                     new_record = pd.DataFrame(new_copy).transpose().filter(regex='^' + prefix).iloc[0]
-                    new_id = osl + len(new_copies)
                     new_record[idn] = new_id
                     new_copy[idn] = new_id
                     if left:
-                        new_copies_right.append(new_record)
-                    else:
                         new_copies_left.append(new_record)
+                    else:
+                        new_copies_right.append(new_record)
                     r1r2c = r1r2c.append(new_copy, ignore_index=True)
         if left:
             r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[

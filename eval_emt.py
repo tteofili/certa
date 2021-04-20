@@ -116,8 +116,8 @@ for subdir, dirs, files in os.walk(root_datadir):
                 if len(local_samples) > 2:
                     maxLenAttributeSet = len(l_tuple) - 1
                     explanation, flipped_pred, triangles = explainSamples(local_samples,
-                                                                          [pd.concat([lsource, gleft_df, gright_df]),
-                                                                           pd.concat([rsource, gright_df, gleft_df])],
+                                                                          [pd.concat([lsource, gright_df]),
+                                                                           pd.concat([rsource, gleft_df])],
                                                                           model, predict_fn, class_to_explain,
                                                                           maxLenAttributeSet, True)
                     print(explanation)
