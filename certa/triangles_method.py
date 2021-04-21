@@ -155,18 +155,21 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
 
 
 def check_transitivity(triangle, sourcesMap, predict_fn, model):
-    t1 = triangle[0].split('@')
-    t2 = triangle[1].split('@')
-    t3 = triangle[2].split('@')
-    u = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
-    v = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
-    v1 = v.copy()
-    w = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
-    _renameColumnsWithPrefix('ltable_', u)
-    _renameColumnsWithPrefix('rtable_', v)
-    _renameColumnsWithPrefix('ltable_', v1)
-    _renameColumnsWithPrefix('rtable_', w)
-    return check_transitivity_text(model, predict_fn, u, v, v1, w)
+    try:
+        t1 = triangle[0].split('@')
+        t2 = triangle[1].split('@')
+        t3 = triangle[2].split('@')
+        u = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
+        v = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
+        v1 = v.copy()
+        w = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
+        _renameColumnsWithPrefix('ltable_', u)
+        _renameColumnsWithPrefix('rtable_', v)
+        _renameColumnsWithPrefix('ltable_', v1)
+        _renameColumnsWithPrefix('rtable_', w)
+        return check_transitivity_text(model, predict_fn, u, v, v1, w)
+    except:
+        return False
 
 
 def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False):
