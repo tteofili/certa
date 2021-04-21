@@ -163,7 +163,6 @@ class EMTERModel():
         predictions.index = np.arange(len(predictions))
         full_df = pd.concat([x, predictions], axis=1, names=names)
         full_df.columns = names
-        print(full_df.head())
         return full_df
 
     def load(self, path):

@@ -204,19 +204,23 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
     flippedPredictions = []
     t_i = 0
     for triangle in tqdm(allTriangles):
-        if check:
-            pre_good = check_transitivity(triangle, sourcesMap, predict_fn, model)
-            allTriangles[t_i] = allTriangles[t_i] + (pre_good, )
-        currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
-                                                               class_to_explain)
-        currPerturbedAttr = currentPerturbations.alteredAttributes.values
-        predictions = predict_fn(currentPerturbations, model)
-        predictions = predictions.drop(columns=['alteredAttributes', 'originalRightId'])
-        proba = predictions[['nomatch_score', 'match_score']].values
-        curr_flippedPredictions = currentPerturbations[proba[:, class_to_explain] < 0.5]
-        flippedPredictions.append(curr_flippedPredictions)
-        ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
-        rankings.append(ranking)
+        try:
+            if check:
+                pre_good = check_transitivity(triangle, sourcesMap, predict_fn, model)
+                allTriangles[t_i] = allTriangles[t_i] + (pre_good, )
+            currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
+                                                                   class_to_explain)
+            currPerturbedAttr = currentPerturbations.alteredAttributes.values
+            predictions = predict_fn(currentPerturbations, model)
+            predictions = predictions.drop(columns=['alteredAttributes', 'originalRightId'])
+            proba = predictions[['nomatch_score', 'match_score']].values
+            curr_flippedPredictions = currentPerturbations[proba[:, class_to_explain] < 0.5]
+            flippedPredictions.append(curr_flippedPredictions)
+            ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
+            rankings.append(ranking)
+        except:
+            allTriangles[t_i] = allTriangles[t_i] + (False,)
+            pass
         t_i += 1
     try:
         flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
