@@ -176,20 +176,14 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
         # check identity
         p1 = np.argmax(predict_fn(pd.concat([u.reset_index(), u1.reset_index()], axis=1), model)[
             ['nomatch_score', 'match_score']].values[0])
-        p1_rev = np.argmax(predict_fn(pd.concat([u1.reset_index(), u.reset_index()], axis=1), model)[
-                           ['nomatch_score', 'match_score']].values[0])
 
         p2 = np.argmax(predict_fn(pd.concat([v.reset_index(), v1.reset_index()], axis=1), model)[
                            ['nomatch_score', 'match_score']].values[0])
-        p2_rev = np.argmax(predict_fn(pd.concat([v1.reset_index(), v.reset_index()], axis=1), model)[
-                               ['nomatch_score', 'match_score']].values[0])
 
         p3 = np.argmax(predict_fn(pd.concat([w.reset_index(), w1.reset_index()], axis=1), model)[
                            ['nomatch_score', 'match_score']].values[0])
-        p3_rev = np.argmax(predict_fn(pd.concat([w1.reset_index(), w.reset_index()], axis=1), model)[
-                               ['nomatch_score', 'match_score']].values[0])
 
-        identity = p1 == p1_rev and p2 == p2_rev and p3 == p3_rev
+        identity = p1 == 1 and p2 == 1 and p3 == 1
 
         # check symmetry
         p1_sim = np.argmax(predict_fn(pd.concat([u.reset_index(), v.reset_index()], axis=1), model)[
