@@ -117,9 +117,7 @@ for subdir, dirs, files in os.walk(root_datadir):
 
             # get triangle 'cuts' depending on the length of the sources
             up_bound = min(len(lsource), len(rsource))
-            cuts = []
-            for c in range(5):
-                cuts.append((1 + c) * int(up_bound / 100))
+            cuts = [100]
 
             for nt in cuts:
                 print('running CERTA with nt=' + str(nt))
@@ -152,7 +150,11 @@ for subdir, dirs, files in os.walk(root_datadir):
                         expl_evaluation['t_requested'] = nt
                         expl_evaluation['t_obtained'] = len(triangles)
                         expl_evaluation['label'] = label
-                        n_good = triangles_df[3].apply(lambda x: int(x)).sum()
+                        identity = triangles_df[3].apply(lambda x: int(x)).sum()
+                        expl_evaluation['identity'] = identity
+                        symmetry = triangles_df[4].apply(lambda x: int(x)).sum()
+                        expl_evaluation['symmetry'] = symmetry
+                        n_good = triangles_df[5].apply(lambda x: int(x)).sum()
                         expl_evaluation['t_good'] = n_good
                         expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
