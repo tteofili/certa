@@ -154,22 +154,67 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     return allPerturbations
 
 
-def check_transitivity(triangle, sourcesMap, predict_fn, model):
+def check_properties(triangle, sourcesMap, predict_fn, model):
     try:
         t1 = triangle[0].split('@')
         t2 = triangle[1].split('@')
         t3 = triangle[2].split('@')
         u = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
         v = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
-        v1 = v.copy()
         w = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
+        u1 = u.copy()
+        v1 = v.copy()
+        w1 = w.copy()
+
         _renameColumnsWithPrefix('ltable_', u)
+        _renameColumnsWithPrefix('rtable_', u1)
         _renameColumnsWithPrefix('rtable_', v)
         _renameColumnsWithPrefix('ltable_', v1)
         _renameColumnsWithPrefix('rtable_', w)
-        return check_transitivity_text(model, predict_fn, u, v, v1, w)
+        _renameColumnsWithPrefix('ltable_', w1)
+
+        # check identity
+        p1 = np.argmax(predict_fn(pd.concat([u.reset_index(), u1.reset_index()], axis=1), model)[
+            ['nomatch_score', 'match_score']].values[0])
+        p1_rev = np.argmax(predict_fn(pd.concat([u1.reset_index(), u.reset_index()], axis=1), model)[
+                           ['nomatch_score', 'match_score']].values[0])
+
+        p2 = np.argmax(predict_fn(pd.concat([v.reset_index(), v1.reset_index()], axis=1), model)[
+                           ['nomatch_score', 'match_score']].values[0])
+        p2_rev = np.argmax(predict_fn(pd.concat([v1.reset_index(), v.reset_index()], axis=1), model)[
+                               ['nomatch_score', 'match_score']].values[0])
+
+        p3 = np.argmax(predict_fn(pd.concat([w.reset_index(), w1.reset_index()], axis=1), model)[
+                           ['nomatch_score', 'match_score']].values[0])
+        p3_rev = np.argmax(predict_fn(pd.concat([w1.reset_index(), w.reset_index()], axis=1), model)[
+                               ['nomatch_score', 'match_score']].values[0])
+
+        identity = p1 == p1_rev and p2 == p2_rev and p3 == p3_rev
+
+        # check symmetry
+        p1_sim = np.argmax(predict_fn(pd.concat([u.reset_index(), v.reset_index()], axis=1), model)[
+                      ['nomatch_score', 'match_score']].values[0])
+        p1_sim1 = np.argmax(predict_fn(pd.concat([v1.reset_index(), u1.reset_index()], axis=1), model)[
+                               ['nomatch_score', 'match_score']].values[0])
+
+        p2_sim = np.argmax(predict_fn(pd.concat([u.reset_index(), w.reset_index()], axis=1), model)[
+                               ['nomatch_score', 'match_score']].values[0])
+        p2_sim1 = np.argmax(predict_fn(pd.concat([w1.reset_index(), u1.reset_index()], axis=1), model)[
+                                ['nomatch_score', 'match_score']].values[0])
+
+        p3_sim = np.argmax(predict_fn(pd.concat([v1.reset_index(), w.reset_index()], axis=1), model)[
+                               ['nomatch_score', 'match_score']].values[0])
+        p3_sim1 = np.argmax(predict_fn(pd.concat([w1.reset_index(), v.reset_index()], axis=1), model)[
+                                ['nomatch_score', 'match_score']].values[0])
+
+        simmetry = p1_sim == p1_sim1 and p2_sim == p2_sim1 and p3_sim == p3_sim1
+
+        # check transitivity
+        transitivity = check_transitivity_text(model, predict_fn, u, v, v1, w)
+
+        return identity, simmetry, transitivity
     except:
-        return False
+        return False, False, False
 
 
 def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False):
@@ -206,8 +251,8 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
     for triangle in tqdm(allTriangles):
         try:
             if check:
-                pre_good = check_transitivity(triangle, sourcesMap, predict_fn, model)
-                allTriangles[t_i] = allTriangles[t_i] + (pre_good, )
+                identity, simmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn, model)
+                allTriangles[t_i] = allTriangles[t_i] + (identity, simmetry, transitivity, )
             currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
                                                                    class_to_explain)
             currPerturbedAttr = currentPerturbations.alteredAttributes.values
@@ -219,7 +264,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
             ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
             rankings.append(ranking)
         except:
-            allTriangles[t_i] = allTriangles[t_i] + (False,)
+            allTriangles[t_i] = allTriangles[t_i] + (False, False, False, )
             pass
         t_i += 1
     try:

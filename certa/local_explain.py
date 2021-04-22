@@ -206,7 +206,8 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         generated_df, generated_records_left_df, generated_records_right_df = generate_neighbors(lprefix, lsource, r1,
                                                                                                  r2, rprefix, rsource)
 
-        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, generated_df)], axis=0)
+        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, generated_df,
+                                                              report=False)], axis=0)
         print(f'+perturbed neighborhood: {len(neighborhood)}')
 
     if len(neighborhood) > 0:
@@ -240,6 +241,12 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
         r1_df.columns = list(map(lambda col: 'ltable_' + col, r1_df.columns))
         r2_df.columns = list(map(lambda col: 'rtable_' + col, r2_df.columns))
         r1r2c = pd.concat([r1_df, r2_df], axis=1)
+
+        # only used for reporting
+        r1r2c['diff'] = ''
+        r1r2c['attr_name'] = ''
+        r1r2c['attr_pos'] = ''
+
         original = r1r2c.iloc[0].copy()
         t_len = int(len(r1r2c.columns) / 2)
         copy = original.copy()
@@ -268,6 +275,12 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
                         new_copies_left.append(new_record)
                     else:
                         new_copies_right.append(new_record)
+
+                    # only used for reporting
+                    new_copy['diff'] = diff(attr_value, new_val)
+                    new_copy['attr_name'] = r1r2c.columns[t]
+                    new_copy['attr_pos'] = t
+
                     r1r2c = r1r2c.append(new_copy, ignore_index=True)
         if left:
             r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
@@ -283,9 +296,28 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
 
     return generated_df, generated_records_left_df, generated_records_right_df
 
+def diff(a: str, b: str):
+    d = set(a.split(' ')).difference(b.split(' '))
+    if len(d) == 0:
+        d = '+'+str(set(b.split(' ')).difference(a.split(' ')))
+    else:
+        d = '-'+str(d)
+    return d
 
-def get_neighbors(findPositives, model, predict_fn, r1r2c):
+def get_neighbors(findPositives, model, predict_fn, r1r2c, report:bool = False):
+    original = r1r2c.copy()
+    try:
+        r1r2c = r1r2c.drop(columns = ['diff', 'attr_name', 'attr_pos'])
+    except:
+        pass
+
     unlabeled_predictions = predict_fn(r1r2c, model)
+    if report:
+        try:
+            report = pd.concat([original, unlabeled_predictions['match_score']], axis=1)
+            report.to_csv('experiments/diffs.csv', mode='a')
+        except:
+            pass
     if findPositives:
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
     else:
