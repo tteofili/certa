@@ -83,8 +83,6 @@ for subdir, dirs, files in os.walk(root_datadir):
         test = pd.read_csv(datadir + '/test.csv')
 
         print('merging sources')
-        train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
-        valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
         test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()
 
         print('training model')
@@ -94,6 +92,8 @@ for subdir, dirs, files in os.walk(root_datadir):
         try:
             model.load(save_path)
         except:
+            train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
+            valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
             model.classic_training(train_df, valid_df, dir)
             model.save(save_path)
 
