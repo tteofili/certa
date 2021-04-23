@@ -100,7 +100,7 @@ for subdir, dirs, files in os.walk(root_datadir):
             model = dp.load_model(path)
         except:
             model = dp.init_DeepER_model(emb_dim)
-            model = dp.train_model_ER(to_deeper_data(train_df), model, embeddings_model, tokenizer, end=dir, save_path=path)
+            model = dp.train_model_ER(to_deeper_data(pd.concat([train_df, valid_df])), model, embeddings_model, tokenizer, end=dir, save_path=path)
 
         tmin = 0.5
         tmax = 0.5
