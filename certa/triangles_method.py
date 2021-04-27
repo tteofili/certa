@@ -177,10 +177,10 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
         p1 = np.argmax(predict_fn(pd.concat([u.reset_index(), u1.reset_index()], axis=1), model)[
             ['nomatch_score', 'match_score']].values[0])
 
-        p2 = np.argmax(predict_fn(pd.concat([v.reset_index(), v1.reset_index()], axis=1), model)[
+        p2 = np.argmax(predict_fn(pd.concat([v1.reset_index(), v.reset_index()], axis=1), model)[
                            ['nomatch_score', 'match_score']].values[0])
 
-        p3 = np.argmax(predict_fn(pd.concat([w.reset_index(), w1.reset_index()], axis=1), model)[
+        p3 = np.argmax(predict_fn(pd.concat([w1.reset_index(), w.reset_index()], axis=1), model)[
                            ['nomatch_score', 'match_score']].values[0])
 
         identity = p1 == 1 and p2 == 1 and p3 == 1
