@@ -30,6 +30,8 @@ class EMTERModel():
     def classic_training(self, label_train, label_valid, dataset_name):
         device, n_gpu = emt.torch_initializer.initialize_gpu_seed(22)
 
+        self.model = self.model.to(device)
+
         exp_dir = 'models/bert/' + dataset_name
         if len(label_train) > 0:
             # balanced datasets
