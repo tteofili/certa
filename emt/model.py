@@ -1,8 +1,6 @@
 import os
 
-from pytorch_transformers import BertTokenizer, DistilBertTokenizer
-from pytorch_transformers.modeling_bert import BertForSequenceClassification
-from transformers import DistilBertConfig, DistilBertForSequenceClassification
+from transformers import DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer
 
 
 def save_model(model, experiment_name, model_output_dir, epoch=None, tokenizer=None):

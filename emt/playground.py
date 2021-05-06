@@ -1,4 +1,4 @@
-from pytorch_transformers import BertTokenizer
+from transformers import BertTokenizer
 
 from emt.config import Config
 from emt.data_representation import InputExample

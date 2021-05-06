@@ -3,7 +3,7 @@ import json
 import os
 import logging
 
-from pytorch_transformers import BertConfig, BertForSequenceClassification, BertTokenizer, XLNetTokenizer, \
+from transformers import BertConfig, BertForSequenceClassification, BertTokenizer, XLNetTokenizer, \
     XLNetForSequenceClassification, XLNetConfig, XLMForSequenceClassification, XLMConfig, XLMTokenizer, \
     RobertaTokenizer, RobertaForSequenceClassification, RobertaConfig, DistilBertConfig, \
     DistilBertForSequenceClassification, DistilBertTokenizer
