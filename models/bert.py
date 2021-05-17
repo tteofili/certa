@@ -92,15 +92,7 @@ class EMTERModel():
 
         emt.model.save_model(self.model, '', exp_dir, tokenizer=self.tokenizer)
         print(f'MODEL SAVED {exp_dir}')
-        l0 = result['report'].split('\n')[2].split('       ')[2].split('      ')
-        l1 = result['report'].split('\n')[3].split('       ')[2].split('      ')
-        p = l1[0]
-        r = l1[1]
-        f1 = l1[2]
-        pnm = l0[0]
-        rnm = l0[1]
-        f1nm = l0[2]
-        return p, r, f1, pnm, rnm, f1nm
+        return result
 
     def evaluation(self, test_set):
         device, n_gpu = emt.torch_initializer.initialize_gpu_seed(22)

@@ -4,72 +4,8 @@ import os
 from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
+from certa.utils import merge_sources
 from models.bert import EMTERModel
-
-
-def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table,
-                  robust: bool = False):
-    dataset = pd.DataFrame(columns={col: table[col].dtype for col in copy_from_table})
-    ignore_column = copy_from_table + ignore_from_table
-
-    for _, row in table.iterrows():
-        leftid = row[left_prefix + 'id']
-        rightid = row[right_prefix + 'id']
-
-        new_row = {column: row[column] for column in copy_from_table}
-
-        try:
-            for id, source, prefix in [(leftid, left_source, left_prefix), (rightid, right_source, right_prefix)]:
-
-                for column in source.keys():
-                    if column not in ignore_column:
-                        new_row[prefix + column] = source.loc[id][column]
-
-            dataset = dataset.append(new_row, ignore_index=True)
-        except:
-            pass
-
-        if robust:
-            # symmetry
-            sym_new_row = {column: row[column] for column in copy_from_table}
-            try:
-                for id, source, prefix in [(rightid, right_source, left_prefix), (leftid, left_source, right_prefix)]:
-
-                    for column in source.keys():
-                        if column not in ignore_column:
-                            sym_new_row[prefix + column] = source.loc[id][column]
-
-                dataset = dataset.append(sym_new_row, ignore_index=True)
-            except:
-                pass
-
-            # identity
-            lcopy_row = {column: row[column] for column in copy_from_table}
-            try:
-                for id, source, prefix in [(leftid, left_source, left_prefix), (leftid, left_source, right_prefix)]:
-
-                    for column in source.keys():
-                        if column not in ignore_column:
-                            lcopy_row[prefix + column] = source.loc[id][column]
-
-                lcopy_row['label'] = 1
-                dataset = dataset.append(lcopy_row, ignore_index=True)
-            except:
-                pass
-
-            rcopy_row = {column: row[column] for column in copy_from_table}
-            try:
-                for id, source, prefix in [(rightid, right_source, left_prefix), (rightid, right_source, right_prefix)]:
-
-                    for column in source.keys():
-                        if column not in ignore_column:
-                            rcopy_row[prefix + column] = source.loc[id][column]
-
-                rcopy_row['label'] = 1
-                dataset = dataset.append(rcopy_row, ignore_index=True)
-            except:
-                pass
-    return dataset
 
 
 def predict_fn(x, m, ignore_columns=['ltable_id', 'rtable_id', 'label']):
@@ -92,142 +28,146 @@ def get_original_prediction(r1, r2):
 
 root_datadir = 'datasets/'
 generate_cf = False
-robust = True
+
 
 for subdir, dirs, files in os.walk(root_datadir):
     for dir in dirs:
-        os.makedirs('experiments/' + dir, exist_ok=True)
-        model_name = 'emt'
-        if robust:
-            model_name = model_name + '_robust'
-        os.makedirs('experiments/' + dir + '/' + model_name, exist_ok=True)
-        if dir == 'temporary':
+        if dir in ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm']:
             continue
-        print(f'working on {dir}')
-        datadir = os.path.join(root_datadir, dir)
-        print(f'reading data from {datadir}')
+        for robust in [False, True]:
+            os.makedirs('experiments/' + dir, exist_ok=True)
+            model_name = 'emt'
+            if robust:
+                model_name = model_name + '_robust'
+            os.makedirs('experiments/' + dir + '/' + model_name, exist_ok=True)
+            if dir == 'temporary':
+                continue
+            print(f'working on {dir}')
+            datadir = os.path.join(root_datadir, dir)
+            print(f'reading data from {datadir}')
 
-        lsource = pd.read_csv(datadir + '/tableA.csv')
-        rsource = pd.read_csv(datadir + '/tableB.csv')
-        gt = pd.read_csv(datadir + '/train.csv')
-        valid = pd.read_csv(datadir + '/valid.csv')
-        test = pd.read_csv(datadir + '/test.csv')
+            lsource = pd.read_csv(datadir + '/tableA.csv')
+            rsource = pd.read_csv(datadir + '/tableB.csv')
+            gt = pd.read_csv(datadir + '/train.csv')
+            valid = pd.read_csv(datadir + '/valid.csv')
+            test = pd.read_csv(datadir + '/test.csv')
 
-        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()
+            test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()[:50]
 
-        os.makedirs('models/bert/' + dir, exist_ok=True)
-        save_path = 'models/bert/' + dir
-        if robust:
-            save_path = save_path + '_robust'
-        model = EMTERModel()
-        try:
-            print(f'loading model from {save_path}')
-            model.load(save_path)
-        except:
-            print('training model')
-            train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'], robust=robust).dropna()
-            valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
-            model.classic_training(train_df, valid_df, dir)
-            model.save(save_path)
+            os.makedirs('models/' + model_name + '/' + dir, exist_ok=True)
+            save_path = 'models/' + model_name + '/' + dir
+            if robust:
+                save_path = save_path + '_robust'
+            model = EMTERModel()
+            try:
+                print(f'loading model from {save_path}')
+                model.load(save_path)
+            except:
+                print('training model')
+                train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'], robust=robust).dropna()
+                valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
+                report = model.classic_training(train_df, valid_df, dir)
+                print(report)
+                model.save(save_path)
 
-        tmin = 0.5
-        tmax = 0.5
+            tmin = 0.5
+            tmax = 0.5
 
-        evals = pd.DataFrame()
-        cf_evals = pd.DataFrame()
-        for i in range(len(test_df)):
-            rand_row = test_df.iloc[i]
-            l_id = int(rand_row['ltable_id'])
-            l_tuple = lsource.iloc[l_id]
-            r_id = int(rand_row['rtable_id'])
-            r_tuple = rsource.iloc[r_id]
+            evals = pd.DataFrame()
+            cf_evals = pd.DataFrame()
+            for i in range(len(test_df)):
+                rand_row = test_df.iloc[i]
+                l_id = int(rand_row['ltable_id'])
+                l_tuple = lsource.iloc[l_id]
+                r_id = int(rand_row['rtable_id'])
+                r_tuple = rsource.iloc[r_id]
 
-            prediction = get_original_prediction(l_tuple, r_tuple)
-            class_to_explain = np.argmax(prediction)
+                prediction = get_original_prediction(l_tuple, r_tuple)
+                class_to_explain = np.argmax(prediction)
 
-            label = rand_row["label"]
-            print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={label}')
+                label = rand_row["label"]
+                print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={label}')
 
-            # get triangle 'cuts' depending on the length of the sources
-            up_bound = min(len(lsource), len(rsource))
-            cuts = [100]
+                # get triangle 'cuts' depending on the length of the sources
+                up_bound = min(len(lsource), len(rsource))
+                cuts = [100]
 
-            for nt in cuts:
-                print('running CERTA with nt=' + str(nt))
-                print(f'generating explanation')
-                local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
-                                                                    tmin, tmax, predict_fn, num_triangles=nt,
-                                                                    class_to_explain=class_to_explain, use_predict=True,
-                                                                    max_predict=500)
-                if len(local_samples) > 2:
-                    maxLenAttributeSet = len(l_tuple) - 1
-                    explanation, flipped_pred, triangles = explainSamples(local_samples,
-                                                                          [pd.concat([lsource, gright_df]),
-                                                                           pd.concat([rsource, gleft_df])],
-                                                                          model, predict_fn, class_to_explain,
-                                                                          maxLenAttributeSet, True)
-                    print(explanation)
-                    triangles_df = pd.DataFrame()
-                    if len(triangles) > 0:
-                        triangles_df = pd.DataFrame(triangles)
-                        triangles_df.to_csv(
-                            'experiments/' + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
-                                nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
-                    for exp in explanation:
-                        e_attrs = exp.split('/')
-                        e_score = explanation[exp]
-                        expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model,
-                                                    prediction, rsource,
-                                                    r_tuple, predict_fn)
-                        print(expl_evaluation.head())
-                        expl_evaluation['t_requested'] = nt
-                        expl_evaluation['t_obtained'] = len(triangles)
-                        expl_evaluation['label'] = label
-                        identity = triangles_df[3].apply(lambda x: int(x)).sum()
-                        expl_evaluation['identity'] = identity
-                        symmetry = triangles_df[4].apply(lambda x: int(x)).sum()
-                        expl_evaluation['symmetry'] = symmetry
-                        n_good = triangles_df[5].apply(lambda x: int(x)).sum()
-                        expl_evaluation['t_good'] = n_good
-                        expl_evaluation['t_bad'] = len(triangles_df) - n_good
+                for nt in cuts:
+                    print('running CERTA with nt=' + str(nt))
+                    print(f'generating explanation')
+                    local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
+                                                                        tmin, tmax, predict_fn, num_triangles=nt,
+                                                                        class_to_explain=class_to_explain, use_predict=True,
+                                                                        max_predict=500)
+                    if len(local_samples) > 2:
+                        maxLenAttributeSet = len(l_tuple) - 1
+                        explanation, flipped_pred, triangles = explainSamples(local_samples,
+                                                                              [pd.concat([lsource, gright_df]),
+                                                                               pd.concat([rsource, gleft_df])],
+                                                                              model, predict_fn, class_to_explain,
+                                                                              maxLenAttributeSet, True)
+                        print(explanation)
+                        triangles_df = pd.DataFrame()
+                        if len(triangles) > 0:
+                            triangles_df = pd.DataFrame(triangles)
+                            triangles_df.to_csv(
+                                'experiments/' + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                    nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
+                        for exp in explanation:
+                            e_attrs = exp.split('/')
+                            e_score = explanation[exp]
+                            expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model,
+                                                        prediction, rsource,
+                                                        r_tuple, predict_fn)
+                            print(expl_evaluation.head())
+                            expl_evaluation['t_requested'] = nt
+                            expl_evaluation['t_obtained'] = len(triangles)
+                            expl_evaluation['label'] = label
+                            identity = triangles_df[3].apply(lambda x: int(x)).sum()
+                            expl_evaluation['identity'] = identity
+                            symmetry = triangles_df[4].apply(lambda x: int(x)).sum()
+                            expl_evaluation['symmetry'] = symmetry
+                            n_good = triangles_df[5].apply(lambda x: int(x)).sum()
+                            expl_evaluation['t_good'] = n_good
+                            expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
-                        evals = evals.append(expl_evaluation, ignore_index=True)
-                        evals.to_csv('experiments/' + dir + '/'+ model_name +'/eval.csv')
+                            evals = evals.append(expl_evaluation, ignore_index=True)
+                            evals.to_csv('experiments/' + dir + '/'+ model_name +'/eval.csv')
 
-                    if generate_cf:
-                        print(f'generating cf explanation')
-                        try:
-                            cf_class = abs(1 - int(class_to_explain))
+                        if generate_cf:
+                            print(f'generating cf explanation')
+                            try:
+                                cf_class = abs(1 - int(class_to_explain))
 
-                            local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin,
-                                                             tmax, predict_fn,
-                                                             num_triangles=nt, class_to_explain=cf_class)
+                                local_samples_cf = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir, tmin,
+                                                                 tmax, predict_fn,
+                                                                 num_triangles=nt, class_to_explain=cf_class)
 
-                            if len(local_samples_cf) > 2:
-                                explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples,
-                                                                                               [lsource, rsource],
-                                                                                               model, predict_fn,
-                                                                                               cf_class,
-                                                                                               maxLenAttributeSet, True)
-                                for exp_cf in explanation_cf:
-                                    e_attrs = exp_cf.split('/')
-                                    e_score = explanation_cf[exp_cf]
-                                    cf_expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple,
-                                                                   model, prediction, rsource,
-                                                                   r_tuple, predict_fn)
-                                    cf_expl_evaluation['t_requested'] = nt
-                                    cf_expl_evaluation['t_obtained'] = len(triangles_cf)
-                                    cf_expl_evaluation['label'] = label
-                                    print(cf_expl_evaluation.head())
-                                    cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
-                                    cf_evals.to_csv('experiments/'+dir+'/'+ model_name +'/eval-cf.csv')
-                                if len(triangles_cf) > 0:
-                                    pd.DataFrame(triangles_cf).to_csv(
-                                        'experiments/'+dir+'/'+ model_name +'/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
-                                            nt) + '_' + str(
-                                            tmin) + '-' + str(tmax) + '.csv')
-                        except:
-                            pass
-        evals.to_csv("experiments/" + dir + "/"+ model_name +"/eval_" + str(tmin) + '-' + str(tmax) + '.csv')
-        if generate_cf:
-            cf_evals.to_csv("experiments/" + dir + "/"+ model_name +"/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
+                                if len(local_samples_cf) > 2:
+                                    explanation_cf, flipped_pred_cf, triangles_cf = explainSamples(local_samples,
+                                                                                                   [lsource, rsource],
+                                                                                                   model, predict_fn,
+                                                                                                   cf_class,
+                                                                                                   maxLenAttributeSet, True)
+                                    for exp_cf in explanation_cf:
+                                        e_attrs = exp_cf.split('/')
+                                        e_score = explanation_cf[exp_cf]
+                                        cf_expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple,
+                                                                       model, prediction, rsource,
+                                                                       r_tuple, predict_fn)
+                                        cf_expl_evaluation['t_requested'] = nt
+                                        cf_expl_evaluation['t_obtained'] = len(triangles_cf)
+                                        cf_expl_evaluation['label'] = label
+                                        print(cf_expl_evaluation.head())
+                                        cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
+                                        cf_evals.to_csv('experiments/'+dir+'/'+ model_name +'/eval-cf.csv')
+                                    if len(triangles_cf) > 0:
+                                        pd.DataFrame(triangles_cf).to_csv(
+                                            'experiments/'+dir+'/'+ model_name +'/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                                nt) + '_' + str(
+                                                tmin) + '-' + str(tmax) + '.csv')
+                            except:
+                                pass
+            evals.to_csv("experiments/" + dir + "/"+ model_name +"/eval_" + str(tmin) + '-' + str(tmax) + '.csv')
+            if generate_cf:
+                cf_evals.to_csv("experiments/" + dir + "/"+ model_name +"/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')

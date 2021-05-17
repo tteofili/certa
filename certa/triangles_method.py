@@ -48,7 +48,7 @@ def getMixedTriangles(dataset, sources):
     negatives = dataset_c[dataset_c.label == 0].astype('str')  # no-match classified samples
     l_pos_ids = positives.ltable_id.astype('str').values  # left ids of positive samples
     r_pos_ids = positives.rtable_id.astype('str').values  # right ids of positive samples
-    for lid, rid in zip(l_pos_ids, r_pos_ids):  # iterate through l_id, r_id pairs
+    for lid, rid in zip(l_pos_ids, r_pos_ids):  # iterate through positive l_id, r_id pairs
         if np.count_nonzero(
                 negatives.rtable_id.values == rid) >= 1:  # if r_id takes part also in a negative predictions
             relatedTuples = negatives[
@@ -121,7 +121,7 @@ def __getRecords(sourcesMap, triangleIds):
 
 
 def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain,
-                                    lprefix='ltable_', rprefix='rtable_'):
+                                    lprefix='ltable_', rprefix='rtable_', use_tokens: bool = False):
     # generate power set of attributes
     allAttributesSubsets = list(_powerset(attributes, 1, maxLenAttributeSet))
     triangle = __getRecords(sourcesMap, triangleIds)  # get triangle values
@@ -133,21 +133,21 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
             newRecord = triangle[1].copy()  # copy the r1 tuple
             rightRecordId = triangleIds[1]
             for att in subset:
-                newRecord[att] = triangle[2][att]  # copy the value for the given attribute from no-match l2 tuple into r1
+                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from no-match l2 tuple into l1
             perturbations.append(newRecord)  # append the new record
         else:
             newRecord = triangle[2].copy()  # copy the l2 tuple
             rightRecordId = triangleIds[2]
             for att in subset:
-                newRecord[att] = triangle[1][att]  # copy the value for the given attribute from match r1 tuple into l2
+                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from match r1 tuple into l1
             perturbations.append(newRecord)  # append the new record
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
-    r1 = triangle[0].copy()
-    r1_copy = [r1] * len(perturbations_df)
-    r1_df = pd.DataFrame(r1_copy, index=np.arange(len(perturbations)))
-    _renameColumnsWithPrefix(lprefix, r1_df)
-    _renameColumnsWithPrefix(rprefix, perturbations_df)
-    allPerturbations = pd.concat([r1_df, perturbations_df], axis=1)
+    r2 = triangle[1].copy()
+    r2_copy = [r2] * len(perturbations_df)
+    r2_df = pd.DataFrame(r2_copy, index=np.arange(len(perturbations)))
+    _renameColumnsWithPrefix(rprefix, r2_df)
+    _renameColumnsWithPrefix(lprefix, perturbations_df)
+    allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
     allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
     allPerturbations['alteredAttributes'] = perturbedAttributes
     allPerturbations['originalRightId'] = rightRecordId
@@ -173,6 +173,56 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
         _renameColumnsWithPrefix('rtable_', w)
         _renameColumnsWithPrefix('ltable_', w1)
 
+        records = pd.concat([
+        #identity
+        pd.concat([u.reset_index(), u1.reset_index()], axis=1),
+        pd.concat([v1.reset_index(), v.reset_index()], axis=1),
+        pd.concat([w1.reset_index(), w.reset_index()], axis=1),
+
+        #symmetry
+        pd.concat([u.reset_index(), v.reset_index()], axis=1),
+        pd.concat([v1.reset_index(), u1.reset_index()], axis=1),
+        pd.concat([u.reset_index(), w.reset_index()], axis=1),
+        pd.concat([w1.reset_index(), u1.reset_index()], axis=1),
+        pd.concat([v1.reset_index(), w.reset_index()], axis=1),
+        pd.concat([w1.reset_index(), v.reset_index()], axis=1),
+
+        #transitivity
+        pd.concat([u.reset_index(), v.reset_index()], axis=1),
+        pd.concat([v1.reset_index(), w.reset_index()], axis=1),
+        pd.concat([u.reset_index(), w.reset_index()], axis=1)
+        ])
+
+        predictions = np.argmax(predict_fn(records, model)[['nomatch_score', 'match_score']].values[0])
+
+        identity = predictions[0] == 1 and predictions[1] == 1 and predictions[2] == 1
+
+        symmetry = predictions[3] == predictions[4] and predictions[5] == predictions[6] and predictions[7] == predictions[8]
+
+        p1 = predictions[9]
+        p2 = predictions[10]
+        p3 = predictions[11]
+
+        '''if strict:
+            return p1[1] >= 0.5 and p2[0] >= 0.5 and p3[0] >= 0.5
+        else:'''
+        matches = 0
+        non_matches = 0
+        if p1[1] >= 0.5:
+            matches += 1
+        else:
+            non_matches += 1
+        if p2[1] >= 0.5:
+            matches += 1
+        else:
+            non_matches += 1
+        if p3[1] >= 0.5:
+            matches += 1
+        else:
+            non_matches += 1
+        transitivity =  matches == 3 or non_matches == 3 or (matches == 1 and non_matches == 2)
+
+        '''
         # check identity
         p1 = np.argmax(predict_fn(pd.concat([u.reset_index(), u1.reset_index()], axis=1), model)[
             ['nomatch_score', 'match_score']].values[0])
@@ -204,9 +254,9 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
         simmetry = p1_sim == p1_sim1 and p2_sim == p2_sim1 and p3_sim == p3_sim1
 
         # check transitivity
-        transitivity = check_transitivity_text(model, predict_fn, u, v, v1, w)
+        transitivity = check_transitivity_text(model, predict_fn, u, v, v1, w)'''
 
-        return identity, simmetry, transitivity
+        return identity, symmetry, transitivity
     except:
         return False, False, False
 
