@@ -42,6 +42,7 @@ root_datadir = 'datasets/'
 generate_cf = False
 
 def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm']):
+    evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
         for dir in dirs:
             if dir in filtered_datasets:
@@ -183,5 +184,7 @@ def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itune
                                 except:
                                     pass
                 evals.to_csv("experiments/" + dir + '/'+model_name+'/eval_' + str(tmin) + '-' + str(tmax) + '.csv')
+                evals_list.append(evals)
                 if generate_cf:
                     cf_evals.to_csv("experiments/" + dir + "/"+model_name+"/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
+    return evals_list
