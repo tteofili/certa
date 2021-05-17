@@ -77,7 +77,7 @@ def get_row(r1, r2):
     return r1r2
 
 
-def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True, max=-1):
+def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, model, lj=True, max=-1):
     temp = []
     for i in range(len(source)):
         if lj:
@@ -90,7 +90,7 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
     samples = pd.concat(temp, axis=0)
     if max > 0:
         samples = samples.sample(frac=1)[:max]
-    predicted = predict_fn(samples, None)
+    predicted = predict_fn(samples, model)
     if find_positives:
         result = predicted[predicted["match_score"] > similarity_threshold][['ltable_id', 'rtable_id']]
     else:
@@ -179,15 +179,15 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True, max=max_predict)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False, max=max_predict)
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, model, lj=True, max=max_predict)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, model, lj=False, max=max_predict)
         else:
             candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
             candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False)
     else:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True, max=max_predict)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False, max=max_predict)
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, model, lj=True, max=max_predict)
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, model, lj=False, max=max_predict)
         else:
             candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)
             candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False)
