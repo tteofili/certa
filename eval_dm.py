@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 import os
-import gensim.downloader as api
-import models.DeepER as dp
 from certa.local_explain import dataset_local
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
@@ -49,7 +47,7 @@ for subdir, dirs, files in os.walk(root_datadir):
             continue
         for robust in [False, True]:
             os.makedirs('experiments/' + dir, exist_ok=True)
-            model_name = 'emt'
+            model_name = 'dm'
             if robust:
                 model_name = model_name + '_robust'
             os.makedirs('experiments/' + dir + '/' + model_name, exist_ok=True)
@@ -71,6 +69,7 @@ for subdir, dirs, files in os.walk(root_datadir):
             save_path = 'models/' + model_name + '/' + dir
             if robust:
                 save_path = save_path + '_robust'
+            save_path = save_path + '.pth'
             model = DMERModel()
             try:
                 model.load(save_path)

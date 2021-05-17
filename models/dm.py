@@ -205,7 +205,7 @@ class DMERModel():
         # read dataset
         trainLab, validationLab = dm.data.process(cache=dataset_name + '.pth', path='', train=train_file,
                                                   validation=valid_file, left_prefix='ltable_',
-                                                  right_prefix='rtable_', )
+                                                  right_prefix='rtable_')
         self.initialize_models(trainLab)
 
         print("TRAINING with " + str(len(trainLab)) + " samples")
