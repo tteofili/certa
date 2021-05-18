@@ -210,7 +210,3 @@ def eval_deeper(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_i
                 if generate_cf:
                     cf_evals.to_csv("experiments/" + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
     return evals_list
-
-
-res = eval_deeper()
-print(res)
