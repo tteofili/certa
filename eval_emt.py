@@ -87,15 +87,12 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                     class_to_explain = np.argmax(prediction)
 
                     label = rand_row["label"]
-                    print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={label}')
 
                     # get triangle 'cuts' depending on the length of the sources
                     up_bound = min(len(lsource), len(rsource))
                     cuts = [100]
 
                     for nt in cuts:
-                        print('running CERTA with nt=' + str(nt))
-                        print(f'generating explanation')
                         local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
                                                                             tmin, tmax, predict_fn, num_triangles=nt,
                                                                             class_to_explain=class_to_explain, use_predict=True,
@@ -107,7 +104,6 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                                                                                    pd.concat([rsource, gleft_df])],
                                                                                   model, predict_fn, class_to_explain,
                                                                                   maxLenAttributeSet, True)
-                            print(explanation)
                             triangles_df = pd.DataFrame()
                             if len(triangles) > 0:
                                 triangles_df = pd.DataFrame(triangles)
@@ -120,7 +116,6 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                                 expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model,
                                                             prediction, rsource,
                                                             r_tuple, predict_fn)
-                                print(expl_evaluation.head())
                                 expl_evaluation['t_requested'] = nt
                                 expl_evaluation['t_obtained'] = len(triangles)
                                 expl_evaluation['label'] = label
@@ -136,7 +131,6 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                                 evals.to_csv('experiments/' + dir + '/'+ model_name +'/eval.csv')
 
                             if generate_cf:
-                                print(f'generating cf explanation')
                                 try:
                                     cf_class = abs(1 - int(class_to_explain))
 
@@ -159,7 +153,6 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                                             cf_expl_evaluation['t_requested'] = nt
                                             cf_expl_evaluation['t_obtained'] = len(triangles_cf)
                                             cf_expl_evaluation['label'] = label
-                                            print(cf_expl_evaluation.head())
                                             cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
                                             cf_evals.to_csv('experiments/'+dir+'/'+ model_name +'/eval-cf.csv')
                                         if len(triangles_cf) > 0:

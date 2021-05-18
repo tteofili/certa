@@ -48,7 +48,7 @@ def get_original_prediction(r1, r2, model):
 
 root_datadir = 'datasets/'
 generate_cf = False
-def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm']):
+def eval_deeper(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm']):
     evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
         for dir in dirs:
@@ -97,7 +97,8 @@ def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itune
                                              robust=robust).dropna()
                     valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
                     model = dp.init_DeepER_model(emb_dim)
-                    model = dp.train_model_ER(to_deeper_data(pd.concat([train_df, valid_df])), model, embeddings_model, tokenizer, end=dir, save_path=path)
+                    model = dp.train_model_ER(to_deeper_data(pd.concat([train_df, valid_df])), model, embeddings_model,
+                                              tokenizer, end=dir, save_path=save_path)
                     report = dp.model_statistics(to_deeper_data(valid_df), model, embeddings_model, tokenizer)
                     print(report)
                     dp.save(model, save_path)
@@ -119,15 +120,12 @@ def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itune
                     class_to_explain = np.argmax(prediction)
 
                     label = rand_row["label"]
-                    print(f'({l_id}-{r_id}) -> pred={class_to_explain}, label={label}')
 
                     # get triangle 'cuts' depending on the length of the sources
                     up_bound = min(len(lsource), len(rsource))
                     cuts = [100]
 
                     for nt in cuts:
-                        print('running CERTA with nt=' + str(nt))
-                        print(f'generating explanation')
                         local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model_stuff, lsource, rsource,
                                                                            datadir,
                                                                            tmin, tmax, predict_fn, num_triangles=nt,
@@ -173,7 +171,6 @@ def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itune
                                     pass
 
                             if generate_cf:
-                                print(f'generating cf explanation')
                                 try:
                                     cf_class = abs(1 - int(class_to_explain))
 
@@ -196,7 +193,6 @@ def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itune
                                             cf_expl_evaluation['t_requested'] = nt
                                             cf_expl_evaluation['t_obtained'] = len(triangles_cf)
                                             cf_expl_evaluation['label'] = label
-                                            print(cf_expl_evaluation.head())
                                             cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
                                             cf_evals.to_csv('experiments/'+dir+'/'+model_name+'/eval-cf.csv')
                                         if len(triangles_cf) > 0:
