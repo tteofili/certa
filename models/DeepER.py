@@ -291,7 +291,7 @@ def model_statistics(data, model, embeddings_model, tokenizer):
         precision=-1
         recall=-1
 
-    return precision,recall,fmeasure
+    return (precision, recall, fmeasure)
 
 
 def predict(data, model, embeddings_model, tokenizer):

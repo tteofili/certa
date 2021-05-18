@@ -7,19 +7,6 @@ from certa.eval import expl_eval
 from certa.utils import merge_sources
 from models.dm import DMERModel
 
-def to_deeper_data(df: pd.DataFrame):
-    res = []
-    for r in range(len(df)):
-        row = df.iloc[r]
-        lpd = row.filter(regex='^ltable_')
-        rpd = row.filter(regex='^rtable_')
-        if 'label' in row:
-            label = row['label']
-            res.append((lpd.values.astype('str'), rpd.values.astype('str'), label))
-        else:
-            res.append((lpd.values.astype('str'), rpd.values.astype('str')))
-    return res
-
 
 def predict_fn(x, model, ignore_columns=['ltable_id', 'rtable_id', 'label']):
     return model.predict(x)
