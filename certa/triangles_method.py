@@ -130,16 +130,14 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     for subset in allAttributesSubsets:  # iterate over the attribute power set
         perturbedAttributes.append(subset)
         if classToExplain == 1:
-            newRecord = triangle[1].copy()  # copy the r1 tuple
-            rightRecordId = triangleIds[1]
+            newRecord = triangle[0].copy()  # copy the l1 tuple
             for att in subset:
-                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from no-match l2 tuple into l1
+                newRecord[att] = triangle[2][att]  # copy the value for the given attribute from l2 of no-match l2, r1 pair into l1
             perturbations.append(newRecord)  # append the new record
         else:
             newRecord = triangle[2].copy()  # copy the l2 tuple
-            rightRecordId = triangleIds[2]
             for att in subset:
-                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from match r1 tuple into l1
+                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from l1 of match l1, r1 pair into l2
             perturbations.append(newRecord)  # append the new record
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
@@ -150,7 +148,7 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
     allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
     allPerturbations['alteredAttributes'] = perturbedAttributes
-    allPerturbations['originalRightId'] = rightRecordId
+
     return allPerturbations
 
 
@@ -197,15 +195,13 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
 
         identity = predictions[0] == 1 and predictions[1] == 1 and predictions[2] == 1
 
-        symmetry = predictions[3] == predictions[4] and predictions[5] == predictions[6] and predictions[7] == predictions[8]
+        symmetry = predictions[3] == predictions[4] and predictions[5] == predictions[6] \
+                   and predictions[7] == predictions[8]
 
         p1 = predictions[9]
         p2 = predictions[10]
         p3 = predictions[11]
 
-        '''if strict:
-            return p1[1] >= 0.5 and p2[0] >= 0.5 and p3[0] >= 0.5
-        else:'''
         matches = 0
         non_matches = 0
         if p1[1] >= 0.5:
@@ -220,41 +216,7 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
             matches += 1
         else:
             non_matches += 1
-        transitivity =  matches == 3 or non_matches == 3 or (matches == 1 and non_matches == 2)
-
-        '''
-        # check identity
-        p1 = np.argmax(predict_fn(pd.concat([u.reset_index(), u1.reset_index()], axis=1), model)[
-            ['nomatch_score', 'match_score']].values[0])
-
-        p2 = np.argmax(predict_fn(pd.concat([v1.reset_index(), v.reset_index()], axis=1), model)[
-                           ['nomatch_score', 'match_score']].values[0])
-
-        p3 = np.argmax(predict_fn(pd.concat([w1.reset_index(), w.reset_index()], axis=1), model)[
-                           ['nomatch_score', 'match_score']].values[0])
-
-        identity = p1 == 1 and p2 == 1 and p3 == 1
-
-        # check symmetry
-        p1_sim = np.argmax(predict_fn(pd.concat([u.reset_index(), v.reset_index()], axis=1), model)[
-                      ['nomatch_score', 'match_score']].values[0])
-        p1_sim1 = np.argmax(predict_fn(pd.concat([v1.reset_index(), u1.reset_index()], axis=1), model)[
-                               ['nomatch_score', 'match_score']].values[0])
-
-        p2_sim = np.argmax(predict_fn(pd.concat([u.reset_index(), w.reset_index()], axis=1), model)[
-                               ['nomatch_score', 'match_score']].values[0])
-        p2_sim1 = np.argmax(predict_fn(pd.concat([w1.reset_index(), u1.reset_index()], axis=1), model)[
-                                ['nomatch_score', 'match_score']].values[0])
-
-        p3_sim = np.argmax(predict_fn(pd.concat([v1.reset_index(), w.reset_index()], axis=1), model)[
-                               ['nomatch_score', 'match_score']].values[0])
-        p3_sim1 = np.argmax(predict_fn(pd.concat([w1.reset_index(), v.reset_index()], axis=1), model)[
-                                ['nomatch_score', 'match_score']].values[0])
-
-        simmetry = p1_sim == p1_sim1 and p2_sim == p2_sim1 and p3_sim == p3_sim1
-
-        # check transitivity
-        transitivity = check_transitivity_text(model, predict_fn, u, v, v1, w)'''
+        transitivity = matches == 3 or non_matches == 3 or (matches == 1 and non_matches == 2)
 
         return identity, symmetry, transitivity
     except:
@@ -286,7 +248,7 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,
-                   class_to_explain: int, maxLenAttributeSet: int, check: bool):
+                   class_to_explain: int, maxLenAttributeSet: int, check: bool, tokens: bool = False):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     rankings = []
@@ -301,7 +263,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
                                                                    class_to_explain)
             currPerturbedAttr = currentPerturbations.alteredAttributes.values
             predictions = predict_fn(currentPerturbations, model)
-            predictions = predictions.drop(columns=['alteredAttributes', 'originalRightId'])
+            predictions = predictions.drop(columns=['alteredAttributes'])
             proba = predictions[['nomatch_score', 'match_score']].values
             curr_flippedPredictions = currentPerturbations[proba[:, class_to_explain] < 0.5]
             flippedPredictions.append(curr_flippedPredictions)
@@ -326,6 +288,24 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
         filtered_exp = defaultdict(int)
         for te in filtered:
             filtered_exp[te] = explanations[te]
+
+        if tokens:
+            for exp in filtered_exp:
+                e_attrs = exp.split('/')
+                e_score = explanation[exp]
+
+                for triangle in tqdm(allTriangles):
+                    currentPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, e_attrs, maxLenAttributeSet,
+                                                                           class_to_explain)
+                    currPerturbedAttr = currentPerturbations.alteredAttributes.values
+                    predictions = predict_fn(currentPerturbations, model)
+                    predictions = predictions.drop(columns=['alteredAttributes', 'originalRightId'])
+                    proba = predictions[['nomatch_score', 'match_score']].values
+                    curr_flippedPredictions = currentPerturbations[proba[:, class_to_explain] < 0.5]
+                    flippedPredictions.append(curr_flippedPredictions)
+                    ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
+                    rankings.append(ranking)
+
 
         return filtered_exp, flippedPredictions_df, allTriangles
     else:
@@ -354,3 +334,36 @@ def aggregateRankings(ranking_l: list, lenTriangles: int, maxLenAttributeSet: in
 
     alteredAttr = list(map(lambda t: "/".join(t), aggregateRanking_normalized.keys()))
     return pd.Series(data=list(aggregateRanking_normalized.values()), index=alteredAttr)
+
+def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain,
+                                    lprefix='ltable_', rprefix='rtable_', use_tokens: bool = False):
+    # generate power set of attributes
+    allAttributesSubsets = list(_powerset(attributes, 1, maxLenAttributeSet))
+    triangle = __getRecords(sourcesMap, triangleIds)  # get triangle values
+    perturbations = []
+    perturbedAttributes = []
+    for subset in allAttributesSubsets:  # iterate over the attribute power set
+        perturbedAttributes.append(subset)
+        if classToExplain == 1:
+            newRecord = triangle[1].copy()  # copy the r1 tuple
+            rightRecordId = triangleIds[1]
+            for att in subset:
+                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from no-match l2 tuple into l1
+            perturbations.append(newRecord)  # append the new record
+        else:
+            newRecord = triangle[2].copy()  # copy the l2 tuple
+            rightRecordId = triangleIds[2]
+            for att in subset:
+                newRecord[att] = triangle[0][att]  # copy the value for the given attribute from match r1 tuple into l1
+            perturbations.append(newRecord)  # append the new record
+    perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
+    r2 = triangle[1].copy()
+    r2_copy = [r2] * len(perturbations_df)
+    r2_df = pd.DataFrame(r2_copy, index=np.arange(len(perturbations)))
+    _renameColumnsWithPrefix(rprefix, r2_df)
+    _renameColumnsWithPrefix(lprefix, perturbations_df)
+    allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
+    allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
+    allPerturbations['alteredAttributes'] = perturbedAttributes
+    allPerturbations['originalRightId'] = rightRecordId
+    return allPerturbations

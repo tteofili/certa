@@ -78,7 +78,10 @@ def eval_deeper(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_i
 
                 test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()[:50]
 
-                os.makedirs('models/' + model_name + '/' + dir, exist_ok=True)
+                try:
+                    os.makedirs('models/' + model_name + '/' + dir, exist_ok=True)
+                except:
+                    pass
                 save_path = 'models/' + model_name + '/' + dir
                 if robust:
                     save_path = save_path + '_robust'
@@ -207,3 +210,7 @@ def eval_deeper(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_i
                 if generate_cf:
                     cf_evals.to_csv("experiments/" + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
     return evals_list
+
+
+res = eval_deeper()
+print(res)
