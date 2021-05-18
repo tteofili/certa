@@ -34,7 +34,7 @@ def predict_fn(x, model_stuff, ignore_columns=['ltable_id', 'rtable_id', 'label'
     return pd.concat([x.copy(), out_df], axis=1)
 
 
-def get_original_prediction(r1, r2):
+def get_original_prediction(r1, r2, model):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -115,7 +115,7 @@ def eval_dm(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itune
                     r_id = int(rand_row['rtable_id'])
                     r_tuple = rsource.iloc[r_id]
 
-                    prediction = get_original_prediction(l_tuple, r_tuple)
+                    prediction = get_original_prediction(l_tuple, r_tuple, model_stuff)
                     class_to_explain = np.argmax(prediction)
 
                     label = rand_row["label"]
