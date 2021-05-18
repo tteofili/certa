@@ -29,7 +29,8 @@ def get_original_prediction(r1, r2, model):
 root_datadir = 'datasets/'
 generate_cf = False
 
-def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm']):
+def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon',
+                                           'dirty_dblp_acm', 'dblp_scholar', 'dblp_acm', 'walmart_amazon', 'amazon_google']):
     evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
         for dir in dirs:
