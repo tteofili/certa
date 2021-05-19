@@ -63,3 +63,12 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
             except:
                 pass
     return dataset
+
+
+def diff(a: str, b: str):
+    d = set(a.split(' ')).difference(b.split(' '))
+    if len(d) == 0:
+        d = '+'+str(set(b.split(' ')).difference(a.split(' ')))
+    else:
+        d = '-'+str(d)
+    return d

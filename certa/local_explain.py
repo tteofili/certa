@@ -3,6 +3,7 @@ import math, re, os, random, string
 from collections import Counter
 import numpy as np
 from certa.edit_dna import Sequence
+from certa.utils import diff
 
 '''
 N.B. For now this script can only work using deepmatcher
@@ -296,13 +297,6 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
 
     return generated_df, generated_records_left_df, generated_records_right_df
 
-def diff(a: str, b: str):
-    d = set(a.split(' ')).difference(b.split(' '))
-    if len(d) == 0:
-        d = '+'+str(set(b.split(' ')).difference(a.split(' ')))
-    else:
-        d = '-'+str(d)
-    return d
 
 def get_neighbors(findPositives, model, predict_fn, r1r2c, report:bool = False):
     original = r1r2c.copy()
