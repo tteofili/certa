@@ -257,7 +257,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
     rankings = []
     flippedPredictions = []
     t_i = 0
-    identity, symmetry, transitivity = True
+    transitivity = True
     for triangle in tqdm(allTriangles):
         try:
             if check:
