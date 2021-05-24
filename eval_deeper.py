@@ -48,7 +48,7 @@ def get_original_prediction(r1, r2, model):
 
 root_datadir = 'datasets/'
 generate_cf = False
-def eval_deeper(max_predict = 500, discard_bad = False, filtered_datasets: list = []):
+def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_datasets: list = []):
     evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
         for dir in dirs:
@@ -75,7 +75,7 @@ def eval_deeper(max_predict = 500, discard_bad = False, filtered_datasets: list 
                 valid = pd.read_csv(datadir + '/valid.csv')
                 test = pd.read_csv(datadir + '/test.csv')
 
-                test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()[:50]
+                test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], []).dropna()[:samples]
 
                 try:
                     os.makedirs('models/' + model_name + '/' + dir, exist_ok=True)
