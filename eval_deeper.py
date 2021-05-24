@@ -54,7 +54,7 @@ def eval_deeper(max_predict = 500, discard_bad = False, filtered_datasets: list 
         for dir in dirs:
             if dir in filtered_datasets:
                 continue
-            for robust in [ True]:
+            for robust in [False, True]:
                 os.makedirs('experiments/' + dir, exist_ok=True)
                 os.makedirs('experiments/' + dir + '/deeper/', exist_ok=True)
                 if dir == 'temporary':
