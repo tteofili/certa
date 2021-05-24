@@ -250,17 +250,21 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,
-                   class_to_explain: int, maxLenAttributeSet: int, check: bool, tokens: bool = False):
+                   class_to_explain: int, maxLenAttributeSet: int, check: bool, tokens: bool = False,
+                   discard_bad: bool = False):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     rankings = []
     flippedPredictions = []
     t_i = 0
+    identity, symmetry, transitivity = True
     for triangle in tqdm(allTriangles):
         try:
             if check:
-                identity, simmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn, model)
-                allTriangles[t_i] = allTriangles[t_i] + (identity, simmetry, transitivity, )
+                identity, symmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn, model)
+                allTriangles[t_i] = allTriangles[t_i] + (identity, symmetry, transitivity, )
+            if check and discard_bad and not transitivity:
+                continue
             currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
                                                                    class_to_explain)
             currPerturbedAttr = currentPerturbations.alteredAttributes.values

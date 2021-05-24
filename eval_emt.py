@@ -29,8 +29,7 @@ def get_original_prediction(r1, r2, model):
 root_datadir = 'datasets/'
 generate_cf = False
 
-def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon',
-                                           'dirty_dblp_acm', 'dblp_scholar', 'dblp_acm', 'walmart_amazon', 'amazon_google']):
+def eval_emt(max_predict = 500, discard_bad = False, filtered_datasets: list = []):
     evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
         for dir in dirs:
@@ -69,7 +68,9 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                     train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'], robust=robust).dropna()
                     valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id']).dropna()
                     report = model.classic_training(train_df, valid_df, dir)
-                    print(report)
+                    text_file = open(save_path + '_report.txt', "w")
+                    text_file.write(str(report))
+                    text_file.close()
                     model.save(save_path)
 
                 tmin = 0.5
@@ -97,14 +98,15 @@ def eval_emt(filtered_datasets: list = ['dirty_dblp_scholar', 'dirty_amazon_itun
                         local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model, lsource, rsource, datadir,
                                                                             tmin, tmax, predict_fn, num_triangles=nt,
                                                                             class_to_explain=class_to_explain, use_predict=True,
-                                                                            max_predict=500)
+                                                                            max_predict=max_predict)
                         if len(local_samples) > 2:
                             maxLenAttributeSet = len(l_tuple) - 1
                             explanation, flipped_pred, triangles = explainSamples(local_samples,
                                                                                   [pd.concat([lsource, gright_df]),
                                                                                    pd.concat([rsource, gleft_df])],
                                                                                   model, predict_fn, class_to_explain,
-                                                                                  maxLenAttributeSet, True)
+                                                                                  maxLenAttributeSet, True,
+                                                                                  discard_bad=discard_bad)
                             triangles_df = pd.DataFrame()
                             if len(triangles) > 0:
                                 triangles_df = pd.DataFrame(triangles)
