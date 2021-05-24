@@ -206,15 +206,15 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
 
         matches = 0
         non_matches = 0
-        if p1[1] >= 0.5:
+        if p1 == 1:
             matches += 1
         else:
             non_matches += 1
-        if p2[1] >= 0.5:
+        if p2 == 1:
             matches += 1
         else:
             non_matches += 1
-        if p3[1] >= 0.5:
+        if p3 == 1:
             matches += 1
         else:
             non_matches += 1
