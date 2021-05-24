@@ -212,5 +212,3 @@ def eval_deeper(max_predict = 500, discard_bad = False, filtered_datasets: list 
                 if generate_cf:
                     cf_evals.to_csv("experiments/" + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
     return evals_list
-
-eval_deeper()
