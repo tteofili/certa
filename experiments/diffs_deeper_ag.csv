@@ -1,0 +1,539 @@
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,,,,0@393#1@393,0.29892436
+1,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3226,visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,-{'microsoft'},rtable_title,5,0@393#1@3226,0.75088197
+2,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3227,microsoft,microsoft software,5099.0,"-{'studio', '2005', 'test', 'visual', 'processor', 'license', '1', 'agent', 'cd'}",rtable_title,5,0@393#1@3227,0.003872318
+3,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3228,studio test agent 2005 cd 1 processor license,microsoft software,5099.0,"-{'microsoft', 'visual'}",rtable_title,5,0@393#1@3228,0.8723358
+4,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3229,microsoft visual,microsoft software,5099.0,"-{'studio', '2005', 'test', 'processor', 'license', '1', 'agent', 'cd'}",rtable_title,5,0@393#1@3229,0.0077722985
+5,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3230,test agent 2005 cd 1 processor license,microsoft software,5099.0,"-{'microsoft', 'studio', 'visual'}",rtable_title,5,0@393#1@3230,0.5433716
+6,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3231,microsoft visual studio,microsoft software,5099.0,"-{'2005', 'test', 'processor', 'license', '1', 'agent', 'cd'}",rtable_title,5,0@393#1@3231,0.0046407357
+7,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3232,agent 2005 cd 1 processor license,microsoft software,5099.0,"-{'microsoft', 'studio', 'test', 'visual'}",rtable_title,5,0@393#1@3232,0.47104523
+8,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3233,microsoft visual studio test,microsoft software,5099.0,"-{'2005', 'processor', 'license', '1', 'agent', 'cd'}",rtable_title,5,0@393#1@3233,0.07308842
+9,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3234,2005 cd 1 processor license,microsoft software,5099.0,"-{'microsoft', 'studio', 'test', 'visual', 'agent'}",rtable_title,5,0@393#1@3234,0.089127295
+10,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3235,microsoft visual studio test agent,microsoft software,5099.0,"-{'2005', 'processor', 'license', '1', 'cd'}",rtable_title,5,0@393#1@3235,0.06200791
+11,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3236,cd 1 processor license,microsoft software,5099.0,"-{'microsoft', 'studio', '2005', 'test', 'visual', 'agent'}",rtable_title,5,0@393#1@3236,0.073162906
+12,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3237,microsoft visual studio test agent 2005,microsoft software,5099.0,"-{'processor', 'license', '1', 'cd'}",rtable_title,5,0@393#1@3237,0.076039836
+13,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3238,1 processor license,microsoft software,5099.0,"-{'microsoft', 'studio', '2005', 'test', 'visual', 'agent', 'cd'}",rtable_title,5,0@393#1@3238,0.09272083
+14,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3239,microsoft visual studio test agent 2005 cd,microsoft software,5099.0,"-{'processor', 'license', '1'}",rtable_title,5,0@393#1@3239,0.03971537
+15,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3240,processor license,microsoft software,5099.0,"-{'microsoft', 'studio', '2005', 'test', 'visual', '1', 'agent', 'cd'}",rtable_title,5,0@393#1@3240,0.027202446
+16,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3241,microsoft visual studio test agent 2005 cd 1,microsoft software,5099.0,"-{'processor', 'license'}",rtable_title,5,0@393#1@3241,0.049598664
+17,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3242,license,microsoft software,5099.0,"-{'microsoft', 'studio', '2005', 'test', 'visual', 'processor', '1', 'agent', 'cd'}",rtable_title,5,0@393#1@3242,0.0019141291
+18,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3243,microsoft visual studio test agent 2005 cd 1 processor,microsoft software,5099.0,-{'license'},rtable_title,5,0@393#1@3243,0.17897259
+19,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3244,microsoft visual studio test agent 2005 cd 1 processor license,software,5099.0,-{'microsoft'},rtable_manufacturer,6,0@393#1@3244,0.34254572
+20,393,microsoft visual studio test agent 2005 cd 1 processor license,microsoft software,5099.0,3245,microsoft visual studio test agent 2005 cd 1 processor license,microsoft,5099.0,-{'software'},rtable_manufacturer,6,0@393#1@3245,0.11395782
+0,831,individual software professor teaches microsoft office 2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,,,,0@831#1@831,0.08569824
+1,1363,software professor teaches microsoft office 2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,-{'individual'},ltable_title,1,0@1363#1@831,0.30074134
+2,1364,individual,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'microsoft', 'teaches', 'office', 'software', 'professor', '2007'}",ltable_title,1,0@1364#1@831,0.008199776
+3,1365,professor teaches microsoft office 2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'individual', 'software'}",ltable_title,1,0@1365#1@831,0.67193735
+4,1366,individual software,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'microsoft', 'teaches', 'office', 'professor', '2007'}",ltable_title,1,0@1366#1@831,0.002683953
+5,1367,teaches microsoft office 2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'individual', 'software', 'professor'}",ltable_title,1,0@1367#1@831,0.43036714
+6,1368,individual software professor,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'microsoft', 'teaches', 'office', '2007'}",ltable_title,1,0@1368#1@831,0.07407178
+7,1369,microsoft office 2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'teaches', 'individual', 'software', 'professor'}",ltable_title,1,0@1369#1@831,0.22477394
+8,1370,individual software professor teaches,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'microsoft', 'office', '2007'}",ltable_title,1,0@1370#1@831,0.06953192
+9,1371,office 2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'microsoft', 'teaches', 'individual', 'software', 'professor'}",ltable_title,1,0@1371#1@831,0.72716784
+10,1372,individual software professor teaches microsoft,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'office', '2007'}",ltable_title,1,0@1372#1@831,0.074323304
+11,1373,2007,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,"-{'microsoft', 'teaches', 'individual', 'office', 'software', 'professor'}",ltable_title,1,0@1373#1@831,0.026090948
+12,1374,individual software professor teaches microsoft office,,29.99,831,individual software professor teaches microsoft office 2007,,29.99,-{'2007'},ltable_title,1,0@1374#1@831,0.084784195
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,654,acrobat professional 8 ( windows ),adobe,273.0,654,acrobat professional 8 ( windows ),adobe,273.0,,,,0@654#1@654,0.21008836
+1,654,acrobat professional 8 ( windows ),adobe,273.0,3226,professional 8 ( windows ),adobe,273.0,-{'acrobat'},rtable_title,5,0@654#1@3226,0.3408695
+2,654,acrobat professional 8 ( windows ),adobe,273.0,3227,acrobat,adobe,273.0,"-{')', 'windows', '(', '8', 'professional'}",rtable_title,5,0@654#1@3227,0.000228695
+3,654,acrobat professional 8 ( windows ),adobe,273.0,3228,8 ( windows ),adobe,273.0,"-{'acrobat', 'professional'}",rtable_title,5,0@654#1@3228,0.3587198
+4,654,acrobat professional 8 ( windows ),adobe,273.0,3229,acrobat professional,adobe,273.0,"-{')', 'windows', '(', '8'}",rtable_title,5,0@654#1@3229,0.00055426644
+5,654,acrobat professional 8 ( windows ),adobe,273.0,3230,( windows ),adobe,273.0,"-{'8', 'acrobat', 'professional'}",rtable_title,5,0@654#1@3230,0.033127353
+6,654,acrobat professional 8 ( windows ),adobe,273.0,3231,acrobat professional 8,adobe,273.0,"-{')', 'windows', '('}",rtable_title,5,0@654#1@3231,0.008919102
+7,654,acrobat professional 8 ( windows ),adobe,273.0,3232,windows ),adobe,273.0,"-{'(', '8', 'acrobat', 'professional'}",rtable_title,5,0@654#1@3232,0.0016057318
+8,654,acrobat professional 8 ( windows ),adobe,273.0,3233,acrobat professional 8 (,adobe,273.0,"-{')', 'windows'}",rtable_title,5,0@654#1@3233,0.03161151
+9,654,acrobat professional 8 ( windows ),adobe,273.0,3234,),adobe,273.0,"-{'windows', '(', '8', 'acrobat', 'professional'}",rtable_title,5,0@654#1@3234,0.024615718
+10,654,acrobat professional 8 ( windows ),adobe,273.0,3235,acrobat professional 8 ( windows,adobe,273.0,-{')'},rtable_title,5,0@654#1@3235,0.1995071
+0,1183,web easy ( r ) professional 6,,49.99,1183,web easy ( r ) professional 6,,49.99,,,,0@1183#1@1183,0.7475517
+1,1363,easy ( r ) professional 6,,49.99,1183,web easy ( r ) professional 6,,49.99,-{'web'},ltable_title,1,0@1363#1@1183,0.80301327
+2,1364,web,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{')', '(', 'easy', '6', 'r', 'professional'}",ltable_title,1,0@1364#1@1183,0.0010252236
+3,1365,( r ) professional 6,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{'web', 'easy'}",ltable_title,1,0@1365#1@1183,0.7457593
+4,1366,web easy,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{')', '(', '6', 'r', 'professional'}",ltable_title,1,0@1366#1@1183,0.01064256
+5,1367,r ) professional 6,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{'(', 'web', 'easy'}",ltable_title,1,0@1367#1@1183,0.5495174
+6,1368,web easy (,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{')', '6', 'r', 'professional'}",ltable_title,1,0@1368#1@1183,0.18929279
+7,1369,) professional 6,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{'(', 'web', 'easy', 'r'}",ltable_title,1,0@1369#1@1183,0.037619762
+8,1370,web easy ( r,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{')', '6', 'professional'}",ltable_title,1,0@1370#1@1183,0.7085789
+9,1371,professional 6,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{')', '(', 'web', 'easy', 'r'}",ltable_title,1,0@1371#1@1183,0.002882725
+10,1372,web easy ( r ),,49.99,1183,web easy ( r ) professional 6,,49.99,"-{'6', 'professional'}",ltable_title,1,0@1372#1@1183,0.8228558
+11,1373,6,,49.99,1183,web easy ( r ) professional 6,,49.99,"-{')', '(', 'web', 'easy', 'r', 'professional'}",ltable_title,1,0@1373#1@1183,0.024966596
+12,1374,web easy ( r ) professional,,49.99,1183,web easy ( r ) professional 6,,49.99,-{'6'},ltable_title,1,0@1374#1@1183,0.6808695
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,858,microsoft onenote 2007 upgrade,microsoft,79.95,858,microsoft onenote 2007 upgrade,microsoft,79.95,,,,0@858#1@858,0.29563698
+1,858,microsoft onenote 2007 upgrade,microsoft,79.95,3226,onenote 2007 upgrade,microsoft,79.95,-{'microsoft'},rtable_title,5,0@858#1@3226,0.40051603
+2,858,microsoft onenote 2007 upgrade,microsoft,79.95,3227,microsoft,microsoft,79.95,"-{'onenote', 'upgrade', '2007'}",rtable_title,5,0@858#1@3227,0.011741351
+3,858,microsoft onenote 2007 upgrade,microsoft,79.95,3228,2007 upgrade,microsoft,79.95,"-{'microsoft', 'onenote'}",rtable_title,5,0@858#1@3228,0.27070022
+4,858,microsoft onenote 2007 upgrade,microsoft,79.95,3229,microsoft onenote,microsoft,79.95,"-{'upgrade', '2007'}",rtable_title,5,0@858#1@3229,0.03451733
+5,858,microsoft onenote 2007 upgrade,microsoft,79.95,3230,upgrade,microsoft,79.95,"-{'microsoft', 'onenote', '2007'}",rtable_title,5,0@858#1@3230,0.28594065
+6,858,microsoft onenote 2007 upgrade,microsoft,79.95,3231,microsoft onenote 2007,microsoft,79.95,-{'upgrade'},rtable_title,5,0@858#1@3231,0.078133345
+0,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,,,,0@1805#1@1805,0.78739524
+1,1363,microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,-{'164-04052'},ltable_title,1,0@1363#1@1805,0.78739524
+2,1364,164-04052,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', 'win', 'cd', 'pc', 'version', 'en', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1364#1@1805,1.1679901e-06
+3,1365,office publisher 2007 version upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'microsoft', '164-04052'}",ltable_title,1,0@1365#1@1805,0.876207
+4,1366,164-04052 microsoft,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'office', 'win', 'cd', 'pc', 'version', 'en', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1366#1@1805,5.5918295e-05
+5,1367,publisher 2007 version upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'microsoft', 'office', '164-04052'}",ltable_title,1,0@1367#1@1805,0.9394885
+6,1368,164-04052 microsoft office,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'win', 'cd', 'pc', 'version', 'en', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1368#1@1805,0.000854118
+7,1369,2007 version upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052'}",ltable_title,1,0@1369#1@1805,0.8483269
+8,1370,164-04052 microsoft office publisher,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'cd', 'pc', 'version', 'en', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1370#1@1805,0.0053805746
+9,1371,version upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052', '2007'}",ltable_title,1,0@1371#1@1805,0.79897046
+10,1372,164-04052 microsoft office publisher 2007,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'cd', 'pc', 'version', 'en', '1', 'package', 'upgrade'}",ltable_title,1,0@1372#1@1805,0.021976883
+11,1373,upgrade package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052', 'version', '2007'}",ltable_title,1,0@1373#1@1805,0.09230673
+12,1374,164-04052 microsoft office publisher 2007 version,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'cd', 'pc', 'en', '1', 'package', 'upgrade'}",ltable_title,1,0@1374#1@1805,0.057214227
+13,1375,package 1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052', 'version', 'upgrade', '2007'}",ltable_title,1,0@1375#1@1805,0.66726524
+14,1376,164-04052 microsoft office publisher 2007 version upgrade,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'cd', 'pc', 'en', '1', 'package'}",ltable_title,1,0@1376#1@1805,0.061508007
+15,1377,1 pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052', 'version', 'package', 'upgrade', '2007'}",ltable_title,1,0@1377#1@1805,0.8267917
+16,1378,164-04052 microsoft office publisher 2007 version upgrade package,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'pc', '1', 'cd', 'en'}",ltable_title,1,0@1378#1@1805,0.08785443
+17,1379,pc cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052', 'version', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1379#1@1805,0.16862765
+18,1380,164-04052 microsoft office publisher 2007 version upgrade package 1,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'pc', 'cd', 'en'}",ltable_title,1,0@1380#1@1805,0.13438281
+19,1381,cd win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', '164-04052', 'pc', 'version', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1381#1@1805,0.18362986
+20,1382,164-04052 microsoft office publisher 2007 version upgrade package 1 pc,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'cd', 'en'}",ltable_title,1,0@1382#1@1805,0.08086966
+21,1383,win en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', 'cd', '164-04052', 'pc', 'version', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1383#1@1805,0.010754905
+22,1384,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'win', 'en'}",ltable_title,1,0@1384#1@1805,0.14353031
+23,1385,en,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,"-{'publisher', 'microsoft', 'office', 'win', 'cd', '164-04052', 'pc', 'version', '1', 'package', 'upgrade', '2007'}",ltable_title,1,0@1385#1@1805,0.0010302534
+24,1386,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win,,88.8,1805,164-04052 microsoft office publisher 2007 version upgrade package 1 pc cd win en,,88.8,-{'en'},ltable_title,1,0@1386#1@1805,0.5766913
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,522,microsoft visio standard 2007,microsoft,259.95,522,microsoft visio standard 2007,microsoft,259.95,,,,0@522#1@522,0.021818468
+1,522,microsoft visio standard 2007,microsoft,259.95,3226,visio standard 2007,microsoft,259.95,-{'microsoft'},rtable_title,5,0@522#1@3226,0.023992768
+2,522,microsoft visio standard 2007,microsoft,259.95,3227,microsoft,microsoft,259.95,"-{'standard', 'visio', '2007'}",rtable_title,5,0@522#1@3227,0.010232663
+3,522,microsoft visio standard 2007,microsoft,259.95,3228,standard 2007,microsoft,259.95,"-{'microsoft', 'visio'}",rtable_title,5,0@522#1@3228,0.038428746
+4,522,microsoft visio standard 2007,microsoft,259.95,3229,microsoft visio,microsoft,259.95,"-{'standard', '2007'}",rtable_title,5,0@522#1@3229,0.004558593
+5,522,microsoft visio standard 2007,microsoft,259.95,3230,2007,microsoft,259.95,"-{'microsoft', 'standard', 'visio'}",rtable_title,5,0@522#1@3230,0.010200424
+6,522,microsoft visio standard 2007,microsoft,259.95,3231,microsoft visio standard,microsoft,259.95,-{'2007'},rtable_title,5,0@522#1@3231,0.022801176
+0,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,,,,0@1512#1@1512,0.74367386
+1,1363,w87-02380 office sbe 2007 win32,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,-{'microsoft'},ltable_title,1,0@1363#1@1512,0.8516258
+2,1364,microsoft,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'office', 'sbe', 'w87-02380', 'win32', '2007'}",ltable_title,1,0@1364#1@1512,0.021969048
+3,1365,office sbe 2007 win32,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'microsoft', 'w87-02380'}",ltable_title,1,0@1365#1@1512,0.8516258
+4,1366,microsoft w87-02380,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'office', 'sbe', 'win32', '2007'}",ltable_title,1,0@1366#1@1512,0.021969048
+5,1367,sbe 2007 win32,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'microsoft', 'office', 'w87-02380'}",ltable_title,1,0@1367#1@1512,0.32420838
+6,1368,microsoft w87-02380 office,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'sbe', 'win32', '2007'}",ltable_title,1,0@1368#1@1512,0.20027468
+7,1369,2007 win32,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'microsoft', 'office', 'sbe', 'w87-02380'}",ltable_title,1,0@1369#1@1512,0.20044754
+8,1370,microsoft w87-02380 office sbe,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'win32', '2007'}",ltable_title,1,0@1370#1@1512,0.6167235
+9,1371,win32,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,"-{'microsoft', 'office', 'sbe', 'w87-02380', '2007'}",ltable_title,1,0@1371#1@1512,0.024968538
+10,1372,microsoft w87-02380 office sbe 2007,,400.34,1512,microsoft w87-02380 office sbe 2007 win32,,400.34,-{'win32'},ltable_title,1,0@1372#1@1512,0.7063189
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,606,microsoft office 2004 professional ( mac ),microsoft,499.99,606,microsoft office 2004 professional ( mac ),microsoft,499.99,,,,0@606#1@606,0.108358465
+1,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3226,office 2004 professional ( mac ),microsoft,499.99,-{'microsoft'},rtable_title,5,0@606#1@3226,0.19872597
+2,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3227,microsoft,microsoft,499.99,"-{'2004', ')', '(', 'office', 'mac', 'professional'}",rtable_title,5,0@606#1@3227,0.002185228
+3,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3228,2004 professional ( mac ),microsoft,499.99,"-{'microsoft', 'office'}",rtable_title,5,0@606#1@3228,0.005473758
+4,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3229,microsoft office,microsoft,499.99,"-{'2004', ')', '(', 'mac', 'professional'}",rtable_title,5,0@606#1@3229,0.013593679
+5,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3230,professional ( mac ),microsoft,499.99,"-{'2004', 'microsoft', 'office'}",rtable_title,5,0@606#1@3230,0.00042727223
+6,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3231,microsoft office 2004,microsoft,499.99,"-{')', '(', 'mac', 'professional'}",rtable_title,5,0@606#1@3231,0.053188317
+7,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3232,( mac ),microsoft,499.99,"-{'2004', 'microsoft', 'office', 'professional'}",rtable_title,5,0@606#1@3232,1.9887459e-05
+8,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3233,microsoft office 2004 professional,microsoft,499.99,"-{')', '(', 'mac'}",rtable_title,5,0@606#1@3233,0.057806116
+9,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3234,mac ),microsoft,499.99,"-{'2004', 'microsoft', '(', 'office', 'professional'}",rtable_title,5,0@606#1@3234,0.00048478227
+10,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3235,microsoft office 2004 professional (,microsoft,499.99,"-{')', 'mac'}",rtable_title,5,0@606#1@3235,0.06820417
+11,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3236,),microsoft,499.99,"-{'2004', 'microsoft', '(', 'office', 'mac', 'professional'}",rtable_title,5,0@606#1@3236,0.0032881768
+12,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3237,microsoft office 2004 professional ( mac,microsoft,499.99,-{')'},rtable_title,5,0@606#1@3237,0.08873065
+0,2867,microsoft onenote 2007 ( pc ),,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,,,,0@2867#1@2867,0.016739372
+1,1363,onenote 2007 ( pc ),,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,-{'microsoft'},ltable_title,1,0@1363#1@2867,0.003438805
+2,1364,microsoft,,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{')', '(', '2007', 'onenote', 'pc'}",ltable_title,1,0@1364#1@2867,0.0053879144
+3,1365,2007 ( pc ),,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{'microsoft', 'onenote'}",ltable_title,1,0@1365#1@2867,0.0012533721
+4,1366,microsoft onenote,,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{')', '(', '2007', 'pc'}",ltable_title,1,0@1366#1@2867,0.0148797445
+5,1367,( pc ),,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{'microsoft', '2007', 'onenote'}",ltable_title,1,0@1367#1@2867,0.0011980233
+6,1368,microsoft onenote 2007,,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{')', '(', 'pc'}",ltable_title,1,0@1368#1@2867,0.050721455
+7,1369,pc ),,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{'microsoft', '(', '2007', 'onenote'}",ltable_title,1,0@1369#1@2867,0.02904964
+8,1370,microsoft onenote 2007 (,,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{')', 'pc'}",ltable_title,1,0@1370#1@2867,0.01518067
+9,1371,),,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,"-{'microsoft', '(', '2007', 'onenote', 'pc'}",ltable_title,1,0@1371#1@2867,0.00028303583
+10,1372,microsoft onenote 2007 ( pc,,99.95,2867,microsoft onenote 2007 ( pc ),,99.95,-{')'},ltable_title,1,0@1372#1@2867,0.03227401
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,614,microsoft works suite 2006,microsoft,99.0,614,microsoft works suite 2006,microsoft,99.0,,,,0@614#1@614,0.2685637
+1,614,microsoft works suite 2006,microsoft,99.0,3226,works suite 2006,microsoft,99.0,-{'microsoft'},rtable_title,5,0@614#1@3226,0.6893718
+2,614,microsoft works suite 2006,microsoft,99.0,3227,microsoft,microsoft,99.0,"-{'works', '2006', 'suite'}",rtable_title,5,0@614#1@3227,0.025230432
+3,614,microsoft works suite 2006,microsoft,99.0,3228,suite 2006,microsoft,99.0,"-{'microsoft', 'works'}",rtable_title,5,0@614#1@3228,0.74713933
+4,614,microsoft works suite 2006,microsoft,99.0,3229,microsoft works,microsoft,99.0,"-{'suite', '2006'}",rtable_title,5,0@614#1@3229,0.08291304
+5,614,microsoft works suite 2006,microsoft,99.0,3230,2006,microsoft,99.0,"-{'microsoft', 'works', 'suite'}",rtable_title,5,0@614#1@3230,0.055309255
+6,614,microsoft works suite 2006,microsoft,99.0,3231,microsoft works suite,microsoft,99.0,-{'2006'},rtable_title,5,0@614#1@3231,0.17316419
+0,945,microsoft office 2004 student/teacher,,145.99,945,microsoft office 2004 student/teacher,,145.99,,,,0@945#1@945,0.6614997
+1,1363,office 2004 student/teacher,,145.99,945,microsoft office 2004 student/teacher,,145.99,-{'microsoft'},ltable_title,1,0@1363#1@945,0.6878154
+2,1364,microsoft,,145.99,945,microsoft office 2004 student/teacher,,145.99,"-{'2004', 'office', 'student/teacher'}",ltable_title,1,0@1364#1@945,0.09606635
+3,1365,2004 student/teacher,,145.99,945,microsoft office 2004 student/teacher,,145.99,"-{'microsoft', 'office'}",ltable_title,1,0@1365#1@945,0.044036753
+4,1366,microsoft office,,145.99,945,microsoft office 2004 student/teacher,,145.99,"-{'2004', 'student/teacher'}",ltable_title,1,0@1366#1@945,0.46950477
+5,1367,student/teacher,,145.99,945,microsoft office 2004 student/teacher,,145.99,"-{'2004', 'microsoft', 'office'}",ltable_title,1,0@1367#1@945,0.027058737
+6,1368,microsoft office 2004,,145.99,945,microsoft office 2004 student/teacher,,145.99,-{'student/teacher'},ltable_title,1,0@1368#1@945,0.32658616
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,1241,quicken legal business pro 2007,nolo press,79.99,1241,quicken legal business pro 2007,nolo press,79.99,,,,0@1241#1@1241,0.18935941
+1,1241,quicken legal business pro 2007,nolo press,79.99,3226,legal business pro 2007,nolo press,79.99,-{'quicken'},rtable_title,5,0@1241#1@3226,0.23072599
+2,1241,quicken legal business pro 2007,nolo press,79.99,3227,quicken,nolo press,79.99,"-{'pro', 'business', 'legal', '2007'}",rtable_title,5,0@1241#1@3227,0.0023781746
+3,1241,quicken legal business pro 2007,nolo press,79.99,3228,business pro 2007,nolo press,79.99,"-{'quicken', 'legal'}",rtable_title,5,0@1241#1@3228,0.560539
+4,1241,quicken legal business pro 2007,nolo press,79.99,3229,quicken legal,nolo press,79.99,"-{'pro', 'business', '2007'}",rtable_title,5,0@1241#1@3229,0.0033642026
+5,1241,quicken legal business pro 2007,nolo press,79.99,3230,pro 2007,nolo press,79.99,"-{'business', 'quicken', 'legal'}",rtable_title,5,0@1241#1@3230,0.4429482
+6,1241,quicken legal business pro 2007,nolo press,79.99,3231,quicken legal business,nolo press,79.99,"-{'pro', '2007'}",rtable_title,5,0@1241#1@3231,0.009189086
+7,1241,quicken legal business pro 2007,nolo press,79.99,3232,2007,nolo press,79.99,"-{'pro', 'business', 'quicken', 'legal'}",rtable_title,5,0@1241#1@3232,0.28753638
+8,1241,quicken legal business pro 2007,nolo press,79.99,3233,quicken legal business pro,nolo press,79.99,-{'2007'},rtable_title,5,0@1241#1@3233,0.081379145
+9,1241,quicken legal business pro 2007,nolo press,79.99,3234,quicken legal business pro 2007,press,79.99,-{'nolo'},rtable_manufacturer,6,0@1241#1@3234,0.056213927
+10,1241,quicken legal business pro 2007,nolo press,79.99,3235,quicken legal business pro 2007,nolo,79.99,-{'press'},rtable_manufacturer,6,0@1241#1@3235,0.03814869
+0,3145,palo alto business plan pro 2007,,83.99,3145,palo alto business plan pro 2007,,83.99,,,,0@3145#1@3145,0.34371868
+1,1363,alto business plan pro 2007,,83.99,3145,palo alto business plan pro 2007,,83.99,-{'palo'},ltable_title,1,0@1363#1@3145,0.21864775
+2,1364,palo,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'plan', 'pro', 'business', 'alto', '2007'}",ltable_title,1,0@1364#1@3145,0.06819009
+3,1365,business plan pro 2007,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'palo', 'alto'}",ltable_title,1,0@1365#1@3145,0.061976638
+4,1366,palo alto,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'plan', 'pro', 'business', '2007'}",ltable_title,1,0@1366#1@3145,0.3515626
+5,1367,plan pro 2007,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'palo', 'business', 'alto'}",ltable_title,1,0@1367#1@3145,0.07694119
+6,1368,palo alto business,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'plan', 'pro', '2007'}",ltable_title,1,0@1368#1@3145,0.28804916
+7,1369,pro 2007,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'palo', 'plan', 'business', 'alto'}",ltable_title,1,0@1369#1@3145,0.040262662
+8,1370,palo alto business plan,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'pro', '2007'}",ltable_title,1,0@1370#1@3145,0.36889404
+9,1371,2007,,83.99,3145,palo alto business plan pro 2007,,83.99,"-{'palo', 'plan', 'pro', 'business', 'alto'}",ltable_title,1,0@1371#1@3145,0.002616934
+10,1372,palo alto business plan pro,,83.99,3145,palo alto business plan pro 2007,,83.99,-{'2007'},ltable_title,1,0@1372#1@3145,0.4094606
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,,,,0@225#1@225,0.019172959
+1,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3226,powerpoint 2004 ( mac ),microsoft,229.99,-{'microsoft'},rtable_title,5,0@225#1@3226,0.022528801
+2,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3227,microsoft,microsoft,229.99,"-{'2004', ')', '(', 'powerpoint', 'mac'}",rtable_title,5,0@225#1@3227,0.0007060734
+3,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3228,2004 ( mac ),microsoft,229.99,"-{'microsoft', 'powerpoint'}",rtable_title,5,0@225#1@3228,5.4579283e-05
+4,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3229,microsoft powerpoint,microsoft,229.99,"-{'2004', ')', '(', 'mac'}",rtable_title,5,0@225#1@3229,0.012389922
+5,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3230,( mac ),microsoft,229.99,"-{'2004', 'microsoft', 'powerpoint'}",rtable_title,5,0@225#1@3230,8.240698e-05
+6,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3231,microsoft powerpoint 2004,microsoft,229.99,"-{')', '(', 'mac'}",rtable_title,5,0@225#1@3231,0.01621395
+7,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3232,mac ),microsoft,229.99,"-{'2004', 'microsoft', '(', 'powerpoint'}",rtable_title,5,0@225#1@3232,0.001953215
+8,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3233,microsoft powerpoint 2004 (,microsoft,229.99,"-{')', 'mac'}",rtable_title,5,0@225#1@3233,0.015789725
+9,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3234,),microsoft,229.99,"-{'2004', 'microsoft', '(', 'powerpoint', 'mac'}",rtable_title,5,0@225#1@3234,0.00090461917
+10,225,microsoft powerpoint 2004 ( mac ),microsoft,229.99,3235,microsoft powerpoint 2004 ( mac,microsoft,229.99,-{')'},rtable_title,5,0@225#1@3235,0.025472783
+0,2837,microsoft money 2007 home and business ( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,,,,0@2837#1@2837,0.77146304
+1,1363,money 2007 home and business ( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,-{'microsoft'},ltable_title,1,0@1363#1@2837,0.83440274
+2,1364,microsoft,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'business', 'pc', '(', 'and', 'money', 'home', '2007'}",ltable_title,1,0@1364#1@2837,0.00029623148
+3,1365,2007 home and business ( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'money'}",ltable_title,1,0@1365#1@2837,0.78339046
+4,1366,microsoft money,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'business', 'pc', '(', 'and', 'home', '2007'}",ltable_title,1,0@1366#1@2837,0.011121777
+5,1367,home and business ( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'money', '2007'}",ltable_title,1,0@1367#1@2837,0.9190826
+6,1368,microsoft money 2007,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'business', 'pc', '(', 'and', 'home'}",ltable_title,1,0@1368#1@2837,0.06999617
+7,1369,and business ( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'money', 'home', '2007'}",ltable_title,1,0@1369#1@2837,0.8104818
+8,1370,microsoft money 2007 home,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'business', 'pc', '(', 'and'}",ltable_title,1,0@1370#1@2837,0.45087907
+9,1371,business ( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'and', 'money', 'home', '2007'}",ltable_title,1,0@1371#1@2837,0.08863993
+10,1372,microsoft money 2007 home and,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'business', 'pc', '('}",ltable_title,1,0@1372#1@2837,0.62506497
+11,1373,( pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'business', 'and', 'money', 'home', '2007'}",ltable_title,1,0@1373#1@2837,2.361001e-05
+12,1374,microsoft money 2007 home and business,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'pc', '('}",ltable_title,1,0@1374#1@2837,0.5521621
+13,1375,pc ),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'business', '(', 'and', 'money', 'home', '2007'}",ltable_title,1,0@1375#1@2837,0.00013639769
+14,1376,microsoft money 2007 home and business (,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{')', 'pc'}",ltable_title,1,0@1376#1@2837,0.6757985
+15,1377,),,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,"-{'microsoft', 'business', 'pc', '(', 'and', 'money', 'home', '2007'}",ltable_title,1,0@1377#1@2837,7.7549985e-06
+16,1378,microsoft money 2007 home and business ( pc,,89.99,2837,microsoft money 2007 home and business ( pc ),,89.99,-{')'},ltable_title,1,0@1378#1@2837,0.6654313
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,,,,0@597#1@597,0.76973104
+1,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3226,creative suite cs3 design premium [ mac ],adobe,1799.0,-{'adobe'},rtable_title,5,0@597#1@3226,0.7489351
+2,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3227,adobe,adobe,1799.0,"-{'creative', '[', 'premium', 'cs3', 'mac', ']', 'design', 'suite'}",rtable_title,5,0@597#1@3227,0.119217634
+3,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3228,suite cs3 design premium [ mac ],adobe,1799.0,"-{'creative', 'adobe'}",rtable_title,5,0@597#1@3228,0.78752536
+4,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3229,adobe creative,adobe,1799.0,"-{'[', 'premium', 'cs3', 'mac', ']', 'design', 'suite'}",rtable_title,5,0@597#1@3229,0.11938483
+5,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3230,cs3 design premium [ mac ],adobe,1799.0,"-{'creative', 'suite', 'adobe'}",rtable_title,5,0@597#1@3230,0.60137725
+6,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3231,adobe creative suite,adobe,1799.0,"-{'[', 'premium', 'cs3', 'mac', ']', 'design'}",rtable_title,5,0@597#1@3231,0.3051664
+7,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3232,design premium [ mac ],adobe,1799.0,"-{'creative', 'cs3', 'suite', 'adobe'}",rtable_title,5,0@597#1@3232,0.10864727
+8,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3233,adobe creative suite cs3,adobe,1799.0,"-{'[', 'premium', 'mac', ']', 'design'}",rtable_title,5,0@597#1@3233,0.27103642
+9,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3234,premium [ mac ],adobe,1799.0,"-{'creative', 'cs3', 'design', 'suite', 'adobe'}",rtable_title,5,0@597#1@3234,0.013249003
+10,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3235,adobe creative suite cs3 design,adobe,1799.0,"-{'[', 'premium', 'mac', ']'}",rtable_title,5,0@597#1@3235,0.34348324
+11,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3236,[ mac ],adobe,1799.0,"-{'creative', 'premium', 'cs3', 'design', 'suite', 'adobe'}",rtable_title,5,0@597#1@3236,0.00867068
+12,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3237,adobe creative suite cs3 design premium,adobe,1799.0,"-{'[', 'mac', ']'}",rtable_title,5,0@597#1@3237,0.4349284
+13,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3238,mac ],adobe,1799.0,"-{'creative', '[', 'premium', 'cs3', 'design', 'suite', 'adobe'}",rtable_title,5,0@597#1@3238,0.02574381
+14,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3239,adobe creative suite cs3 design premium [,adobe,1799.0,"-{'mac', ']'}",rtable_title,5,0@597#1@3239,0.4970337
+15,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3240,],adobe,1799.0,"-{'creative', '[', 'premium', 'cs3', 'mac', 'design', 'suite', 'adobe'}",rtable_title,5,0@597#1@3240,0.043697834
+16,597,adobe creative suite cs3 design premium [ mac ],adobe,1799.0,3241,adobe creative suite cs3 design premium [ mac,adobe,1799.0,-{']'},rtable_title,5,0@597#1@3241,0.699818
+0,242,adobe cs3 design standard academic,,385.99,242,adobe cs3 design standard academic,,385.99,,,,0@242#1@242,0.092471145
+1,1363,cs3 design standard academic,,385.99,242,adobe cs3 design standard academic,,385.99,-{'adobe'},ltable_title,1,0@1363#1@242,0.19329561
+2,1364,adobe,,385.99,242,adobe cs3 design standard academic,,385.99,"-{'standard', 'design', 'cs3', 'academic'}",ltable_title,1,0@1364#1@242,0.074392624
+3,1365,design standard academic,,385.99,242,adobe cs3 design standard academic,,385.99,"-{'cs3', 'adobe'}",ltable_title,1,0@1365#1@242,0.105471484
+4,1366,adobe cs3,,385.99,242,adobe cs3 design standard academic,,385.99,"-{'standard', 'design', 'academic'}",ltable_title,1,0@1366#1@242,0.041723225
+5,1367,standard academic,,385.99,242,adobe cs3 design standard academic,,385.99,"-{'design', 'cs3', 'adobe'}",ltable_title,1,0@1367#1@242,0.04553075
+6,1368,adobe cs3 design,,385.99,242,adobe cs3 design standard academic,,385.99,"-{'standard', 'academic'}",ltable_title,1,0@1368#1@242,0.17731431
+7,1369,academic,,385.99,242,adobe cs3 design standard academic,,385.99,"-{'standard', 'design', 'cs3', 'adobe'}",ltable_title,1,0@1369#1@242,0.025260253
+8,1370,adobe cs3 design standard,,385.99,242,adobe cs3 design standard academic,,385.99,-{'academic'},ltable_title,1,0@1370#1@242,0.2676207
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,661,adobe cs3 design standard macosx dvd,adobe,399.0,661,adobe cs3 design standard macosx dvd,adobe,399.0,,,,0@661#1@661,0.68107975
+1,661,adobe cs3 design standard macosx dvd,adobe,399.0,3226,cs3 design standard macosx dvd,adobe,399.0,-{'adobe'},rtable_title,5,0@661#1@3226,0.7086982
+2,661,adobe cs3 design standard macosx dvd,adobe,399.0,3227,adobe,adobe,399.0,"-{'macosx', 'standard', 'design', 'cs3', 'dvd'}",rtable_title,5,0@661#1@3227,0.10117874
+3,661,adobe cs3 design standard macosx dvd,adobe,399.0,3228,design standard macosx dvd,adobe,399.0,"-{'cs3', 'adobe'}",rtable_title,5,0@661#1@3228,0.56187755
+4,661,adobe cs3 design standard macosx dvd,adobe,399.0,3229,adobe cs3,adobe,399.0,"-{'macosx', 'standard', 'design', 'dvd'}",rtable_title,5,0@661#1@3229,0.14002188
+5,661,adobe cs3 design standard macosx dvd,adobe,399.0,3230,standard macosx dvd,adobe,399.0,"-{'design', 'cs3', 'adobe'}",rtable_title,5,0@661#1@3230,0.31344822
+6,661,adobe cs3 design standard macosx dvd,adobe,399.0,3231,adobe cs3 design,adobe,399.0,"-{'macosx', 'standard', 'dvd'}",rtable_title,5,0@661#1@3231,0.33740237
+7,661,adobe cs3 design standard macosx dvd,adobe,399.0,3232,macosx dvd,adobe,399.0,"-{'standard', 'design', 'cs3', 'adobe'}",rtable_title,5,0@661#1@3232,0.24881232
+8,661,adobe cs3 design standard macosx dvd,adobe,399.0,3233,adobe cs3 design standard,adobe,399.0,"-{'macosx', 'dvd'}",rtable_title,5,0@661#1@3233,0.4951225
+9,661,adobe cs3 design standard macosx dvd,adobe,399.0,3234,dvd,adobe,399.0,"-{'macosx', 'standard', 'design', 'cs3', 'adobe'}",rtable_title,5,0@661#1@3234,0.24881232
+10,661,adobe cs3 design standard macosx dvd,adobe,399.0,3235,adobe cs3 design standard macosx,adobe,399.0,-{'dvd'},rtable_title,5,0@661#1@3235,0.4951225
+0,946,adobe cs3 design standard upgrade,,413.99,946,adobe cs3 design standard upgrade,,413.99,,,,0@946#1@946,0.43029165
+1,1363,cs3 design standard upgrade,,413.99,946,adobe cs3 design standard upgrade,,413.99,-{'adobe'},ltable_title,1,0@1363#1@946,0.49797174
+2,1364,adobe,,413.99,946,adobe cs3 design standard upgrade,,413.99,"-{'standard', 'design', 'cs3', 'upgrade'}",ltable_title,1,0@1364#1@946,0.06758958
+3,1365,design standard upgrade,,413.99,946,adobe cs3 design standard upgrade,,413.99,"-{'cs3', 'adobe'}",ltable_title,1,0@1365#1@946,0.10516843
+4,1366,adobe cs3,,413.99,946,adobe cs3 design standard upgrade,,413.99,"-{'standard', 'design', 'upgrade'}",ltable_title,1,0@1366#1@946,0.112134695
+5,1367,standard upgrade,,413.99,946,adobe cs3 design standard upgrade,,413.99,"-{'design', 'cs3', 'adobe'}",ltable_title,1,0@1367#1@946,0.060709868
+6,1368,adobe cs3 design,,413.99,946,adobe cs3 design standard upgrade,,413.99,"-{'standard', 'upgrade'}",ltable_title,1,0@1368#1@946,0.27494717
+7,1369,upgrade,,413.99,946,adobe cs3 design standard upgrade,,413.99,"-{'standard', 'design', 'cs3', 'adobe'}",ltable_title,1,0@1369#1@946,0.062278524
+8,1370,adobe cs3 design standard,,413.99,946,adobe cs3 design standard upgrade,,413.99,-{'upgrade'},ltable_title,1,0@1370#1@946,0.4398899
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,705,professional home design suite platinum,punch ! software,99.95,705,professional home design suite platinum,punch ! software,99.95,,,,0@705#1@705,0.90136576
+1,705,professional home design suite platinum,punch ! software,99.95,3226,home design suite platinum,punch ! software,99.95,-{'professional'},rtable_title,5,0@705#1@3226,0.91545767
+2,705,professional home design suite platinum,punch ! software,99.95,3227,professional,punch ! software,99.95,"-{'design', 'suite', 'platinum', 'home'}",rtable_title,5,0@705#1@3227,0.014297468
+3,705,professional home design suite platinum,punch ! software,99.95,3228,design suite platinum,punch ! software,99.95,"-{'professional', 'home'}",rtable_title,5,0@705#1@3228,0.81630135
+4,705,professional home design suite platinum,punch ! software,99.95,3229,professional home,punch ! software,99.95,"-{'design', 'suite', 'platinum'}",rtable_title,5,0@705#1@3229,0.09172015
+5,705,professional home design suite platinum,punch ! software,99.95,3230,suite platinum,punch ! software,99.95,"-{'design', 'professional', 'home'}",rtable_title,5,0@705#1@3230,0.15950477
+6,705,professional home design suite platinum,punch ! software,99.95,3231,professional home design,punch ! software,99.95,"-{'suite', 'platinum'}",rtable_title,5,0@705#1@3231,0.40233982
+7,705,professional home design suite platinum,punch ! software,99.95,3232,platinum,punch ! software,99.95,"-{'design', 'suite', 'professional', 'home'}",rtable_title,5,0@705#1@3232,0.0011931055
+8,705,professional home design suite platinum,punch ! software,99.95,3233,professional home design suite,punch ! software,99.95,-{'platinum'},rtable_title,5,0@705#1@3233,0.8292981
+9,705,professional home design suite platinum,punch ! software,99.95,3234,professional home design suite platinum,! software,99.95,-{'punch'},rtable_manufacturer,6,0@705#1@3234,0.9214827
+10,705,professional home design suite platinum,punch ! software,99.95,3235,professional home design suite platinum,punch,99.95,"-{'!', 'software'}",rtable_manufacturer,6,0@705#1@3235,0.8837187
+11,705,professional home design suite platinum,punch ! software,99.95,3236,professional home design suite platinum,software,99.95,"-{'punch', '!'}",rtable_manufacturer,6,0@705#1@3236,0.8554371
+12,705,professional home design suite platinum,punch ! software,99.95,3237,professional home design suite platinum,punch !,99.95,-{'software'},rtable_manufacturer,6,0@705#1@3237,0.92400813
+0,2054,scrapbook designer platinum,riverdeep-learning-company,17.9,2054,scrapbook designer platinum,riverdeep-learning-company,17.9,,,,0@2054#1@2054,0.16110057
+1,1363,designer platinum,riverdeep-learning-company,17.9,2054,scrapbook designer platinum,riverdeep-learning-company,17.9,-{'scrapbook'},ltable_title,1,0@1363#1@2054,0.45031354
+2,1364,scrapbook,riverdeep-learning-company,17.9,2054,scrapbook designer platinum,riverdeep-learning-company,17.9,"-{'platinum', 'designer'}",ltable_title,1,0@1364#1@2054,0.07512702
+3,1365,platinum,riverdeep-learning-company,17.9,2054,scrapbook designer platinum,riverdeep-learning-company,17.9,"-{'scrapbook', 'designer'}",ltable_title,1,0@1365#1@2054,0.13737771
+4,1366,scrapbook designer,riverdeep-learning-company,17.9,2054,scrapbook designer platinum,riverdeep-learning-company,17.9,-{'platinum'},ltable_title,1,0@1366#1@2054,0.15298417
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,606,microsoft office 2004 professional ( mac ),microsoft,499.99,606,microsoft office 2004 professional ( mac ),microsoft,499.99,,,,0@606#1@606,0.108358465
+1,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3226,office 2004 professional ( mac ),microsoft,499.99,-{'microsoft'},rtable_title,5,0@606#1@3226,0.19872597
+2,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3227,microsoft,microsoft,499.99,"-{'2004', ')', '(', 'office', 'mac', 'professional'}",rtable_title,5,0@606#1@3227,0.002185228
+3,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3228,2004 professional ( mac ),microsoft,499.99,"-{'microsoft', 'office'}",rtable_title,5,0@606#1@3228,0.005473758
+4,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3229,microsoft office,microsoft,499.99,"-{'2004', ')', '(', 'mac', 'professional'}",rtable_title,5,0@606#1@3229,0.013593679
+5,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3230,professional ( mac ),microsoft,499.99,"-{'2004', 'microsoft', 'office'}",rtable_title,5,0@606#1@3230,0.00042727223
+6,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3231,microsoft office 2004,microsoft,499.99,"-{')', '(', 'mac', 'professional'}",rtable_title,5,0@606#1@3231,0.053188317
+7,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3232,( mac ),microsoft,499.99,"-{'2004', 'microsoft', 'office', 'professional'}",rtable_title,5,0@606#1@3232,1.9887459e-05
+8,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3233,microsoft office 2004 professional,microsoft,499.99,"-{')', '(', 'mac'}",rtable_title,5,0@606#1@3233,0.057806116
+9,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3234,mac ),microsoft,499.99,"-{'2004', 'microsoft', '(', 'office', 'professional'}",rtable_title,5,0@606#1@3234,0.00048478227
+10,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3235,microsoft office 2004 professional (,microsoft,499.99,"-{')', 'mac'}",rtable_title,5,0@606#1@3235,0.06820417
+11,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3236,),microsoft,499.99,"-{'2004', 'microsoft', '(', 'office', 'mac', 'professional'}",rtable_title,5,0@606#1@3236,0.0032881768
+12,606,microsoft office 2004 professional ( mac ),microsoft,499.99,3237,microsoft office 2004 professional ( mac,microsoft,499.99,-{')'},rtable_title,5,0@606#1@3237,0.08873065
+0,1485,diskeeper 2007 professional,,46.95,1485,diskeeper 2007 professional,,46.95,,,,0@1485#1@1485,0.80405027
+1,1363,2007 professional,,46.95,1485,diskeeper 2007 professional,,46.95,-{'diskeeper'},ltable_title,1,0@1363#1@1485,0.80405027
+2,1364,diskeeper,,46.95,1485,diskeeper 2007 professional,,46.95,"-{'professional', '2007'}",ltable_title,1,0@1364#1@1485,0.0126193045
+3,1365,professional,,46.95,1485,diskeeper 2007 professional,,46.95,"-{'diskeeper', '2007'}",ltable_title,1,0@1365#1@1485,0.41942564
+4,1366,diskeeper 2007,,46.95,1485,diskeeper 2007 professional,,46.95,-{'professional'},ltable_title,1,0@1366#1@1485,0.3633501
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,1030,final draft av 2.5 win/mac,final draft,199.99,1030,final draft av 2.5 win/mac,final draft,199.99,,,,0@1030#1@1030,0.46454608
+1,1030,final draft av 2.5 win/mac,final draft,199.99,3226,draft av 2.5 win/mac,final draft,199.99,-{'final'},rtable_title,5,0@1030#1@3226,0.21847156
+2,1030,final draft av 2.5 win/mac,final draft,199.99,3227,final,final draft,199.99,"-{'2.5', 'win/mac', 'draft', 'av'}",rtable_title,5,0@1030#1@3227,0.13525349
+3,1030,final draft av 2.5 win/mac,final draft,199.99,3228,av 2.5 win/mac,final draft,199.99,"-{'final', 'draft'}",rtable_title,5,0@1030#1@3228,0.2800772
+4,1030,final draft av 2.5 win/mac,final draft,199.99,3229,final draft,final draft,199.99,"-{'2.5', 'win/mac', 'av'}",rtable_title,5,0@1030#1@3229,0.2075385
+5,1030,final draft av 2.5 win/mac,final draft,199.99,3230,2.5 win/mac,final draft,199.99,"-{'final', 'draft', 'av'}",rtable_title,5,0@1030#1@3230,0.10980688
+6,1030,final draft av 2.5 win/mac,final draft,199.99,3231,final draft av,final draft,199.99,"-{'2.5', 'win/mac'}",rtable_title,5,0@1030#1@3231,0.33332333
+7,1030,final draft av 2.5 win/mac,final draft,199.99,3232,win/mac,final draft,199.99,"-{'final', '2.5', 'draft', 'av'}",rtable_title,5,0@1030#1@3232,0.10268646
+8,1030,final draft av 2.5 win/mac,final draft,199.99,3233,final draft av 2.5,final draft,199.99,-{'win/mac'},rtable_title,5,0@1030#1@3233,0.46454608
+9,1030,final draft av 2.5 win/mac,final draft,199.99,3234,final draft av 2.5 win/mac,draft,199.99,-{'final'},rtable_manufacturer,6,0@1030#1@3234,0.34376797
+10,1030,final draft av 2.5 win/mac,final draft,199.99,3235,final draft av 2.5 win/mac,final,199.99,-{'draft'},rtable_manufacturer,6,0@1030#1@3235,0.41797537
+0,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,,,,0@2320#1@2320,0.90714604
+1,1363,final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,-{'final-draft'},ltable_title,1,0@1363#1@2320,0.90714604
+2,1364,final-draft,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'mac/win', 'final', 'screenwriting', 'screen', 'software', 'writing'}",ltable_title,1,0@1364#1@2320,0.0044682524
+3,1365,draft av 2.5 screenwriting software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'final', 'final-draft'}",ltable_title,1,0@1365#1@2320,0.80147356
+4,1366,final-draft final,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'mac/win', 'screenwriting', 'screen', 'software', 'writing'}",ltable_title,1,0@1366#1@2320,0.21708056
+5,1367,av 2.5 screenwriting software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', 'final', 'final-draft'}",ltable_title,1,0@1367#1@2320,0.77280897
+6,1368,final-draft final draft,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'2.5', 'av', 'mac/win', 'screenwriting', 'screen', 'software', 'writing'}",ltable_title,1,0@1368#1@2320,0.52977055
+7,1369,2.5 screenwriting software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', 'av', 'final', 'final-draft'}",ltable_title,1,0@1369#1@2320,0.38017383
+8,1370,final-draft final draft av,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'2.5', 'mac/win', 'screenwriting', 'screen', 'software', 'writing'}",ltable_title,1,0@1370#1@2320,0.72891355
+9,1371,screenwriting software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'final', 'final-draft'}",ltable_title,1,0@1371#1@2320,0.47982657
+10,1372,final-draft final draft av 2.5,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'mac/win', 'screenwriting', 'screen', 'software', 'writing'}",ltable_title,1,0@1372#1@2320,0.23986244
+11,1373,software mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'final', 'screenwriting', 'final-draft'}",ltable_title,1,0@1373#1@2320,0.574098
+12,1374,final-draft final draft av 2.5 screenwriting,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'mac/win', 'screen', 'software', 'writing'}",ltable_title,1,0@1374#1@2320,0.8045013
+13,1375,mac/win screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'final', 'screenwriting', 'final-draft'}",ltable_title,1,0@1375#1@2320,0.4638475
+14,1376,final-draft final draft av 2.5 screenwriting software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'mac/win', 'screen', 'writing'}",ltable_title,1,0@1376#1@2320,0.55312073
+15,1377,screen writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'mac/win', 'final', 'screenwriting', 'final-draft'}",ltable_title,1,0@1377#1@2320,0.4638475
+16,1378,final-draft final draft av 2.5 screenwriting software mac/win,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'screen', 'writing'}",ltable_title,1,0@1378#1@2320,0.55312073
+17,1379,writing software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'mac/win', 'final', 'screenwriting', 'screen', 'final-draft'}",ltable_title,1,0@1379#1@2320,0.092549846
+18,1380,final-draft final draft av 2.5 screenwriting software mac/win screen,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,-{'writing'},ltable_title,1,0@1380#1@2320,0.89476633
+19,1381,software,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,"-{'draft', '2.5', 'av', 'mac/win', 'final', 'screenwriting', 'screen', 'final-draft', 'writing'}",ltable_title,1,0@1381#1@2320,0.0082394555
+20,1382,final-draft final draft av 2.5 screenwriting software mac/win screen writing,,199.95,2320,final-draft final draft av 2.5 screenwriting software mac/win screen writing software,,199.95,+set(),ltable_title,1,0@1382#1@2320,0.93666667
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,,,,0@1225#1@1225,0.43872955
+1,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3226,acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,-{'sony'},rtable_title,5,0@1225#1@3226,0.71425843
+2,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3227,sony,sony-pictures-digital-entertainment,499.95,"-{'pro', 'acid', '6', 'music', 'workstation', 'professional'}",rtable_title,5,0@1225#1@3227,0.003261546
+3,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3228,pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,"-{'acid', 'sony'}",rtable_title,5,0@1225#1@3228,0.72211856
+4,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3229,sony acid,sony-pictures-digital-entertainment,499.95,"-{'pro', '6', 'music', 'workstation', 'professional'}",rtable_title,5,0@1225#1@3229,0.0032519842
+5,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3230,6 professional music workstation,sony-pictures-digital-entertainment,499.95,"-{'pro', 'acid', 'sony'}",rtable_title,5,0@1225#1@3230,0.58047396
+6,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3231,sony acid pro,sony-pictures-digital-entertainment,499.95,"-{'6', 'music', 'workstation', 'professional'}",rtable_title,5,0@1225#1@3231,0.040750455
+7,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3232,professional music workstation,sony-pictures-digital-entertainment,499.95,"-{'pro', 'acid', 'sony', '6'}",rtable_title,5,0@1225#1@3232,0.015830541
+8,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3233,sony acid pro 6,sony-pictures-digital-entertainment,499.95,"-{'music', 'workstation', 'professional'}",rtable_title,5,0@1225#1@3233,0.051178075
+9,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3234,music workstation,sony-pictures-digital-entertainment,499.95,"-{'pro', 'acid', 'sony', '6', 'professional'}",rtable_title,5,0@1225#1@3234,0.0011403929
+10,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3235,sony acid pro 6 professional,sony-pictures-digital-entertainment,499.95,"-{'music', 'workstation'}",rtable_title,5,0@1225#1@3235,0.25495175
+11,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3236,workstation,sony-pictures-digital-entertainment,499.95,"-{'pro', 'acid', 'sony', '6', 'music', 'professional'}",rtable_title,5,0@1225#1@3236,0.0005184542
+12,1225,sony acid pro 6 professional music workstation,sony-pictures-digital-entertainment,499.95,3237,sony acid pro 6 professional music,sony-pictures-digital-entertainment,499.95,-{'workstation'},rtable_title,5,0@1225#1@3237,0.5140808
+0,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,,,,0@2383#1@2383,0.30884874
+1,1363,photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,-{'sibelius'},ltable_title,1,0@1363#1@2383,0.11347777
+2,1364,sibelius,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'scanning', 'music', 'production', 'professional', 'software'}",ltable_title,1,0@1364#1@2383,0.26906666
+3,1365,professional scanning software music production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'sibelius'}",ltable_title,1,0@1365#1@2383,0.11347777
+4,1366,sibelius photoscore,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'scanning', 'music', 'production', 'professional', 'software'}",ltable_title,1,0@1366#1@2383,0.26906666
+5,1367,scanning software music production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'sibelius', 'professional'}",ltable_title,1,0@1367#1@2383,0.013442216
+6,1368,sibelius photoscore professional,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'scanning', 'music', 'production', 'software'}",ltable_title,1,0@1368#1@2383,0.4375341
+7,1369,software music production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'scanning', 'sibelius', 'professional'}",ltable_title,1,0@1369#1@2383,0.0131315505
+8,1370,sibelius photoscore professional scanning,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'music', 'software', 'production'}",ltable_title,1,0@1370#1@2383,0.40307653
+9,1371,music production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'scanning', 'sibelius', 'professional'}",ltable_title,1,0@1371#1@2383,0.018875796
+10,1372,sibelius photoscore professional scanning software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'music', 'production'}",ltable_title,1,0@1372#1@2383,0.25511396
+11,1373,production software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'scanning', 'music', 'sibelius', 'professional'}",ltable_title,1,0@1373#1@2383,0.012385581
+12,1374,sibelius photoscore professional scanning software music,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,-{'production'},ltable_title,1,0@1374#1@2383,0.13050194
+13,1375,software,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,"-{'photoscore', 'scanning', 'music', 'sibelius', 'production', 'professional'}",ltable_title,1,0@1375#1@2383,0.0129884025
+14,1376,sibelius photoscore professional scanning software music production,sibelius-software-ltd .,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,+set(),ltable_title,1,0@1376#1@2383,0.19863783
+15,1377,sibelius photoscore professional scanning software music production software,.,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,-{'sibelius-software-ltd'},ltable_manufacturer,2,0@1377#1@2383,0.30884874
+16,1378,sibelius photoscore professional scanning software music production software,sibelius-software-ltd,179.95,2383,sibelius photoscore professional scanning software music production software,sibelius-software-ltd .,179.95,-{'.'},ltable_manufacturer,2,0@1378#1@2383,0.32192802
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,375,reel deal casino championship edition,phantom efx,19.99,375,reel deal casino championship edition,phantom efx,19.99,,,,0@375#1@375,0.61138284
+1,375,reel deal casino championship edition,phantom efx,19.99,3226,deal casino championship edition,phantom efx,19.99,-{'reel'},rtable_title,5,0@375#1@3226,0.532759
+2,375,reel deal casino championship edition,phantom efx,19.99,3227,reel,phantom efx,19.99,"-{'edition', 'championship', 'casino', 'deal'}",rtable_title,5,0@375#1@3227,0.06755464
+3,375,reel deal casino championship edition,phantom efx,19.99,3228,casino championship edition,phantom efx,19.99,"-{'reel', 'deal'}",rtable_title,5,0@375#1@3228,0.64270043
+4,375,reel deal casino championship edition,phantom efx,19.99,3229,reel deal,phantom efx,19.99,"-{'edition', 'championship', 'casino'}",rtable_title,5,0@375#1@3229,0.05827838
+5,375,reel deal casino championship edition,phantom efx,19.99,3230,championship edition,phantom efx,19.99,"-{'reel', 'casino', 'deal'}",rtable_title,5,0@375#1@3230,0.20426984
+6,375,reel deal casino championship edition,phantom efx,19.99,3231,reel deal casino,phantom efx,19.99,"-{'edition', 'championship'}",rtable_title,5,0@375#1@3231,0.12643187
+7,375,reel deal casino championship edition,phantom efx,19.99,3232,edition,phantom efx,19.99,"-{'reel', 'championship', 'casino', 'deal'}",rtable_title,5,0@375#1@3232,0.028522586
+8,375,reel deal casino championship edition,phantom efx,19.99,3233,reel deal casino championship,phantom efx,19.99,-{'edition'},rtable_title,5,0@375#1@3233,0.18706115
+9,375,reel deal casino championship edition,phantom efx,19.99,3234,reel deal casino championship edition,efx,19.99,-{'phantom'},rtable_manufacturer,6,0@375#1@3234,0.61150396
+10,375,reel deal casino championship edition,phantom efx,19.99,3235,reel deal casino championship edition,phantom,19.99,-{'efx'},rtable_manufacturer,6,0@375#1@3235,0.4833467
+0,532,phantom efx reel deal casino shuffle master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,,,,0@532#1@532,0.92452365
+1,1363,efx reel deal casino shuffle master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,-{'phantom'},ltable_title,1,0@1363#1@532,0.9619403
+2,1364,phantom,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'edition', 'shuffle', 'deal', 'efx', 'casino', 'master'}",ltable_title,1,0@1364#1@532,0.5099638
+3,1365,reel deal casino shuffle master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'efx', 'phantom'}",ltable_title,1,0@1365#1@532,0.9168086
+4,1366,phantom efx,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'edition', 'shuffle', 'deal', 'casino', 'master'}",ltable_title,1,0@1366#1@532,0.83570975
+5,1367,deal casino shuffle master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'efx', 'phantom'}",ltable_title,1,0@1367#1@532,0.9760366
+6,1368,phantom efx reel,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'edition', 'shuffle', 'deal', 'casino', 'master'}",ltable_title,1,0@1368#1@532,0.75012726
+7,1369,casino shuffle master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'deal', 'efx', 'phantom'}",ltable_title,1,0@1369#1@532,0.9719359
+8,1370,phantom efx reel deal,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'edition', 'shuffle', 'casino', 'master'}",ltable_title,1,0@1370#1@532,0.645949
+9,1371,shuffle master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'deal', 'efx', 'casino', 'phantom'}",ltable_title,1,0@1371#1@532,0.92961895
+10,1372,phantom efx reel deal casino,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'edition', 'shuffle', 'master'}",ltable_title,1,0@1372#1@532,0.7478912
+11,1373,master edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'shuffle', 'deal', 'efx', 'casino', 'phantom'}",ltable_title,1,0@1373#1@532,0.9104233
+12,1374,phantom efx reel deal casino shuffle,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'edition', 'master'}",ltable_title,1,0@1374#1@532,0.7122191
+13,1375,edition,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,"-{'reel', 'shuffle', 'deal', 'efx', 'casino', 'master', 'phantom'}",ltable_title,1,0@1375#1@532,0.640084
+14,1376,phantom efx reel deal casino shuffle master,,17.24,532,phantom efx reel deal casino shuffle master edition,,17.24,-{'edition'},ltable_title,1,0@1376#1@532,0.8009649
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,781,microsoft excel 2004 ( mac ),microsoft,229.99,781,microsoft excel 2004 ( mac ),microsoft,229.99,,,,0@781#1@781,0.0020965103
+1,781,microsoft excel 2004 ( mac ),microsoft,229.99,3226,excel 2004 ( mac ),microsoft,229.99,-{'microsoft'},rtable_title,5,0@781#1@3226,0.00045368922
+2,781,microsoft excel 2004 ( mac ),microsoft,229.99,3227,microsoft,microsoft,229.99,"-{'2004', ')', '(', 'excel', 'mac'}",rtable_title,5,0@781#1@3227,0.0027005891
+3,781,microsoft excel 2004 ( mac ),microsoft,229.99,3228,2004 ( mac ),microsoft,229.99,"-{'microsoft', 'excel'}",rtable_title,5,0@781#1@3228,8.861512e-05
+4,781,microsoft excel 2004 ( mac ),microsoft,229.99,3229,microsoft excel,microsoft,229.99,"-{'2004', ')', '(', 'mac'}",rtable_title,5,0@781#1@3229,0.0009554128
+5,781,microsoft excel 2004 ( mac ),microsoft,229.99,3230,( mac ),microsoft,229.99,"-{'2004', 'microsoft', 'excel'}",rtable_title,5,0@781#1@3230,6.5079475e-05
+6,781,microsoft excel 2004 ( mac ),microsoft,229.99,3231,microsoft excel 2004,microsoft,229.99,"-{')', '(', 'mac'}",rtable_title,5,0@781#1@3231,0.0013223912
+7,781,microsoft excel 2004 ( mac ),microsoft,229.99,3232,mac ),microsoft,229.99,"-{'2004', 'microsoft', '(', 'excel'}",rtable_title,5,0@781#1@3232,0.0015888552
+8,781,microsoft excel 2004 ( mac ),microsoft,229.99,3233,microsoft excel 2004 (,microsoft,229.99,"-{')', 'mac'}",rtable_title,5,0@781#1@3233,0.0018343
+9,781,microsoft excel 2004 ( mac ),microsoft,229.99,3234,),microsoft,229.99,"-{'2004', 'microsoft', '(', 'excel', 'mac'}",rtable_title,5,0@781#1@3234,0.002232131
+10,781,microsoft excel 2004 ( mac ),microsoft,229.99,3235,microsoft excel 2004 ( mac,microsoft,229.99,-{')'},rtable_title,5,0@781#1@3235,0.0017422802
+0,3199,microsoft ( r ) office ultimate 2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,,,,0@3199#1@3199,0.80026406
+1,1363,( r ) office ultimate 2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,-{'microsoft'},ltable_title,1,0@1363#1@3199,0.93748415
+2,1364,microsoft,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{')', '(', 'office', 'ultimate', 'r', '2007'}",ltable_title,1,0@1364#1@3199,0.010797176
+3,1365,r ) office ultimate 2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'microsoft', '('}",ltable_title,1,0@1365#1@3199,0.8693758
+4,1366,microsoft (,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{')', 'office', 'ultimate', 'r', '2007'}",ltable_title,1,0@1366#1@3199,0.04447066
+5,1367,) office ultimate 2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'microsoft', '(', 'r'}",ltable_title,1,0@1367#1@3199,0.8786275
+6,1368,microsoft ( r,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{')', 'office', 'ultimate', '2007'}",ltable_title,1,0@1368#1@3199,0.16136613
+7,1369,office ultimate 2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'microsoft', ')', '(', 'r'}",ltable_title,1,0@1369#1@3199,0.5963668
+8,1370,microsoft ( r ),,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'office', 'ultimate', '2007'}",ltable_title,1,0@1370#1@3199,0.50218654
+9,1371,ultimate 2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'microsoft', ')', '(', 'office', 'r'}",ltable_title,1,0@1371#1@3199,0.24775179
+10,1372,microsoft ( r ) office,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'ultimate', '2007'}",ltable_title,1,0@1372#1@3199,0.78598475
+11,1373,2007,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,"-{'microsoft', ')', '(', 'office', 'ultimate', 'r'}",ltable_title,1,0@1373#1@3199,0.28689265
+12,1374,microsoft ( r ) office ultimate,,539.95,3199,microsoft ( r ) office ultimate 2007,,539.95,-{'2007'},ltable_title,1,0@1374#1@3199,0.82228315
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,,,,0@93#1@93,0.1015569
+1,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3226,office frontpage 2003 academic version windows ),microsoft,159.98,-{'microsoft'},rtable_title,5,0@93#1@3226,0.31224397
+2,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3227,microsoft,microsoft,159.98,"-{'windows', ')', 'office', 'academic', 'version', 'frontpage', '2003'}",rtable_title,5,0@93#1@3227,9.707004e-05
+3,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3228,frontpage 2003 academic version windows ),microsoft,159.98,"-{'microsoft', 'office'}",rtable_title,5,0@93#1@3228,0.35303172
+4,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3229,microsoft office,microsoft,159.98,"-{'windows', ')', 'academic', 'version', 'frontpage', '2003'}",rtable_title,5,0@93#1@3229,0.00068865396
+5,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3230,2003 academic version windows ),microsoft,159.98,"-{'microsoft', 'office', 'frontpage'}",rtable_title,5,0@93#1@3230,0.07940285
+6,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3231,microsoft office frontpage,microsoft,159.98,"-{'windows', ')', 'academic', 'version', '2003'}",rtable_title,5,0@93#1@3231,0.007159026
+7,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3232,academic version windows ),microsoft,159.98,"-{'microsoft', 'office', 'frontpage', '2003'}",rtable_title,5,0@93#1@3232,0.038662262
+8,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3233,microsoft office frontpage 2003,microsoft,159.98,"-{'windows', ')', 'academic', 'version'}",rtable_title,5,0@93#1@3233,0.020196192
+9,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3234,version windows ),microsoft,159.98,"-{'microsoft', 'office', 'academic', 'frontpage', '2003'}",rtable_title,5,0@93#1@3234,0.007830457
+10,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3235,microsoft office frontpage 2003 academic,microsoft,159.98,"-{'windows', ')', 'version'}",rtable_title,5,0@93#1@3235,0.042136706
+11,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3236,windows ),microsoft,159.98,"-{'microsoft', 'office', 'academic', 'version', 'frontpage', '2003'}",rtable_title,5,0@93#1@3236,0.0028553647
+12,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3237,microsoft office frontpage 2003 academic version,microsoft,159.98,"-{'windows', ')'}",rtable_title,5,0@93#1@3237,0.07597757
+13,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3238,),microsoft,159.98,"-{'microsoft', 'windows', 'office', 'academic', 'version', 'frontpage', '2003'}",rtable_title,5,0@93#1@3238,0.0014805116
+14,93,microsoft office frontpage 2003 academic version windows ),microsoft,159.98,3239,microsoft office frontpage 2003 academic version windows,microsoft,159.98,-{')'},rtable_title,5,0@93#1@3239,0.07815007
+0,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,,,,0@3160#1@3160,0.84970516
+1,1363,( r ) windows ( r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,-{'microsoft'},ltable_title,1,0@1363#1@3160,0.90562385
+2,1364,microsoft,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'windows', ')', 'edition', 'with', 'professional', '(', 'sp2', 'xp', 'r'}",ltable_title,1,0@1364#1@3160,4.0833587e-05
+3,1365,r ) windows ( r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,-{'microsoft'},ltable_title,1,0@1365#1@3160,0.8096169
+4,1366,microsoft (,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'windows', ')', 'edition', 'with', 'professional', 'sp2', 'xp', 'r'}",ltable_title,1,0@1366#1@3160,0.0008037822
+5,1367,) windows ( r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,-{'microsoft'},ltable_title,1,0@1367#1@3160,0.4461492
+6,1368,microsoft ( r,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'windows', ')', 'edition', 'with', 'professional', 'sp2', 'xp'}",ltable_title,1,0@1368#1@3160,0.0035412228
+7,1369,windows ( r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,-{'microsoft'},ltable_title,1,0@1369#1@3160,0.07021181
+8,1370,microsoft ( r ),,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'windows', 'edition', 'with', 'professional', 'sp2', 'xp'}",ltable_title,1,0@1370#1@3160,0.024695285
+9,1371,( r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows'}",ltable_title,1,0@1371#1@3160,0.24904396
+10,1372,microsoft ( r ) windows,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'edition', 'with', 'professional', 'sp2', 'xp'}",ltable_title,1,0@1372#1@3160,0.014899805
+11,1373,r ) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', '('}",ltable_title,1,0@1373#1@3160,0.075483605
+12,1374,microsoft ( r ) windows (,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'edition', 'with', 'professional', 'sp2', 'xp'}",ltable_title,1,0@1374#1@3160,0.045716222
+13,1375,) xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', '(', 'r'}",ltable_title,1,0@1375#1@3160,0.0009039988
+14,1376,microsoft ( r ) windows ( r,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'edition', 'with', 'professional', 'sp2', 'xp'}",ltable_title,1,0@1376#1@3160,0.12544492
+15,1377,xp professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', ')', '(', 'r'}",ltable_title,1,0@1377#1@3160,2.011366e-06
+16,1378,microsoft ( r ) windows ( r ),,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'edition', 'with', 'professional', 'sp2', 'xp'}",ltable_title,1,0@1378#1@3160,0.18208514
+17,1379,professional edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', ')', '(', 'xp', 'r'}",ltable_title,1,0@1379#1@3160,0.00026402657
+18,1380,microsoft ( r ) windows ( r ) xp,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'edition', 'with', 'professional', 'sp2'}",ltable_title,1,0@1380#1@3160,0.6765534
+19,1381,edition with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', ')', 'professional', '(', 'xp', 'r'}",ltable_title,1,0@1381#1@3160,0.02230666
+20,1382,microsoft ( r ) windows ( r ) xp professional,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'edition', 'with', 'sp2'}",ltable_title,1,0@1382#1@3160,0.8758498
+21,1383,with sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', ')', 'edition', 'professional', '(', 'xp', 'r'}",ltable_title,1,0@1383#1@3160,0.017230904
+22,1384,microsoft ( r ) windows ( r ) xp professional edition,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'sp2', 'with'}",ltable_title,1,0@1384#1@3160,0.7995046
+23,1385,sp2,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,"-{'microsoft', 'windows', ')', 'edition', 'with', 'professional', '(', 'xp', 'r'}",ltable_title,1,0@1385#1@3160,0.011960654
+24,1386,microsoft ( r ) windows ( r ) xp professional edition with,,199.99,3160,microsoft ( r ) windows ( r ) xp professional edition with sp2,,199.99,-{'sp2'},ltable_title,1,0@1386#1@3160,0.78829676
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,578,microsoft office excel 2007,microsoft,229.95,578,microsoft office excel 2007,microsoft,229.95,,,,0@578#1@578,0.026553046
+1,578,microsoft office excel 2007,microsoft,229.95,3226,office excel 2007,microsoft,229.95,-{'microsoft'},rtable_title,5,0@578#1@3226,0.118386164
+2,578,microsoft office excel 2007,microsoft,229.95,3227,microsoft,microsoft,229.95,"-{'2007', 'office', 'excel'}",rtable_title,5,0@578#1@3227,0.013153257
+3,578,microsoft office excel 2007,microsoft,229.95,3228,excel 2007,microsoft,229.95,"-{'microsoft', 'office'}",rtable_title,5,0@578#1@3228,0.009925766
+4,578,microsoft office excel 2007,microsoft,229.95,3229,microsoft office,microsoft,229.95,"-{'excel', '2007'}",rtable_title,5,0@578#1@3229,0.04177266
+5,578,microsoft office excel 2007,microsoft,229.95,3230,2007,microsoft,229.95,"-{'microsoft', 'office', 'excel'}",rtable_title,5,0@578#1@3230,0.041985843
+6,578,microsoft office excel 2007,microsoft,229.95,3231,microsoft office excel,microsoft,229.95,-{'2007'},rtable_title,5,0@578#1@3231,0.022227846
+0,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,,,,0@2195#1@2195,0.8706451
+1,1363,microsoft office 2004 software suite mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,+set(),ltable_title,1,0@1363#1@2195,0.88494855
+2,1364,microsoft,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'apple', 'office', '&', 'mac', 'suite', 'software'}",ltable_title,1,0@1364#1@2195,0.018700598
+3,1365,office 2004 software suite mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,-{'microsoft'},ltable_title,1,0@1365#1@2195,0.9360661
+4,1366,microsoft microsoft,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'apple', 'office', '&', 'mac', 'suite', 'software'}",ltable_title,1,0@1366#1@2195,0.009156899
+5,1367,2004 software suite mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'microsoft', 'office'}",ltable_title,1,0@1367#1@2195,0.7930341
+6,1368,microsoft microsoft office,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'apple', '&', 'mac', 'suite', 'software'}",ltable_title,1,0@1368#1@2195,0.062651046
+7,1369,software suite mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'office'}",ltable_title,1,0@1369#1@2195,0.6753978
+8,1370,microsoft microsoft office 2004,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'apple', '&', 'mac', 'suite', 'software'}",ltable_title,1,0@1370#1@2195,0.09026632
+9,1371,suite mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'office'}",ltable_title,1,0@1371#1@2195,0.39940152
+10,1372,microsoft microsoft office 2004 software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'apple', '&', 'mac', 'suite'}",ltable_title,1,0@1372#1@2195,0.22633988
+11,1373,mac apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'office', 'suite'}",ltable_title,1,0@1373#1@2195,0.12537429
+12,1374,microsoft microsoft office 2004 software suite,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'apple', '&', 'mac'}",ltable_title,1,0@1374#1@2195,0.17599161
+13,1375,apple & mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'office', 'suite'}",ltable_title,1,0@1375#1@2195,0.08455435
+14,1376,microsoft microsoft office 2004 software suite mac,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'apple', '&'}",ltable_title,1,0@1376#1@2195,0.520936
+15,1377,& mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'apple', 'office', 'suite'}",ltable_title,1,0@1377#1@2195,0.21026726
+16,1378,microsoft microsoft office 2004 software suite mac apple,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,-{'&'},ltable_title,1,0@1378#1@2195,0.4643131
+17,1379,mac software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'apple', 'office', '&', 'suite'}",ltable_title,1,0@1379#1@2195,0.071348175
+18,1380,microsoft microsoft office 2004 software suite mac apple &,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,+set(),ltable_title,1,0@1380#1@2195,0.65943044
+19,1381,software,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,"-{'2004', 'microsoft', 'apple', 'office', '&', 'mac', 'suite'}",ltable_title,1,0@1381#1@2195,0.11515043
+20,1382,microsoft microsoft office 2004 software suite mac apple & mac,,399.95,2195,microsoft microsoft office 2004 software suite mac apple & mac software,,399.95,+set(),ltable_title,1,0@1382#1@2195,0.7847228
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,511,microsoft publisher 2007 version upgrade,microsoft,99.95,511,microsoft publisher 2007 version upgrade,microsoft,99.95,,,,0@511#1@511,0.064138204
+1,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3226,publisher 2007 version upgrade,microsoft,99.95,-{'microsoft'},rtable_title,5,0@511#1@3226,0.19872233
+2,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3227,microsoft,microsoft,99.95,"-{'version', 'publisher', 'upgrade', '2007'}",rtable_title,5,0@511#1@3227,0.0054451646
+3,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3228,2007 version upgrade,microsoft,99.95,"-{'publisher', 'microsoft'}",rtable_title,5,0@511#1@3228,0.08796573
+4,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3229,microsoft publisher,microsoft,99.95,"-{'version', 'upgrade', '2007'}",rtable_title,5,0@511#1@3229,0.0049424297
+5,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3230,version upgrade,microsoft,99.95,"-{'publisher', 'microsoft', '2007'}",rtable_title,5,0@511#1@3230,0.061160218
+6,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3231,microsoft publisher 2007,microsoft,99.95,"-{'version', 'upgrade'}",rtable_title,5,0@511#1@3231,0.013266956
+7,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3232,upgrade,microsoft,99.95,"-{'version', 'publisher', 'microsoft', '2007'}",rtable_title,5,0@511#1@3232,0.029767137
+8,511,microsoft publisher 2007 version upgrade,microsoft,99.95,3233,microsoft publisher 2007 version,microsoft,99.95,-{'upgrade'},rtable_title,5,0@511#1@3233,0.0274466
+0,2821,microsoft excel 2007 ( pc ),,229.95,2821,microsoft excel 2007 ( pc ),,229.95,,,,0@2821#1@2821,0.022844505
+1,1363,excel 2007 ( pc ),,229.95,2821,microsoft excel 2007 ( pc ),,229.95,-{'microsoft'},ltable_title,1,0@1363#1@2821,0.00828253
+2,1364,microsoft,,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{')', '(', '2007', 'excel', 'pc'}",ltable_title,1,0@1364#1@2821,0.032983843
+3,1365,2007 ( pc ),,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{'microsoft', 'excel'}",ltable_title,1,0@1365#1@2821,0.005785519
+4,1366,microsoft excel,,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{')', '(', '2007', 'pc'}",ltable_title,1,0@1366#1@2821,0.019284843
+5,1367,( pc ),,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{'microsoft', '2007', 'excel'}",ltable_title,1,0@1367#1@2821,0.003967467
+6,1368,microsoft excel 2007,,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{')', '(', 'pc'}",ltable_title,1,0@1368#1@2821,0.031478774
+7,1369,pc ),,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{'microsoft', '(', '2007', 'excel'}",ltable_title,1,0@1369#1@2821,0.08658452
+8,1370,microsoft excel 2007 (,,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{')', 'pc'}",ltable_title,1,0@1370#1@2821,0.023470536
+9,1371,),,229.95,2821,microsoft excel 2007 ( pc ),,229.95,"-{'microsoft', '(', '2007', 'excel', 'pc'}",ltable_title,1,0@1371#1@2821,0.0024178273
+10,1372,microsoft excel 2007 ( pc,,229.95,2821,microsoft excel 2007 ( pc ),,229.95,-{')'},ltable_title,1,0@1372#1@2821,0.022590056
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,,,,0@553#1@553,0.508176
+1,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3226,indesign cs3 upgrade from pagemaker,adobe,199.0,-{'adobe'},rtable_title,5,0@553#1@3226,0.712889
+2,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3227,adobe,adobe,199.0,"-{'from', 'indesign', 'cs3', 'pagemaker', 'upgrade'}",rtable_title,5,0@553#1@3227,0.017377986
+3,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3228,cs3 upgrade from pagemaker,adobe,199.0,"-{'indesign', 'adobe'}",rtable_title,5,0@553#1@3228,0.649292
+4,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3229,adobe indesign,adobe,199.0,"-{'from', 'cs3', 'pagemaker', 'upgrade'}",rtable_title,5,0@553#1@3229,0.020794975
+5,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3230,upgrade from pagemaker,adobe,199.0,"-{'indesign', 'cs3', 'adobe'}",rtable_title,5,0@553#1@3230,0.33694908
+6,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3231,adobe indesign cs3,adobe,199.0,"-{'from', 'pagemaker', 'upgrade'}",rtable_title,5,0@553#1@3231,0.03240501
+7,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3232,from pagemaker,adobe,199.0,"-{'indesign', 'cs3', 'upgrade', 'adobe'}",rtable_title,5,0@553#1@3232,0.15969446
+8,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3233,adobe indesign cs3 upgrade,adobe,199.0,"-{'from', 'pagemaker'}",rtable_title,5,0@553#1@3233,0.29451147
+9,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3234,pagemaker,adobe,199.0,"-{'from', 'indesign', 'cs3', 'upgrade', 'adobe'}",rtable_title,5,0@553#1@3234,0.015897123
+10,553,adobe indesign cs3 upgrade from pagemaker,adobe,199.0,3235,adobe indesign cs3 upgrade from,adobe,199.0,-{'pagemaker'},rtable_title,5,0@553#1@3235,0.34324148
+0,897,adobe contribute cs3 upgrade,,82.99,897,adobe contribute cs3 upgrade,,82.99,,,,0@897#1@897,0.653563
+1,1363,contribute cs3 upgrade,,82.99,897,adobe contribute cs3 upgrade,,82.99,-{'adobe'},ltable_title,1,0@1363#1@897,0.688746
+2,1364,adobe,,82.99,897,adobe contribute cs3 upgrade,,82.99,"-{'cs3', 'upgrade', 'contribute'}",ltable_title,1,0@1364#1@897,0.035482265
+3,1365,cs3 upgrade,,82.99,897,adobe contribute cs3 upgrade,,82.99,"-{'contribute', 'adobe'}",ltable_title,1,0@1365#1@897,0.6624239
+4,1366,adobe contribute,,82.99,897,adobe contribute cs3 upgrade,,82.99,"-{'cs3', 'upgrade'}",ltable_title,1,0@1366#1@897,0.23021282
+5,1367,upgrade,,82.99,897,adobe contribute cs3 upgrade,,82.99,"-{'adobe', 'cs3', 'contribute'}",ltable_title,1,0@1367#1@897,0.105326675
+6,1368,adobe contribute cs3,,82.99,897,adobe contribute cs3 upgrade,,82.99,-{'upgrade'},ltable_title,1,0@1368#1@897,0.3087605
+,ltable_id,ltable_title,ltable_manufacturer,ltable_price,rtable_id,rtable_title,rtable_manufacturer,rtable_price,diff,attr_name,attr_pos,id,match_score
+0,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,,,,0@897#1@897,0.62503546
+1,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3226,creative suite cs3 production premium upsell,adobe,1199.0,-{'adobe'},rtable_title,5,0@897#1@3226,0.70031065
+2,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3227,adobe,adobe,1199.0,"-{'creative', 'premium', 'suite', 'cs3', 'production', 'upsell'}",rtable_title,5,0@897#1@3227,0.006355474
+3,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3228,suite cs3 production premium upsell,adobe,1199.0,"-{'creative', 'adobe'}",rtable_title,5,0@897#1@3228,0.6549861
+4,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3229,adobe creative,adobe,1199.0,"-{'premium', 'suite', 'cs3', 'production', 'upsell'}",rtable_title,5,0@897#1@3229,0.007984715
+5,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3230,cs3 production premium upsell,adobe,1199.0,"-{'creative', 'suite', 'adobe'}",rtable_title,5,0@897#1@3230,0.56084543
+6,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3231,adobe creative suite,adobe,1199.0,"-{'premium', 'cs3', 'production', 'upsell'}",rtable_title,5,0@897#1@3231,0.020331694
+7,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3232,production premium upsell,adobe,1199.0,"-{'creative', 'suite', 'cs3', 'adobe'}",rtable_title,5,0@897#1@3232,0.27367833
+8,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3233,adobe creative suite cs3,adobe,1199.0,"-{'premium', 'production', 'upsell'}",rtable_title,5,0@897#1@3233,0.024315832
+9,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3234,premium upsell,adobe,1199.0,"-{'creative', 'suite', 'cs3', 'production', 'adobe'}",rtable_title,5,0@897#1@3234,0.023013044
+10,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3235,adobe creative suite cs3 production,adobe,1199.0,"-{'premium', 'upsell'}",rtable_title,5,0@897#1@3235,0.26659614
+11,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3236,upsell,adobe,1199.0,"-{'creative', 'premium', 'suite', 'cs3', 'production', 'adobe'}",rtable_title,5,0@897#1@3236,0.031051677
+12,897,adobe creative suite cs3 production premium upsell,adobe,1199.0,3237,adobe creative suite cs3 production premium,adobe,1199.0,-{'upsell'},rtable_title,5,0@897#1@3237,0.62503546
+0,3017,production prem cs3 mac upgrad,,808.15,3017,production prem cs3 mac upgrad,,808.15,,,,0@3017#1@3017,0.79749405
+1,1363,prem cs3 mac upgrad,,808.15,3017,production prem cs3 mac upgrad,,808.15,-{'production'},ltable_title,1,0@1363#1@3017,0.7607387
+2,1364,production,,808.15,3017,production prem cs3 mac upgrad,,808.15,"-{'upgrad', 'prem', 'mac', 'cs3'}",ltable_title,1,0@1364#1@3017,0.20911935
+3,1365,cs3 mac upgrad,,808.15,3017,production prem cs3 mac upgrad,,808.15,"-{'prem', 'production'}",ltable_title,1,0@1365#1@3017,0.601456
+4,1366,production prem,,808.15,3017,production prem cs3 mac upgrad,,808.15,"-{'upgrad', 'mac', 'cs3'}",ltable_title,1,0@1366#1@3017,0.65140045
+5,1367,mac upgrad,,808.15,3017,production prem cs3 mac upgrad,,808.15,"-{'prem', 'cs3', 'production'}",ltable_title,1,0@1367#1@3017,0.09689883
+6,1368,production prem cs3,,808.15,3017,production prem cs3 mac upgrad,,808.15,"-{'upgrad', 'mac'}",ltable_title,1,0@1368#1@3017,0.82808876
+7,1369,upgrad,,808.15,3017,production prem cs3 mac upgrad,,808.15,"-{'prem', 'mac', 'cs3', 'production'}",ltable_title,1,0@1369#1@3017,0.023244025
+8,1370,production prem cs3 mac,,808.15,3017,production prem cs3 mac upgrad,,808.15,-{'upgrad'},ltable_title,1,0@1370#1@3017,0.79749405
