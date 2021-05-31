@@ -163,7 +163,8 @@ def copy_EDIT_match(tupla, d):
 def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, dataset_dir, theta_min: float,
                   theta_max: float, predict_fn, num_triangles: int = 100, class_to_explain: int = None,
-                  use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1):
+                  use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
+                  use_w: bool = True, use_y: bool = True):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -174,24 +175,34 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
     originalPrediction = predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1), model)[['nomatch_score', 'match_score']].values[0]
 
+    candidates4r1 = pd.DataFrame()
+    candidates4r2 = pd.DataFrame()
     if class_to_explain == None:
        findPositives = bool(originalPrediction[0] > originalPrediction[1])
     else:
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, model, lj=True, max=max_predict)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, model, lj=False, max=max_predict)
+            if use_y:
+                candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, model, lj=True, max=max_predict)
+            if use_w:
+                candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, model, lj=False, max=max_predict)
         else:
-            candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
-            candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False)
+            if use_y:
+                candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
+            if use_w:
+                candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False)
     else:
         if use_predict:
-            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, model, lj=True, max=max_predict)
-            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, model, lj=False, max=max_predict)
+            if use_y:
+                candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, model, lj=True, max=max_predict)
+            if use_w:
+                candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, model, lj=False, max=max_predict)
         else:
-            candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)
-            candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False)
+            if use_y:
+                candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)
+            if use_w:
+                candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False)
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     id4explanation.to_csv(os.path.join(dataset_dir, tmp_name), index=False)

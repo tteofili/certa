@@ -48,6 +48,7 @@ def get_original_prediction(r1, r2, model):
 
 root_datadir = 'datasets/'
 generate_cf = False
+experiments_dir = 'experiments_sep/'
 def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_datasets: list = []):
     evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
@@ -55,14 +56,14 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
             if dir in filtered_datasets:
                 continue
             for robust in [False, True]:
-                os.makedirs('experiments/' + dir, exist_ok=True)
-                os.makedirs('experiments/' + dir + '/deeper/', exist_ok=True)
+                os.makedirs(experiments_dir + dir, exist_ok=True)
+                os.makedirs(experiments_dir + dir + '/deeper/', exist_ok=True)
                 if dir == 'temporary':
                     continue
                 model_name = 'deeper'
                 if robust:
                     model_name = model_name + '_robust'
-                os.makedirs('experiments/' + dir + '/' + model_name, exist_ok=True)
+                os.makedirs(experiments_dir + dir + '/' + model_name, exist_ok=True)
                 if dir == 'temporary':
                     continue
                 print(f'working on {dir}')
@@ -114,7 +115,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                 evals = pd.DataFrame()
                 cf_evals = pd.DataFrame()
                 model_stuff = (model, embeddings_model, tokenizer)
-                for i in range(len(test_df[:50])):
+                for i in range(len(test_df)):
                     rand_row = test_df.iloc[i]
                     l_id = int(rand_row['ltable_id'])
                     l_tuple = lsource.iloc[l_id]
@@ -128,15 +129,16 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
 
                     # get triangle 'cuts' depending on the length of the sources
                     up_bound = min(len(lsource), len(rsource))
-                    cuts = [100]
+                    nt = 100
 
-                    for nt in cuts:
+                    for comb in [[False, True], [True, False]]:
                         local_samples, gleft_df, gright_df = dataset_local(l_tuple, r_tuple, model_stuff, lsource, rsource,
                                                                            datadir,
                                                                            tmin, tmax, predict_fn, num_triangles=nt,
                                                                            class_to_explain=class_to_explain,
                                                                            use_predict=True,
-                                                                           max_predict=max_predict)
+                                                                           max_predict=max_predict,
+                                                                           use_w=comb[0], use_y=comb[1])
                         if len(local_samples) > 2:
                             maxLenAttributeSet = len(l_tuple) - 1
                             explanation, flipped_pred, triangles = explainSamples(local_samples,
@@ -150,7 +152,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                             if len(triangles) > 0:
                                 triangles_df = pd.DataFrame(triangles)
                                 triangles_df.to_csv(
-                                    'experiments/' + dir + '/'+model_name+'/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                    experiments_dir + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                         nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                             for exp in explanation:
                                 e_attrs = exp.split('/')
@@ -172,7 +174,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                                     expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                                     evals = evals.append(expl_evaluation, ignore_index=True)
-                                    evals.to_csv('experiments/' + dir + '/'+model_name+'/eval.csv')
+                                    evals.to_csv(experiments_dir + dir + '/' + model_name + '/eval.csv')
                                 except:
                                     pass
 
@@ -200,15 +202,15 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                                             cf_expl_evaluation['t_obtained'] = len(triangles_cf)
                                             cf_expl_evaluation['label'] = label
                                             cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
-                                            cf_evals.to_csv('experiments/'+dir+'/'+model_name+'/eval-cf.csv')
+                                            cf_evals.to_csv(experiments_dir + dir + '/' + model_name + '/eval-cf.csv')
                                         if len(triangles_cf) > 0:
                                             pd.DataFrame(triangles_cf).to_csv(
-                                                'experiments/'+dir+'/'+model_name+'/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                                experiments_dir + dir + '/' + model_name + '/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                                     nt) + '_' + str(
                                                     tmin) + '-' + str(tmax) + '.csv')
                                 except:
                                     pass
-                evals.to_csv("experiments/" + dir + '/'+model_name+'/eval_' + str(tmin) + '-' + str(tmax) + '.csv')
+                evals.to_csv(experiments_dir + dir + '/'+model_name+'/eval_' + str(tmin) + '-' + str(tmax) + '.csv')
                 if generate_cf:
-                    cf_evals.to_csv("experiments/" + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
+                    cf_evals.to_csv(experiments_dir + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
     return evals_list

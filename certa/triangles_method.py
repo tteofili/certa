@@ -159,12 +159,21 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
         t1 = triangle[0].split('@')
         t2 = triangle[1].split('@')
         t3 = triangle[2].split('@')
-        u = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
-        v = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
-        w = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
-        u1 = u.copy()
-        v1 = v.copy()
-        w1 = w.copy()
+        if int(t1[0]) == 0:
+            u = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
+            v = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
+            w1 = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
+            u1 = u.copy()
+            v1 = v.copy()
+            w = w1.copy()
+
+        else:
+            u = pd.DataFrame(sourcesMap.get(int(t2[0])).iloc[int(t2[1])]).transpose()
+            v = pd.DataFrame(sourcesMap.get(int(t1[0])).iloc[int(t1[1])]).transpose()
+            w = pd.DataFrame(sourcesMap.get(int(t3[0])).iloc[int(t3[1])]).transpose()
+            u1 = u.copy()
+            v1 = v.copy()
+            w1 = w.copy()
 
         _renameColumnsWithPrefix('ltable_', u)
         _renameColumnsWithPrefix('rtable_', u1)

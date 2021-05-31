@@ -27,6 +27,7 @@ def get_original_prediction(r1, r2, model):
 
 
 root_datadir = 'datasets/'
+experiments_dir = 'experiments_sep/'
 generate_cf = False
 
 def eval_emt(samples=50, max_predict = 500, discard_bad = False, filtered_datasets: list = []):
@@ -36,11 +37,11 @@ def eval_emt(samples=50, max_predict = 500, discard_bad = False, filtered_datase
             if dir in filtered_datasets:
                 continue
             for robust in [False, True]:
-                os.makedirs('experiments/' + dir, exist_ok=True)
+                os.makedirs(experiments_dir + dir, exist_ok=True)
                 model_name = 'emt'
                 if robust:
                     model_name = model_name + '_robust'
-                os.makedirs('experiments/' + dir + '/' + model_name, exist_ok=True)
+                os.makedirs(experiments_dir + dir + '/' + model_name, exist_ok=True)
                 if dir == 'temporary':
                     continue
                 print(f'working on {dir}')
@@ -111,7 +112,7 @@ def eval_emt(samples=50, max_predict = 500, discard_bad = False, filtered_datase
                             if len(triangles) > 0:
                                 triangles_df = pd.DataFrame(triangles)
                                 triangles_df.to_csv(
-                                    'experiments/' + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                    experiments_dir + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                         nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                             for exp in explanation:
                                 e_attrs = exp.split('/')
@@ -131,7 +132,7 @@ def eval_emt(samples=50, max_predict = 500, discard_bad = False, filtered_datase
                                 expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                                 evals = evals.append(expl_evaluation, ignore_index=True)
-                                evals.to_csv('experiments/' + dir + '/'+ model_name +'/eval.csv')
+                                evals.to_csv(experiments_dir + dir + '/' + model_name + '/eval.csv')
 
                             if generate_cf:
                                 try:
@@ -157,16 +158,16 @@ def eval_emt(samples=50, max_predict = 500, discard_bad = False, filtered_datase
                                             cf_expl_evaluation['t_obtained'] = len(triangles_cf)
                                             cf_expl_evaluation['label'] = label
                                             cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
-                                            cf_evals.to_csv('experiments/'+dir+'/'+ model_name +'/eval-cf.csv')
+                                            cf_evals.to_csv(experiments_dir + dir + '/' + model_name + '/eval-cf.csv')
                                         if len(triangles_cf) > 0:
                                             pd.DataFrame(triangles_cf).to_csv(
-                                                'experiments/'+dir+'/'+ model_name +'/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                                experiments_dir + dir + '/' + model_name + '/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                                     nt) + '_' + str(
                                                     tmin) + '-' + str(tmax) + '.csv')
                                 except:
                                     pass
-                evals.to_csv("experiments/" + dir + "/"+ model_name +"/eval_" + str(tmin) + '-' + str(tmax) + '.csv')
+                evals.to_csv(experiments_dir + dir + "/"+ model_name +"/eval_" + str(tmin) + '-' + str(tmax) + '.csv')
                 evals_list.append(evals)
                 if generate_cf:
-                    cf_evals.to_csv("experiments/" + dir + "/"+ model_name +"/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
+                    cf_evals.to_csv(experiments_dir + dir + "/"+ model_name +"/eval_cf_" + str(tmin) + '-' + str(tmax) + '.csv')
     return evals_list

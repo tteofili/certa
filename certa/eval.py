@@ -46,7 +46,6 @@ def expl_eval(class_to_explain, explanation_attributes, e_score, lsource, l_reco
                            'attributes': explanation_attributes,
                            'e_size': len(explanation_attributes), 'prediction': class_probability, 'row': ids}
                 results.append(new_row)
-            except ValueError as e:
-                print(e)
+            except:
                 pass
     return pd.DataFrame(results)
