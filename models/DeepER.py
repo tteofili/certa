@@ -1,11 +1,11 @@
 import numpy as np
-from keras.layers import Input, Embedding, LSTM, concatenate, subtract, Dense, Bidirectional, Lambda
-from keras.models import Model, load_model
-from keras.initializers import Constant
-from keras.preprocessing.text import Tokenizer
-from keras.utils import plot_model, to_categorical
-from keras.preprocessing.sequence import pad_sequences
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import Input, Embedding, LSTM, concatenate, subtract, Dense, Bidirectional, Lambda
+from tensorflow.keras.models import Model, load_model
+from tensorflow.keras.initializers import Constant
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.utils import plot_model, to_categorical
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 
 # InPut: Nome del file con gli embeddings
 # Output: Un dizionario con tutti gli embeddings: {parola: embedding}
