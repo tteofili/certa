@@ -5,8 +5,10 @@ import numpy as np
 import torch
 from sklearn.metrics import classification_report, f1_score
 from tqdm import tqdm
-
 from emt.logging_customized import setup_logging
+from functools import partialmethod
+
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 setup_logging()
 

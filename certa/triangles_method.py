@@ -9,8 +9,11 @@ import math
 import string
 import os
 from tqdm import tqdm
+from functools import partialmethod
 
 from certa.utils import diff
+
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
 def __getCorrectPredictions(dataset, model, predict_fn):
