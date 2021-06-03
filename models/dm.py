@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import defaultdict
 
@@ -208,7 +209,7 @@ class DMERModel():
                                                   right_prefix='rtable_')
         self.initialize_models(trainLab)
 
-        print("TRAINING with " + str(len(trainLab)) + " samples")
+        logging.debug("TRAINING with {} samples", len(trainLab))
         # train default model with standard dataset
         self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth')
 

@@ -5,6 +5,9 @@ from sklearn.metrics import f1_score, classification_report
 from tqdm import tqdm
 
 import torch.nn.functional as F
+from functools import partialmethod
+
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 def predict(model, device, test_data_loader):
     nb_prediction_steps = 0

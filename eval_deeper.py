@@ -1,9 +1,11 @@
+import logging
+
 import pandas as pd
 import numpy as np
 import os
 import gensim.downloader as api
 import models.DeepER as dp
-from certa.local_explain import dataset_local
+from certa.local_explain import dataset_local, get_original_prediction
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
 from certa.utils import merge_sources
@@ -34,41 +36,33 @@ def predict_fn(x, model_stuff, ignore_columns=['ltable_id', 'rtable_id', 'label'
     return pd.concat([x.copy(), out_df], axis=1)
 
 
-def get_original_prediction(r1, r2, model):
-    lprefix = 'ltable_'
-    rprefix = 'rtable_'
-    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
-    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
-    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
-    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
-    r1r2 = pd.concat([r1_df, r2_df], axis=1)
-    r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    return predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1), model)[['nomatch_score', 'match_score']].values[0]
-
-
 root_datadir = 'datasets/'
 generate_cf = False
-experiments_dir = 'experiments_sep/'
-def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_datasets: list = []):
+experiments_dir = 'experiments/'
+
+def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_datasets: list = [],
+                exp_dir=experiments_dir):
+    if not exp_dir.endswith('/'):
+        exp_dir = exp_dir + '/'
     evals_list = []
     for subdir, dirs, files in os.walk(root_datadir):
         for dir in dirs:
             if dir in filtered_datasets:
                 continue
             for robust in [False, True]:
-                os.makedirs(experiments_dir + dir, exist_ok=True)
-                os.makedirs(experiments_dir + dir + '/deeper/', exist_ok=True)
+                os.makedirs(exp_dir + dir, exist_ok=True)
+                os.makedirs(exp_dir + dir + '/deeper/', exist_ok=True)
                 if dir == 'temporary':
                     continue
                 model_name = 'deeper'
                 if robust:
                     model_name = model_name + '_robust'
-                os.makedirs(experiments_dir + dir + '/' + model_name, exist_ok=True)
+                os.makedirs(exp_dir + dir + '/' + model_name, exist_ok=True)
                 if dir == 'temporary':
                     continue
-                print(f'working on {dir}')
+                logging.info(f'working on {dir}')
                 datadir = os.path.join(root_datadir, dir)
-                print(f'reading data from {datadir}')
+                logging.info(f'reading data from {datadir}')
 
                 lsource = pd.read_csv(datadir + '/tableA.csv')
                 rsource = pd.read_csv(datadir + '/tableB.csv')
@@ -122,7 +116,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                     r_id = int(rand_row['rtable_id'])
                     r_tuple = rsource.iloc[r_id]
 
-                    prediction = get_original_prediction(l_tuple, r_tuple, model_stuff)
+                    prediction = get_original_prediction(l_tuple, r_tuple, model_stuff, predict_fn)
                     class_to_explain = np.argmax(prediction)
 
                     label = rand_row["label"]
@@ -145,14 +139,15 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                                                                                   [pd.concat([lsource, gright_df]),
                                                                                    pd.concat([rsource, gleft_df])],
                                                                                   model_stuff, predict_fn, class_to_explain,
-                                                                                  maxLenAttributeSet, True,
+                                                                                  maxLenAttributeSet=maxLenAttributeSet,
+                                                                                  check=True,
                                                                                   discard_bad=discard_bad)
-                            print(explanation)
+                            logging.info(explanation)
                             triangles_df = pd.DataFrame()
                             if len(triangles) > 0:
                                 triangles_df = pd.DataFrame(triangles)
                                 triangles_df.to_csv(
-                                    experiments_dir + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                    exp_dir + dir + '/' + model_name + '/tri_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                         nt) + '_' + str(tmin) + '-' + str(tmax) + '.csv')
                             for exp in explanation:
                                 e_attrs = exp.split('/')
@@ -161,7 +156,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                                     expl_evaluation = expl_eval(class_to_explain, e_attrs, e_score, lsource, l_tuple, model_stuff,
                                                                 prediction, rsource,
                                                                 r_tuple, predict_fn)
-                                    print(expl_evaluation.head())
+                                    logging.debug(expl_evaluation.head())
                                     expl_evaluation['t_requested'] = nt
                                     expl_evaluation['t_obtained'] = len(triangles)
                                     expl_evaluation['label'] = label
@@ -174,7 +169,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                                     expl_evaluation['t_bad'] = len(triangles_df) - n_good
 
                                     evals = evals.append(expl_evaluation, ignore_index=True)
-                                    evals.to_csv(experiments_dir + dir + '/' + model_name + '/eval.csv')
+                                    evals.to_csv(exp_dir + dir + '/' + model_name + '/eval.csv')
                                 except:
                                     pass
 
@@ -202,15 +197,15 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                                             cf_expl_evaluation['t_obtained'] = len(triangles_cf)
                                             cf_expl_evaluation['label'] = label
                                             cf_evals = cf_evals.append(cf_expl_evaluation, ignore_index=True)
-                                            cf_evals.to_csv(experiments_dir + dir + '/' + model_name + '/eval-cf.csv')
+                                            cf_evals.to_csv(exp_dir + dir + '/' + model_name + '/eval-cf.csv')
                                         if len(triangles_cf) > 0:
                                             pd.DataFrame(triangles_cf).to_csv(
-                                                experiments_dir + dir + '/' + model_name + '/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
+                                                exp_dir + dir + '/' + model_name + '/tri_cf_' + str(l_id) + '-' + str(r_id) + '_' + str(
                                                     nt) + '_' + str(
                                                     tmin) + '-' + str(tmax) + '.csv')
                                 except:
                                     pass
-                evals.to_csv(experiments_dir + dir + '/'+model_name+'/eval_' + str(tmin) + '-' + str(tmax) + '.csv')
+                evals.to_csv(exp_dir + dir + '/'+model_name+'/eval_' + str(tmin) + '-' + str(tmax) + '.csv')
                 if generate_cf:
-                    cf_evals.to_csv(experiments_dir + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
+                    cf_evals.to_csv(exp_dir + dir + '/'+model_name+'/eval_cf_' + str(tmin) + '-' + str(tmax) + '.csv')
     return evals_list

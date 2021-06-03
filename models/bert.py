@@ -1,3 +1,4 @@
+import logging
 import os
 import string
 import random
@@ -91,7 +92,7 @@ class EMTERModel():
                                model_type=self.model_type)
 
         emt.model.save_model(self.model, '', exp_dir, tokenizer=self.tokenizer)
-        print(f'MODEL SAVED {exp_dir}')
+        logging.info('MODEL SAVED {}', exp_dir)
         return result
 
     def evaluation(self, test_set):

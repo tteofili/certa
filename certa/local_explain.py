@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 import math, re, os, random, string
 from collections import Counter
@@ -60,11 +62,11 @@ def find_candidates(record, source, similarity_threshold, find_positives, lj=Tru
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
 
-def get_original_prediction(r1, r2, predict_fn):
+def get_original_prediction(r1, r2, model, predict_fn):
     r1r2 = get_row(r1, r2)
     #r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
     #r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    return predict_fn(r1r2, None)[['nomatch_score', 'match_score']].values[0]
+    return predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
 
 
 def get_row(r1, r2):
@@ -220,13 +222,13 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
 
         neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, generated_df,
                                                               report=False)], axis=0)
-        print(f'+perturbed neighborhood: {len(neighborhood)}')
+        logging.debug('perturbed neighborhood', len(neighborhood))
 
     if len(neighborhood) > 0:
         if len(neighborhood) > num_triangles:
             neighborhood = neighborhood.sample(n=num_triangles)
         else:
-            print(f'could find {len(neighborhood)} neighbors of the {num_triangles} requested')
+            logging.debug('could find {} neighbors of the {} requested', len(neighborhood), num_triangles)
 
         neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                          neighborhood.match_score.values))
@@ -238,7 +240,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
         return dataset4explanation, generated_records_left_df, generated_records_right_df
     else:
-        print('no triangles found')
+        logging.warning('no triangles found')
         return pd.DataFrame(), generated_records_left_df, generated_records_right_df
 
 

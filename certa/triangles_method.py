@@ -9,8 +9,11 @@ import math
 import string
 import os
 from tqdm import tqdm
+from functools import partialmethod
 
 from certa.utils import diff
+
+tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
 def __getCorrectPredictions(dataset, model, predict_fn):
@@ -259,8 +262,8 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,
-                   class_to_explain: int, maxLenAttributeSet: int, check: bool, tokens: bool = False,
-                   discard_bad: bool = False):
+                   class_to_explain: int, maxLenAttributeSet: int = 1, check: bool = False, tokens: bool = False,
+                   discard_bad: bool = False, attribute_combine: bool = False):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     rankings = []
@@ -296,13 +299,26 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
                                            maxLenAttributeSet=maxLenAttributeSet)
 
     if len(explanation) > 0:
-        sorted_attr_pairs = explanation.sort_values(ascending=False)
-        explanations = sorted_attr_pairs.loc[sorted_attr_pairs.values == sorted_attr_pairs.values.max()]
-        filtered = [i for i in explanations.keys() if
-                    not any(all(c in i for c in b) and len(b) < len(i) for b in explanations.keys())]
-        filtered_exp = defaultdict(int)
-        for te in filtered:
-            filtered_exp[te] = explanations[te]
+        if attribute_combine:
+            filtered_exp = defaultdict(int)
+            for index, value in explanation.items():
+                #print(f"Index : {index}, Value : {value}")
+                attributes_involved = str(index).split('/')
+                for ai in attributes_involved:
+                    ai_score = value / len(attributes_involved)
+                    if ai in filtered_exp:
+                        filtered_exp[ai] += ai_score
+                    else:
+                        filtered_exp[ai] = ai_score
+        else:
+            sorted_attr_pairs = explanation.sort_values(ascending=False)
+            explanations = sorted_attr_pairs.loc[sorted_attr_pairs.values == sorted_attr_pairs.values.max()]
+            filtered = [i for i in explanations.keys() if
+                        not any(all(c in i for c in b) and len(b) < len(i) for b in explanations.keys())]
+            filtered_exp = defaultdict(int)
+            for te in filtered:
+                filtered_exp[te] = explanations[te]
+
 
         if tokens:
             # todo: to be finished (weight by score, properly aggregate token rankings, better explanation (not string)
@@ -344,7 +360,6 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
                         token_filtered_exp[te] = token_explanations[te]
 
             return token_filtered_exp, token_flippedPredictions_df, allTriangles
-
 
         return filtered_exp, flippedPredictions_df, allTriangles
     else:
