@@ -184,9 +184,11 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
     if findPositives:
         if use_predict:
             if use_y:
-                candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True, max=max_predict)
+                candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True,
+                                                        max=max_predict)
             if use_w:
-                candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False, max=max_predict)
+                candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False,
+                                                        max=max_predict)
         else:
             if use_y:
                 candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
@@ -195,9 +197,11 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
     else:
         if use_predict:
             if use_y:
-                candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True, max=max_predict)
+                candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True,
+                                                        max=max_predict)
             if use_w:
-                candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False, max=max_predict)
+                candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False,
+                                                        max=max_predict)
         else:
             if use_y:
                 candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)

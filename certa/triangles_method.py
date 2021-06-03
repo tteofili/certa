@@ -300,7 +300,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
 
     if len(explanation) > 0:
         if attribute_combine:
-            filtered_exp = defaultdict(int)
+            filtered_exp = {}
             for index, value in explanation.items():
                 #print(f"Index : {index}, Value : {value}")
                 attributes_involved = str(index).split('/')
@@ -315,7 +315,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
             explanations = sorted_attr_pairs.loc[sorted_attr_pairs.values == sorted_attr_pairs.values.max()]
             filtered = [i for i in explanations.keys() if
                         not any(all(c in i for c in b) and len(b) < len(i) for b in explanations.keys())]
-            filtered_exp = defaultdict(int)
+            filtered_exp = {}
             for te in filtered:
                 filtered_exp[te] = explanations[te]
 
@@ -335,7 +335,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
                                                                            class_to_explain)
                     currPerturbedAttr = currentTokenPerturbations[['alteredAttributes', 'alteredTokens']].apply(
                             lambda x: ':'.join(x.dropna().astype(str)), axis=1).values
-                    predictions = predict_fn(currentTokenPerturbations, model)
+                    predictions = predict_fn(currentTokenPerturbations)
                     predictions = predictions.drop(columns=['alteredAttributes', 'alteredTokens'])
                     proba = predictions[['nomatch_score', 'match_score']].values
                     curr_flippedPredictions = currentTokenPerturbations[proba[:, class_to_explain] < 0.5]

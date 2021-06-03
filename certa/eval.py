@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-def expl_eval(class_to_explain, explanation_attributes, e_score, lsource, l_record, model, prediction, rsource,
+def expl_eval(class_to_explain, explanation_attributes, e_score, lsource, l_record, prediction, rsource,
               r_record, predict_fn):
     results = []
     if len(explanation_attributes) > 0:
@@ -34,7 +34,7 @@ def expl_eval(class_to_explain, explanation_attributes, e_score, lsource, l_reco
                             rt[e] = rs_flip.iloc[randint][e]
                 df = pd.DataFrame(lt.add_prefix('ltable_').append(rt.add_prefix('rtable_'))).transpose()
                 df = df.drop([c for c in ['ltable_id', 'rtable_id'] if c in df.columns], axis=1)
-                modified_tuple_prediction = predict_fn(df, model)[['nomatch_score', 'match_score']].values[0]
+                modified_tuple_prediction = predict_fn(df)[['nomatch_score', 'match_score']].values[0]
                 modified_class = np.argmax(modified_tuple_prediction)
                 flip = abs(modified_class - class_to_explain)
                 class_probability = prediction[class_to_explain]
