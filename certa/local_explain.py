@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 import math, re, os, random, string
 from collections import Counter
@@ -220,13 +222,13 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
 
         neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, model, predict_fn, generated_df,
                                                               report=False)], axis=0)
-        print(f'+perturbed neighborhood: {len(neighborhood)}')
+        logging.debug('perturbed neighborhood', len(neighborhood))
 
     if len(neighborhood) > 0:
         if len(neighborhood) > num_triangles:
             neighborhood = neighborhood.sample(n=num_triangles)
         else:
-            print(f'could find {len(neighborhood)} neighbors of the {num_triangles} requested')
+            logging.debug('could find {} neighbors of the {} requested', len(neighborhood), num_triangles)
 
         neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                          neighborhood.match_score.values))
@@ -238,7 +240,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, model, lsource: pd.DataFrame,
         dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
         return dataset4explanation, generated_records_left_df, generated_records_right_df
     else:
-        print('no triangles found')
+        logging.warning('no triangles found')
         return pd.DataFrame(), generated_records_left_df, generated_records_right_df
 
 
