@@ -3,7 +3,7 @@ import logging
 import pandas as pd
 import numpy as np
 import os
-from certa.local_explain import dataset_local
+from certa.local_explain import dataset_local, get_original_prediction
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
 from certa.utils import merge_sources
@@ -12,20 +12,6 @@ from models.bert import EMTERModel
 
 def predict_fn(x, model, ignore_columns=['ltable_id', 'rtable_id', 'label']):
     return model.predict(x)
-
-
-def get_original_prediction(r1, r2, model):
-    lprefix = 'ltable_'
-    rprefix = 'rtable_'
-    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
-    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
-    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
-    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
-    r1r2 = pd.concat([r1_df, r2_df], axis=1)
-    r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    res = predict_fn(r1r2, model)
-    return res[['nomatch_score', 'match_score']].values[0]
 
 
 root_datadir = 'datasets/'
@@ -91,7 +77,7 @@ def eval_emt(samples=50, max_predict = 500, discard_bad = False, filtered_datase
                     r_id = int(rand_row['rtable_id'])
                     r_tuple = rsource.iloc[r_id]
 
-                    prediction = get_original_prediction(l_tuple, r_tuple, model)
+                    prediction = get_original_prediction(l_tuple, r_tuple, model, predict_fn)
                     class_to_explain = np.argmax(prediction)
 
                     label = rand_row["label"]

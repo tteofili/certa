@@ -5,7 +5,7 @@ import numpy as np
 import os
 import gensim.downloader as api
 import models.DeepER as dp
-from certa.local_explain import dataset_local
+from certa.local_explain import dataset_local, get_original_prediction
 from certa.triangles_method import explainSamples
 from certa.eval import expl_eval
 from certa.utils import merge_sources
@@ -34,18 +34,6 @@ def predict_fn(x, model_stuff, ignore_columns=['ltable_id', 'rtable_id', 'label'
     out_df = pd.DataFrame(out, columns=['nomatch_score', 'match_score'])
     out_df.index = x.index
     return pd.concat([x.copy(), out_df], axis=1)
-
-
-def get_original_prediction(r1, r2, model):
-    lprefix = 'ltable_'
-    rprefix = 'rtable_'
-    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
-    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
-    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
-    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
-    r1r2 = pd.concat([r1_df, r2_df], axis=1)
-    r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    return predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1), model)[['nomatch_score', 'match_score']].values[0]
 
 
 root_datadir = 'datasets/'
@@ -128,7 +116,7 @@ def eval_deeper(samples = 50, max_predict = 500, discard_bad = False, filtered_d
                     r_id = int(rand_row['rtable_id'])
                     r_tuple = rsource.iloc[r_id]
 
-                    prediction = get_original_prediction(l_tuple, r_tuple, model_stuff)
+                    prediction = get_original_prediction(l_tuple, r_tuple, model_stuff, predict_fn)
                     class_to_explain = np.argmax(prediction)
 
                     label = rand_row["label"]

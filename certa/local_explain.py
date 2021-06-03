@@ -62,11 +62,11 @@ def find_candidates(record, source, similarity_threshold, find_positives, lj=Tru
     return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
 
 
-def get_original_prediction(r1, r2, predict_fn):
+def get_original_prediction(r1, r2, model, predict_fn):
     r1r2 = get_row(r1, r2)
     #r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
     #r1r2 = r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    return predict_fn(r1r2, None)[['nomatch_score', 'match_score']].values[0]
+    return predict_fn(r1r2, model)[['nomatch_score', 'match_score']].values[0]
 
 
 def get_row(r1, r2):
