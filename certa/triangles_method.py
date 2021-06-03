@@ -157,7 +157,7 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     return allPerturbations
 
 
-def check_properties(triangle, sourcesMap, predict_fn, model):
+def check_properties(triangle, sourcesMap, predict_fn):
     try:
         t1 = triangle[0].split('@')
         t2 = triangle[1].split('@')
@@ -205,7 +205,7 @@ def check_properties(triangle, sourcesMap, predict_fn, model):
         pd.concat([u.reset_index(), w.reset_index()], axis=1)
         ])
 
-        predictions = np.argmax(predict_fn(records, model)[['nomatch_score', 'match_score']].values, axis=1)
+        predictions = np.argmax(predict_fn(records)[['nomatch_score', 'match_score']].values, axis=1)
 
         identity = predictions[0] == 1 and predictions[1] == 1 and predictions[2] == 1
 
@@ -261,7 +261,7 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
         return matches == 3 or non_matches == 3 or (matches == 1 and non_matches == 2)
 
 
-def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: callable,
+def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
                    class_to_explain: int, maxLenAttributeSet: int = 1, check: bool = False, tokens: bool = False,
                    discard_bad: bool = False, attribute_combine: bool = False):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
@@ -273,14 +273,14 @@ def explainSamples(dataset: pd.DataFrame, sources: list, model, predict_fn: call
     for triangle in tqdm(allTriangles):
         try:
             if check:
-                identity, symmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn, model)
+                identity, symmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn)
                 allTriangles[t_i] = allTriangles[t_i] + (identity, symmetry, transitivity, )
             if check and discard_bad and not transitivity:
                 continue
             currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
                                                                    class_to_explain)
             currPerturbedAttr = currentPerturbations.alteredAttributes.values
-            predictions = predict_fn(currentPerturbations, model)
+            predictions = predict_fn(currentPerturbations)
             predictions = predictions.drop(columns=['alteredAttributes'])
             proba = predictions[['nomatch_score', 'match_score']].values
             curr_flippedPredictions = currentPerturbations[proba[:, class_to_explain] < 0.5]
