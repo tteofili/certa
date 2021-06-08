@@ -4,9 +4,10 @@ import numpy as np
 import pandas as pd
 
 
-def expl_eval(class_to_explain, explanation_attributes, e_score, lsource, l_record, prediction, rsource,
-              r_record, predict_fn):
+def expl_eval(prediction, explanation_attributes, e_score, lsource, l_record, rsource,
+              r_record, predict_fn, drop=True, sample=False):
     results = []
+    class_to_explain = np.argmax(prediction)
     if len(explanation_attributes) > 0:
         for i in range(2):
             try:
