@@ -262,14 +262,14 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
-                   class_to_explain: int, maxLenAttributeSet: int = 1, check: bool = False, tokens: bool = False,
+                   class_to_explain: int, attr_length: int = 1, check: bool = False, tokens: bool = False,
                    discard_bad: bool = False, attribute_combine: bool = False, return_top : bool = False):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     flippedPredictions_df, rankings = perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad,
-                                                      maxLenAttributeSet, predict_fn, sourcesMap)
+                                                      attr_length, predict_fn, sourcesMap)
     explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
-                                           maxLenAttributeSet=maxLenAttributeSet)
+                                           attr_length=attr_length)
 
     if len(explanation) > 0:
 
@@ -332,7 +332,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
                     token_flippedPredictions_df = pd.DataFrame(token_flippedPredictions)
 
                 token_explanation = aggregateRankings(token_rankings, lenTriangles=len(allTriangles),
-                                                maxLenAttributeSet=1000)
+                                                attr_length=1000)
 
                 if len(token_explanation) > 0:
                     token_sorted_attr_pairs = token_explanation.sort_values(ascending=False)
@@ -349,7 +349,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
         return [], pd.DataFrame(), []
 
 
-def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, maxLenAttributeSet, predict_fn,
+def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
                     sourcesMap):
     rankings = []
     flippedPredictions = []
@@ -363,7 +363,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                 allTriangles[t_i] = allTriangles[t_i] + (identity, symmetry, transitivity,)
             if check and discard_bad and not transitivity:
                 continue
-            currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, maxLenAttributeSet,
+            currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, attr_length,
                                                                    class_to_explain)
             perturbations.append(currentPerturbations)
         except:
@@ -402,18 +402,18 @@ def getAttributeRanking(proba: np.ndarray, alteredAttributes: list, originalClas
 # MaxLenAttributeSet is the max len of perturbed attributes we want to consider
 # for each ranking, sum  the rank of each altered attribute
 # then normalize the aggregated rank wrt the no. of triangles
-def aggregateRankings(ranking_l: list, lenTriangles: int, maxLenAttributeSet: int):
+def aggregateRankings(ranking_l: list, lenTriangles: int, attr_length: int):
     aggregateRanking = defaultdict(int)
     for ranking in ranking_l:
         for altered_attr in ranking.keys():
-            if len(altered_attr) <= maxLenAttributeSet:
+            if len(altered_attr) <= attr_length:
                 aggregateRanking[altered_attr] += ranking[altered_attr]
     aggregateRanking_normalized = {k: (v / lenTriangles) for (k, v) in aggregateRanking.items()}
 
     alteredAttr = list(map(lambda t: "/".join(t), aggregateRanking_normalized.keys()))
     return pd.Series(data=list(aggregateRanking_normalized.values()), index=alteredAttr)
 
-def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain,
+def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, attr_length, classToExplain,
                                     lprefix='ltable_', rprefix='rtable_', use_tokens: bool = False):
     # generate power set of attributes
     allAttributesSubsets = list(_powerset(attributes, 1, 1))

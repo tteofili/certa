@@ -156,7 +156,6 @@ def copy_EDIT_match(tupla, d):
 
     if copy_tup == tupla:
         copy_tup = copy_EDIT_match(tupla, d)
-    # print(copy_tup)
     return copy_tup
 
 
@@ -164,7 +163,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, predict_fn, num_triangles: int = 100, class_to_explain: int = None,
                   use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
                   use_w: bool = True, use_y: bool = True, datadir='', theta_min: float = 0.5,
-                  theta_max: float = 0.5):
+                  theta_max: float = 0.5, token_parts: bool = False):
     lprefix = 'ltable_'
     rprefix = 'rtable_'
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
@@ -175,10 +174,73 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
     originalPrediction = predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1))[['nomatch_score', 'match_score']].values[0]
 
+    generated_records_left_df = pd.DataFrame()
+    generated_records_right_df = pd.DataFrame()
+
+    findPositives, neighborhood = get_default_neighborhood(class_to_explain, datadir, lsource, max_predict,
+                                                           originalPrediction, predict_fn, r1, r2, rsource, theta_max,
+                                                           theta_min, use_predict, use_w, use_y)
+
+    if token_parts and len(neighborhood) < num_triangles:
+        new_records_left_df = pd.DataFrame()
+        for i in np.arange(len(lsource)):
+            r = lsource.iloc[i]
+            nr_df = pd.DataFrame(generate_modified(r, start_id=len(new_records_left_df) + len(lsource)))
+            nr_df.columns = lsource.columns
+            new_records_left_df = pd.concat([new_records_left_df, nr_df])
+
+        new_records_right_df = pd.DataFrame()
+        for i in np.arange(len(rsource)):
+            r = rsource.iloc[i]
+            nr_df = pd.DataFrame(generate_modified(r, start_id=len(new_records_right_df) + len(rsource)))
+            nr_df.columns = rsource.columns
+            new_records_right_df = pd.concat([new_records_right_df, nr_df])
+
+        generated_records_right_df = pd.concat([generated_records_right_df, new_records_right_df])
+        generated_records_left_df = pd.concat([generated_records_left_df, new_records_left_df])
+
+        _, neighborhood2 = get_default_neighborhood(class_to_explain, datadir, pd.concat([lsource, generated_records_left_df]), max_predict,
+                                                               originalPrediction, predict_fn, r1, r2, pd.concat([rsource, generated_records_right_df]),
+                                                               theta_max,
+                                                               theta_min, use_predict, use_w, use_y)
+        neighborhood = pd.concat([neighborhood, neighborhood2])
+
+    if generate_perturb and len(neighborhood) < num_triangles:
+        generated_df, generated_copies_left_df, generated_copies_right_df = generate_neighbors(lprefix, lsource, r1,
+                                                                                                 r2, rprefix, rsource)
+        generated_records_left_df = pd.concat([generated_records_left_df, generated_copies_left_df])
+        generated_records_right_df = pd.concat([generated_records_right_df, generated_copies_right_df])
+
+        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, predict_fn, generated_df,
+                                                              report=False)], axis=0)
+        logging.debug('perturbed neighborhood', len(neighborhood))
+
+    if len(neighborhood) > 0:
+        if len(neighborhood) > num_triangles:
+            neighborhood = neighborhood.sample(n=num_triangles)
+        else:
+            logging.debug('could find {} neighbors of the {} requested', len(neighborhood), num_triangles)
+
+        neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
+                                         neighborhood.match_score.values))
+        neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
+        if class_to_explain == None:
+            r1r2['label'] = np.argmax(originalPrediction)
+        else:
+            r1r2['label'] = class_to_explain
+        dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
+        return dataset4explanation, generated_records_left_df, generated_records_right_df
+    else:
+        logging.warning('no triangles found')
+        return pd.DataFrame(), generated_records_left_df, generated_records_right_df
+
+
+def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, originalPrediction, predict_fn, r1, r2,
+                             rsource, theta_max, theta_min, use_predict, use_w, use_y):
     candidates4r1 = pd.DataFrame()
     candidates4r2 = pd.DataFrame()
     if class_to_explain == None:
-       findPositives = bool(originalPrediction[0] > originalPrediction[1])
+        findPositives = bool(originalPrediction[0] > originalPrediction[1])
     else:
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
@@ -215,35 +277,25 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
     neighborhood = pd.DataFrame()
     if len(unlabeled_df) > 0:
         neighborhood = get_neighbors(findPositives, predict_fn, unlabeled_df)
+    return findPositives, neighborhood
 
-    generated_records_left_df = pd.DataFrame()
-    generated_records_right_df = pd.DataFrame()
-    if generate_perturb and len(neighborhood) < num_triangles:
-        generated_df, generated_records_left_df, generated_records_right_df = generate_neighbors(lprefix, lsource, r1,
-                                                                                                 r2, rprefix, rsource)
 
-        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, predict_fn, generated_df,
-                                                              report=False)], axis=0)
-        logging.debug('perturbed neighborhood', len(neighborhood))
-
-    if len(neighborhood) > 0:
-        if len(neighborhood) > num_triangles:
-            neighborhood = neighborhood.sample(n=num_triangles)
-        else:
-            logging.debug('could find {} neighbors of the {} requested', len(neighborhood), num_triangles)
-
-        neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
-                                         neighborhood.match_score.values))
-        neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
-        if class_to_explain == None:
-            r1r2['label'] = np.argmax(originalPrediction)
-        else:
-            r1r2['label'] = class_to_explain
-        dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
-        return dataset4explanation, generated_records_left_df, generated_records_right_df
-    else:
-        logging.warning('no triangles found')
-        return pd.DataFrame(), generated_records_left_df, generated_records_right_df
+def generate_modified(record, start_id: int = 0):
+    new_copies = []
+    t_len = len(record)
+    copy = record.copy()
+    for t in range(t_len):
+        attr_value = str(copy.get(t))
+        values = attr_value.split()
+        for cut in range(1, len(values)):
+            for new_val in [" ".join(values[cut:]),
+                            " ".join(values[:cut])]:  # generate new values with prefix / suffix dropped
+                new_copy = record.copy()
+                new_copy[t] = new_val  # substitute the new value with missing prefix / suffix on the target attribute
+                if start_id > 0:
+                    new_copy['id'] = len(new_copies) + start_id
+                new_copies.append(new_copy)
+    return new_copies
 
 
 def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
