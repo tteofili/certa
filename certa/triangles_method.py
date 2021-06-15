@@ -263,11 +263,12 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
                    class_to_explain: int, attr_length: int = 1, check: bool = False, tokens: bool = False,
-                   discard_bad: bool = False, attribute_combine: bool = False, return_top : bool = False):
+                   discard_bad: bool = False, attribute_combine: bool = False, return_top : bool = False,
+                   contrastive: bool = False):
     attributes = [col for col in list(sources[0]) if col not in ['id']]
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     flippedPredictions_df, rankings = perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad,
-                                                      attr_length, predict_fn, sourcesMap)
+                                                      attr_length, predict_fn, sourcesMap, contrastive=contrastive)
     explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                            attr_length=attr_length)
 
@@ -350,7 +351,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
 
 
 def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
-                    sourcesMap):
+                    sourcesMap, contrastive: bool = False):
     rankings = []
     flippedPredictions = []
     t_i = 0
@@ -379,6 +380,8 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
     predictions = predict_fn(perturbations_df)
     predictions = predictions.drop(columns=['alteredAttributes'])
     proba = predictions[['nomatch_score', 'match_score']].values
+    if contrastive:
+        class_to_explain = abs(1 - class_to_explain)
     curr_flippedPredictions = perturbations_df[proba[:, class_to_explain] < 0.5]
     flippedPredictions.append(curr_flippedPredictions)
     ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
