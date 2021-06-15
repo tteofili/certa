@@ -24,6 +24,8 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                       check=check, discard_bad=discard_bad,
                                                                       attr_length=attr_length,
                                                                       return_top=return_top)
+    if predicted_class == 0:
+        explanation = explanation.apply(lambda x: x * -1)
 
     if contrastive:
         cf_class = abs(1 - predicted_class)
@@ -43,8 +45,7 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                                    return_top=return_top, contrastive=True)
         if predicted_class == 1:
             cf_explanation = cf_explanation.apply(lambda x: x * -1)
-        else:
-            explanation = explanation.apply(lambda x: x * -1)
+
         explanation = explanation + cf_explanation
         flipped = pd.concat([flipped, cf_flipped], axis=0)
         triangles = triangles + cf_triangles

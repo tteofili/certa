@@ -282,6 +282,8 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
             filtered_exp = {}
             for te in filtered:
                 filtered_exp[te] = explanations[te]
+            series = pd.Series(index=filtered_exp.keys(), data=filtered_exp.values())
+            filtered_exp = series
         else:
             filtered_exp = explanation
 
