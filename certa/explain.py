@@ -24,10 +24,10 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                       check=check, discard_bad=discard_bad,
                                                                       attr_length=attr_length,
                                                                       return_top=return_top)
-    if not return_top and predicted_class == 0:
+    if predicted_class == 0:
         explanation = explanation.apply(lambda x: x * -1)
 
-    if not return_top and contrastive:
+    if contrastive:
         cf_class = abs(1 - predicted_class)
         cf_local_samples, cf_gleft_df, cf_gright_df = local_explain.dataset_local(l_tuple, r_tuple, lsource, rsource,
                                                                          predict_fn, class_to_explain=cf_class,
