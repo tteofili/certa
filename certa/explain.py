@@ -36,19 +36,20 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                          num_triangles=num_triangles,
                                                                          token_parts=token_parts)
 
-        cf_explanation, cf_flipped, cf_triangles = triangles_method.explainSamples(cf_local_samples,
-                                                                                   [pd.concat([lsource, cf_gright_df]),
-                                                                           pd.concat([rsource, cf_gleft_df])],
-                                                                                   predict_fn, cf_class,
-                                                                                   check=check, discard_bad=discard_bad,
-                                                                                   attr_length=attr_length,
-                                                                                   return_top=return_top, contrastive=True)
-        if predicted_class == 1:
-            cf_explanation = cf_explanation.apply(lambda x: x * -1)
+        if len(local_samples) > 0:
+            cf_explanation, cf_flipped, cf_triangles = triangles_method.explainSamples(cf_local_samples,
+                                                                                       [pd.concat([lsource, cf_gright_df]),
+                                                                               pd.concat([rsource, cf_gleft_df])],
+                                                                                       predict_fn, cf_class,
+                                                                                       check=check, discard_bad=discard_bad,
+                                                                                       attr_length=attr_length,
+                                                                                       return_top=return_top, contrastive=True)
+            if predicted_class == 1:
+                cf_explanation = cf_explanation.apply(lambda x: x * -1)
 
-        explanation = explanation + cf_explanation
-        flipped = pd.concat([flipped, cf_flipped], axis=0)
-        triangles = triangles + cf_triangles
+            explanation = explanation + cf_explanation
+            flipped = pd.concat([flipped, cf_flipped], axis=0)
+            triangles = triangles + cf_triangles
 
 
     return explanation, flipped, triangles
