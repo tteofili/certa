@@ -132,18 +132,28 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     triangle = __getRecords(sourcesMap, triangleIds)  # get triangle values
     perturbations = []
     perturbedAttributes = []
+    droppedValues = []
+    copiedValues = []
     for subset in allAttributesSubsets:  # iterate over the attribute power set
         perturbedAttributes.append(subset)
+        dv = []
+        cv = []
         if classToExplain == 1:
             newRecord = triangle[0].copy()  # copy the l1 tuple
             for att in subset:
+                dv.append(newRecord[att])
+                cv.append(triangle[2][att])
                 newRecord[att] = triangle[2][att]  # copy the value for the given attribute from l2 of no-match l2, r1 pair into l1
             perturbations.append(newRecord)  # append the new record
         else:
             newRecord = triangle[2].copy()  # copy the l2 tuple
             for att in subset:
+                dv.append(newRecord[att])
+                cv.append(triangle[0][att])
                 newRecord[att] = triangle[0][att]  # copy the value for the given attribute from l1 of match l1, r1 pair into l2
             perturbations.append(newRecord)  # append the new record
+        droppedValues.append(dv)
+        copiedValues.append(cv)
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
     r2_copy = [r2] * len(perturbations_df)
@@ -153,6 +163,8 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
     allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
     allPerturbations['alteredAttributes'] = perturbedAttributes
+    allPerturbations['droppedValues'] = droppedValues
+    allPerturbations['copiedValues'] = copiedValues
 
     return allPerturbations
 
@@ -317,7 +329,7 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable,
                 e_score = explanation[exp]
 
                 for triangle in tqdm(allTriangles):
-                    currentTokenPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, e_attrs, maxLenAttributeSet,
+                    currentTokenPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, e_attrs, attr_length,
                                                                            class_to_explain)
                     currPerturbedAttr = currentTokenPerturbations[['alteredAttributes', 'alteredTokens']].apply(
                             lambda x: ':'.join(x.dropna().astype(str)), axis=1).values
@@ -379,6 +391,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
     except:
         perturbations_df = pd.DataFrame(perturbations)
     currPerturbedAttr = perturbations_df.alteredAttributes.values
+    currPerturbedVals = perturbations_df.alteredValues.values
     predictions = predict_fn(perturbations_df)
     predictions = predictions.drop(columns=['alteredAttributes'])
     proba = predictions[['nomatch_score', 'match_score']].values
