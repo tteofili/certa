@@ -1,9 +1,14 @@
 import logging
-
-import pandas as pd
-import math, re, os, random, string
+import math
+import os
+import random
+import re
+import string
 from collections import Counter
+
 import numpy as np
+import pandas as pd
+
 from certa.edit_dna import Sequence
 from certa.utils import diff
 
@@ -36,7 +41,7 @@ def text_to_vector(text):
     return Counter(words)
 
 
-def find_candidates(record, source, similarity_threshold, find_positives, lj=True):
+def find_candidates(record, source, similarity_threshold, find_positives, lj=True, lprefix='ltable_', rprefix='rtable_'):
     record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
@@ -59,7 +64,7 @@ def find_candidates(record, source, similarity_threshold, find_positives, lj=Tru
                     candidates.append((record['id'], source_ids[idx]))
                 else:
                     candidates.append((source_ids[idx], record['id']))
-    return pd.DataFrame(candidates, columns=['ltable_id', 'rtable_id'])
+    return pd.DataFrame(candidates, columns=[lprefix+'id', rprefix+'id'])
 
 
 def get_original_prediction(r1, r2, predict_fn):
@@ -67,9 +72,7 @@ def get_original_prediction(r1, r2, predict_fn):
     return predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
 
 
-def get_row(r1, r2):
-    lprefix = 'ltable_'
-    rprefix = 'rtable_'
+def get_row(r1, r2, lprefix = 'ltable_', rprefix = 'rtable_'):
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
     r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
     r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
@@ -78,7 +81,8 @@ def get_row(r1, r2):
     return r1r2
 
 
-def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True, max=-1):
+def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True, max=-1,
+                            lprefix='ltable_', rprefix='rtable_'):
     temp = []
     for i in range(len(source)):
         if lj:
@@ -93,9 +97,9 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
         samples = samples.sample(frac=1)[:max]
     predicted = predict_fn(samples)
     if find_positives:
-        result = predicted[predicted["match_score"] > similarity_threshold][['ltable_id', 'rtable_id']]
+        result = predicted[predicted["match_score"] > similarity_threshold][[lprefix+'id', rprefix+'id']]
     else:
-        result = predicted[predicted["match_score"] < similarity_threshold][['ltable_id', 'rtable_id']]
+        result = predicted[predicted["match_score"] < similarity_threshold][[lprefix+'id', rprefix+'id']]
     return result
 
 
@@ -121,8 +125,8 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
 def copy_EDIT(series, n, d):
     copy = series.copy()
     if n == -1:
-        l_idx = random.randint(0, int(len(series)/2))
-        r_idx = l_idx + int(len(series)/2)
+        l_idx = random.randint(0, int(len(series) / 2))
+        r_idx = l_idx + int(len(series) / 2)
         o_l_val = str(copy.get(l_idx))
         l_val = o_l_val
         while l_val == o_l_val:
@@ -160,26 +164,28 @@ def copy_EDIT_match(tupla, d):
 
 
 def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
-                  rsource: pd.DataFrame, predict_fn, num_triangles: int = 100, class_to_explain: int = None,
+                  rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100, class_to_explain: int = None,
                   use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
                   use_w: bool = True, use_y: bool = True, datadir='', theta_min: float = 0.5,
-                  theta_max: float = 0.5, token_parts: bool = False):
-    lprefix = 'ltable_'
-    rprefix = 'rtable_'
-    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
-    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
-    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
-    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
-    r1r2 = pd.concat([r1_df, r2_df], axis=1)
+                  theta_max: float = 0, token_parts: bool = False):
+    r1r2 = get_row(r1, r2)
+    originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
+
+    # r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
+    # r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
+    # r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
+    # r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
+    # r1r2 = pd.concat([r1_df, r2_df], axis=1)
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    originalPrediction = predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1))[['nomatch_score', 'match_score']].values[0]
+    # originalPrediction = \
+    #     predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1))[['nomatch_score', 'match_score']].values[0]
 
     generated_records_left_df = pd.DataFrame()
     generated_records_right_df = pd.DataFrame()
 
     findPositives, neighborhood = get_default_neighborhood(class_to_explain, datadir, lsource, max_predict,
                                                            originalPrediction, predict_fn, r1, r2, rsource, theta_max,
-                                                           theta_min, use_predict, use_w, use_y)
+                                                           theta_min, use_predict, use_w, use_y, lprefix, rprefix)
 
     if token_parts and len(neighborhood) < num_triangles:
         new_records_left_df = pd.DataFrame()
@@ -199,15 +205,17 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         generated_records_right_df = pd.concat([generated_records_right_df, new_records_right_df])
         generated_records_left_df = pd.concat([generated_records_left_df, new_records_left_df])
 
-        _, neighborhood2 = get_default_neighborhood(class_to_explain, datadir, pd.concat([lsource, generated_records_left_df]), max_predict,
-                                                               originalPrediction, predict_fn, r1, r2, pd.concat([rsource, generated_records_right_df]),
-                                                               theta_max,
-                                                               theta_min, use_predict, use_w, use_y)
+        _, neighborhood2 = get_default_neighborhood(class_to_explain, datadir,
+                                                    pd.concat([lsource, generated_records_left_df]), max_predict,
+                                                    originalPrediction, predict_fn, r1, r2,
+                                                    pd.concat([rsource, generated_records_right_df]),
+                                                    theta_max,
+                                                    theta_min, use_predict, use_w, use_y, lprefix, rprefix)
         neighborhood = pd.concat([neighborhood, neighborhood2])
 
     if generate_perturb and len(neighborhood) < num_triangles:
         generated_df, generated_copies_left_df, generated_copies_right_df = generate_neighbors(lprefix, lsource, r1,
-                                                                                                 r2, rprefix, rsource)
+                                                                                               r2, rprefix, rsource)
         generated_records_left_df = pd.concat([generated_records_left_df, generated_copies_left_df])
         generated_records_right_df = pd.concat([generated_records_right_df, generated_copies_right_df])
 
@@ -236,7 +244,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
 
 def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, originalPrediction, predict_fn, r1, r2,
-                             rsource, theta_max, theta_min, use_predict, use_w, use_y):
+                             rsource, theta_max, theta_min, use_predict, use_w, use_y, lprefix, rprefix):
     candidates4r1 = pd.DataFrame()
     candidates4r2 = pd.DataFrame()
     if class_to_explain == None:
@@ -247,36 +255,36 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
         if use_predict:
             if use_y:
                 candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True,
-                                                        max=max_predict)
+                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
             if use_w:
                 candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False,
-                                                        max=max_predict)
+                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
         else:
             if use_y:
-                candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True)
+                candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True, lprefix=lprefix, rprefix=rprefix)
             if use_w:
-                candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False)
+                candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False, lprefix=lprefix, rprefix=rprefix)
     else:
         if use_predict:
             if use_y:
                 candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True,
-                                                        max=max_predict)
+                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
             if use_w:
                 candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False,
-                                                        max=max_predict)
+                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
         else:
             if use_y:
-                candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True)
+                candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True, lprefix=lprefix, rprefix=rprefix)
             if use_w:
-                candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False)
+                candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False, lprefix=lprefix, rprefix=rprefix)
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     id4explanation.to_csv(os.path.join(datadir, tmp_name), index=False)
-    unlabeled_df = __generate_unlabeled(datadir, tmp_name)
+    unlabeled_df = __generate_unlabeled(datadir, tmp_name, lprefix=lprefix, rprefix=rprefix)
     os.remove(os.path.join(datadir, tmp_name))
     neighborhood = pd.DataFrame()
     if len(unlabeled_df) > 0:
-        neighborhood = get_neighbors(findPositives, predict_fn, unlabeled_df)
+        neighborhood = get_neighbors(findPositives, predict_fn, unlabeled_df, lprefix=lprefix, rprefix=rprefix)
     return findPositives, neighborhood
 
 
@@ -324,9 +332,11 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
             attr_value = str(copy.get(t))
             values = attr_value.split()
             for cut in range(1, len(values)):
-                for new_val in [" ".join(values[cut:]), " ".join(values[:cut])]: # generate new values with prefix / suffix dropped
+                for new_val in [" ".join(values[cut:]),
+                                " ".join(values[:cut])]:  # generate new values with prefix / suffix dropped
                     new_copy = original.copy()
-                    new_copy[t] = new_val #substitute the new value with missing prefix / suffix on the target attribute
+                    new_copy[
+                        t] = new_val  # substitute the new value with missing prefix / suffix on the target attribute
                     if left:
                         prefix = rprefix
                         new_id = len(new_copies_left) + len(rsource)
@@ -365,10 +375,10 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
     return generated_df, generated_records_left_df, generated_records_right_df
 
 
-def get_neighbors(findPositives, predict_fn, r1r2c, report:bool = False):
+def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False, lprefix='ltable_', rprefix='rtable_'):
     original = r1r2c.copy()
     try:
-        r1r2c = r1r2c.drop(columns = ['diff', 'attr_name', 'attr_pos'])
+        r1r2c = r1r2c.drop(columns=['diff', 'attr_name', 'attr_pos'])
     except:
         pass
 
@@ -386,9 +396,7 @@ def get_neighbors(findPositives, predict_fn, r1r2c, report:bool = False):
     return neighborhood
 
 
-def find_thresholds(test_df: pd.DataFrame, m: float):
-    lprefix = 'ltable_'
-    rprefix = 'rtable_'
+def find_thresholds(test_df: pd.DataFrame, m: float, lprefix='ltable_', rprefix='rtable_'):
     ignore_columns = ['id']
 
     l_columns = [col for col in list(test_df) if (col.startswith(lprefix)) and (col not in ignore_columns)]

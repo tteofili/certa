@@ -113,7 +113,8 @@ def expl_eval(prediction, explanation_attributes, e_score, lsource, l_record, rs
     return pd.DataFrame(results)
 
 
-def eval_drop(prediction, explanation_attributes, l_record, r_record, predict_fn):
+def eval_drop(prediction, explanation_attributes, l_record, r_record, predict_fn, lprefix='ltable',
+              rprefix='rtable'):
     class_to_explain = np.argmax(prediction)
     drop = 0
     impact = 0
@@ -122,10 +123,11 @@ def eval_drop(prediction, explanation_attributes, l_record, r_record, predict_fn
             lt = l_record.copy()
             rt = r_record.copy()
             for e in explanation_attributes:
-                if len(e) > 0:
+                if len(e) > 0 and e.startswith(lprefix):
                     lt[e] = ''
+                if len(e) > 0 and e.startswith(rprefix):
                     rt[e] = ''
-            df = pd.DataFrame(lt.add_prefix('ltable_').append(rt.add_prefix('rtable_'))).transpose()
+            df = pd.DataFrame(lt.append(rt)).transpose()
             df = df.drop([c for c in ['ltable_id', 'rtable_id'] if c in df.columns], axis=1)
             modified_tuple_prediction = predict_fn(df)[['nomatch_score', 'match_score']].values[0]
             modified_class = np.argmax(modified_tuple_prediction)
