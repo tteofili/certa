@@ -289,7 +289,7 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
-                   class_to_explain: int, attr_length: int = 1, check: bool = False, tokens: bool = False,
+                   class_to_explain: int, attr_length: int, check: bool = False, tokens: bool = False,
                    discard_bad: bool = False, attribute_combine: bool = False, return_top: bool = False,
                    contrastive: bool = False):
     _renameColumnsWithPrefix(lprefix, sources[0])

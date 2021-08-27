@@ -71,7 +71,7 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                      num_triangles=num_triangles, token_parts=token_parts)
 
     if attr_length <= 0:
-        attr_length = min(len(l_tuple) - 1, len(r_tuple) - 1)
+        attr_length = len(l_tuple) - 1 + len(r_tuple) - 1
 
     explanations, counterfactual_examples, triangles = triangles_method.explainSamples(local_samples, [pd.concat([lsource, gright_df]),
                                                                                       pd.concat([rsource, gleft_df])],
@@ -90,33 +90,21 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
         alt_attrs = counterfactual_examples['alteredAttributes']
         for index, value in alt_attrs.items():
             attrs = re.sub("[\(\)',]", '', str(value)).split()
+            if attrs[0].startswith('rprefix'):
+                attr_length = len(r_tuple) - 1
+            else:
+                attr_length = len(l_tuple) - 1
+
             for attr in attrs:
-                nec_score = 1
+                nec_score = 1 / (pow(2, attr_length - 1))
                 if attr in sal:
                     ns = sal[attr] + nec_score
                 else:
-                    ns = nec_score
+                    ns = 2 * nec_score
                 sal[attr] = ns
 
         for k, v in sal.items():
-            sal[k] = (v + len(triangles)) / (len(triangles) * (1 + len(alt_attrs.value_counts())))
-
-        # count = 0
-        # for index, value in explanations.items():
-        #     e_attrs = str(index).split('/')
-        #     e_score = value
-        #     if e_score > confidence_threshold:
-        #         count += 1
-        #         for attr in e_attrs:
-        #             nec_score = 1
-        #             if attr in sal:
-        #                 ns = sal[attr] + nec_score
-        #             else:
-        #                 ns = nec_score
-        #             sal[attr] = ns
-        #
-        # for k, v in sal.items():
-        #     sal[k] = v / count
+            sal[k] = (v) / (len(triangles))
 
         saliency_df = pd.DataFrame(data=[sal.values()], columns=sal.keys())
 

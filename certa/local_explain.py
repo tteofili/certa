@@ -167,7 +167,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100, class_to_explain: int = None,
                   use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
                   use_w: bool = True, use_y: bool = True, datadir='', theta_min: float = 0.5,
-                  theta_max: float = 0, token_parts: bool = False):
+                  theta_max: float = 0.5, token_parts: bool = False):
     r1r2 = get_row(r1, r2)
     originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
 
