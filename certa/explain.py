@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import pandas as pd
 import re
@@ -72,41 +74,43 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
 
     if attr_length <= 0:
         attr_length = len(l_tuple) - 1 + len(r_tuple) - 1
+    if len(local_samples) > 0:
+        explanations, counterfactual_examples, triangles = triangles_method.explainSamples(local_samples, [pd.concat([lsource, gright_df]),
+                                                                                          pd.concat([rsource, gleft_df])],
+                                                                          predict_fn, lprefix, rprefix, predicted_class,
+                                                                          check=mode == 'closed',
+                                                                          discard_bad=mode == 'closed',
+                                                                          attr_length=attr_length,
+                                                                          return_top=False)
 
-    explanations, counterfactual_examples, triangles = triangles_method.explainSamples(local_samples, [pd.concat([lsource, gright_df]),
-                                                                                      pd.concat([rsource, gleft_df])],
-                                                                      predict_fn, lprefix, rprefix, predicted_class,
-                                                                      check=mode == 'closed',
-                                                                      discard_bad=mode == 'closed',
-                                                                      attr_length=attr_length,
-                                                                      return_top=False)
+        cf_summary = triangles_method.cf_summary(explanations)
 
-    cf_summary = triangles_method.cf_summary(explanations)
+        saliency_df = pd.DataFrame()
+        if saliency:
+            sal = dict()
 
-    saliency_df = pd.DataFrame()
-    if saliency:
-        sal = dict()
-
-        alt_attrs = counterfactual_examples['alteredAttributes']
-        for index, value in alt_attrs.items():
-            attrs = re.sub("[\(\)',]", '', str(value)).split()
-            if attrs[0].startswith('rprefix'):
-                attr_length = len(r_tuple) - 1
-            else:
-                attr_length = len(l_tuple) - 1
-
-            for attr in attrs:
-                nec_score = 1 / (pow(2, attr_length - 1))
-                if attr in sal:
-                    ns = sal[attr] + nec_score
+            alt_attrs = counterfactual_examples['alteredAttributes']
+            for index, value in alt_attrs.items():
+                attrs = re.sub("[\(\)',]", '', str(value)).split()
+                if attrs[0].startswith('rprefix'):
+                    attr_length = len(r_tuple) - 1
                 else:
-                    ns = 2 * nec_score
-                sal[attr] = ns
+                    attr_length = len(l_tuple) - 1
 
-        for k, v in sal.items():
-            sal[k] = (v) / (len(triangles))
+                for attr in attrs:
+                    nec_score = 1 / (pow(2, attr_length - 1))
+                    if attr in sal:
+                        ns = sal[attr] + nec_score
+                    else:
+                        ns = 2 * nec_score
+                    sal[attr] = ns
 
-        saliency_df = pd.DataFrame(data=[sal.values()], columns=sal.keys())
+            for k, v in sal.items():
+                sal[k] = (v) / (len(triangles))
 
+            saliency_df = pd.DataFrame(data=[sal.values()], columns=sal.keys())
 
-    return saliency_df, cf_summary, counterfactual_examples, triangles
+        return saliency_df, cf_summary, counterfactual_examples, triangles
+    else:
+        logging.warning('no triangles found -> empty explanation')
+        return pd.DataFrame(), pd.Series(), pd.DataFrame(), []

@@ -96,10 +96,15 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
     if max > 0:
         samples = samples.sample(frac=1)[:max]
     predicted = predict_fn(samples)
+    result = pd.DataFrame()
     if find_positives:
-        result = predicted[predicted["match_score"] > similarity_threshold][[lprefix+'id', rprefix+'id']]
+        out = predicted[predicted["match_score"] > similarity_threshold]
+        if len(out) > 0:
+            result = out[[lprefix + 'id', rprefix + 'id']]
     else:
-        result = predicted[predicted["match_score"] < similarity_threshold][[lprefix+'id', rprefix+'id']]
+        out = predicted[predicted["match_score"] < similarity_threshold]
+        if len(out) > 0:
+            result = out[[lprefix + 'id', rprefix + 'id']]
     return result
 
 
