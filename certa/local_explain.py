@@ -95,7 +95,7 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
     samples = pd.concat(temp, axis=0)
     if max > 0:
         samples = samples.sample(frac=1)[:max]
-    predicted = predict_fn(samples)
+    predicted = predict_fn(samples, mojito=True)
     result = pd.DataFrame()
     if find_positives:
         out = predicted[predicted["match_score"] > similarity_threshold]

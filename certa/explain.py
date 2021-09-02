@@ -10,12 +10,19 @@ def explain_old(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fas
             attr_length=-1, check=False, discard_bad=False, num_triangles=100, return_top=False, token_parts=False,
             contrastive: bool = False):
     predicted_class = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
+    if fast:
+        theta_min = 0.5
+        theta_max = 0.05
+    else:
+        theta_min = 0.5
+        theta_max = 0.5
     local_samples, gleft_df, gright_df = local_explain.dataset_local(l_tuple, r_tuple, lsource, rsource,
                                                                      predict_fn, class_to_explain=predicted_class,
                                                                      datadir=dataset_dir, use_predict=not fast,
                                                                      use_w=right, use_y=left,
                                                                      num_triangles=num_triangles,
-                                                                     token_parts=token_parts)
+                                                                     token_parts=token_parts, theta_min=theta_min,
+                                                                     theta_max=theta_max)
 
     if attr_length <= 0:
         attr_length = min(len(l_tuple) - 2, len(r_tuple) - 2)
