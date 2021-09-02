@@ -89,11 +89,13 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
         copy = source.copy()
         records.columns = list(map(lambda col: lprefix + col, records.columns))
         copy.columns = list(map(lambda col: rprefix + col, copy.columns))
+        records.index = copy.index
         samples = pd.concat([records, copy], axis=1)
     else:
         copy = source.copy()
         records = pd.DataFrame()
         records = records.append([record] * len(source), ignore_index=True)
+        records.index = copy.index
         copy.columns = list(map(lambda col: lprefix + col, copy.columns))
         records.columns = list(map(lambda col: rprefix + col, records.columns))
         samples = pd.concat([copy, records], axis=1)
