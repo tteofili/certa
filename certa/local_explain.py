@@ -83,19 +83,24 @@ def get_row(r1, r2, lprefix = 'ltable_', rprefix = 'rtable_'):
 
 def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, lj=True, max=-1,
                             lprefix='ltable_', rprefix='rtable_'):
-    temp = []
-    for i in range(len(source)):
-        if lj:
-            row = get_row(record, source.iloc[i].copy())
-            temp.append(row)
-        else:
-            row = get_row(source.iloc[i].copy(), record)
-            temp.append(row)
+    if lj:
+        records = pd.DataFrame()
+        records = records.append([record] * len(source), ignore_index=True)
+        copy = source.copy()
+        records.columns = list(map(lambda col: lprefix + col, records.columns))
+        copy.columns = list(map(lambda col: rprefix + col, copy.columns))
+        samples = pd.concat([records, copy], axis=1)
+    else:
+        copy = source.copy()
+        records = pd.DataFrame()
+        records = records.append([record] * len(source), ignore_index=True)
+        copy.columns = list(map(lambda col: lprefix + col, copy.columns))
+        records.columns = list(map(lambda col: rprefix + col, records.columns))
+        samples = pd.concat([copy, records], axis=1)
 
-    samples = pd.concat(temp, axis=0)
     if max > 0:
         samples = samples.sample(frac=1)[:max]
-    predicted = predict_fn(samples, mojito=True)
+    predicted = predict_fn(samples)
     result = pd.DataFrame()
     if find_positives:
         out = predicted[predicted["match_score"] > similarity_threshold]
@@ -197,15 +202,17 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         for i in np.arange(len(lsource)):
             r = lsource.iloc[i]
             nr_df = pd.DataFrame(generate_modified(r, start_id=len(new_records_left_df) + len(lsource)))
-            nr_df.columns = lsource.columns
-            new_records_left_df = pd.concat([new_records_left_df, nr_df])
+            if len(nr_df) > 0:
+                nr_df.columns = lsource.columns
+                new_records_left_df = pd.concat([new_records_left_df, nr_df])
 
         new_records_right_df = pd.DataFrame()
         for i in np.arange(len(rsource)):
             r = rsource.iloc[i]
             nr_df = pd.DataFrame(generate_modified(r, start_id=len(new_records_right_df) + len(rsource)))
-            nr_df.columns = rsource.columns
-            new_records_right_df = pd.concat([new_records_right_df, nr_df])
+            if len(nr_df) > 0:
+                nr_df.columns = rsource.columns
+                new_records_right_df = pd.concat([new_records_right_df, nr_df])
 
         generated_records_right_df = pd.concat([generated_records_right_df, new_records_right_df])
         generated_records_left_df = pd.concat([generated_records_left_df, new_records_left_df])
