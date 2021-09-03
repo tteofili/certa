@@ -6,9 +6,10 @@ import re
 
 from certa import local_explain, triangles_method
 
+
 def explain_old(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: bool = True, left=True, right=True,
-            attr_length=-1, check=False, discard_bad=False, num_triangles=100, return_top=False, token_parts=False,
-            contrastive: bool = False):
+                attr_length=-1, check=False, discard_bad=False, num_triangles=100, return_top=False, token_parts=False,
+                contrastive: bool = False):
     predicted_class = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
     if fast:
         theta_min = 0.5
@@ -50,8 +51,8 @@ def explain_old(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fas
             cf_explanation, cf_flipped, cf_triangles = triangles_method.explainSamples(cf_local_samples,
                                                                                        [pd.concat(
                                                                                            [lsource, cf_gright_df]),
-                                                                                        pd.concat(
-                                                                                            [rsource, cf_gleft_df])],
+                                                                                           pd.concat(
+                                                                                               [rsource, cf_gleft_df])],
                                                                                        predict_fn, cf_class,
                                                                                        check=check,
                                                                                        discard_bad=discard_bad,
@@ -69,26 +70,30 @@ def explain_old(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fas
 
 
 def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: bool = False, left=True, right=True,
-             attr_length=-1, mode: str = 'open', num_triangles: int = 100, token_parts: bool = True,
-             saliency: bool = True, lprefix='ltable_', rprefix='rtable_'):
-
+            attr_length=-1, mode: str = 'open', num_triangles: int = 100, token_parts: bool = True,
+            saliency: bool = True, lprefix='ltable_', rprefix='rtable_', max_predict: int = -1):
     predicted_class = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
     local_samples, gleft_df, gright_df = local_explain.dataset_local(l_tuple, r_tuple, lsource, rsource,
-                                                                     predict_fn, lprefix, rprefix, class_to_explain=predicted_class,
+                                                                     predict_fn, lprefix, rprefix,
+                                                                     class_to_explain=predicted_class,
                                                                      datadir=dataset_dir, use_predict=not fast,
                                                                      use_w=right, use_y=left,
-                                                                     num_triangles=num_triangles, token_parts=token_parts)
+                                                                     num_triangles=num_triangles,
+                                                                     token_parts=token_parts,
+                                                                     max_predict=max_predict)
 
     if attr_length <= 0:
         attr_length = len(l_tuple) - 1 + len(r_tuple) - 1
     if len(local_samples) > 0:
-        explanations, counterfactual_examples, triangles = triangles_method.explainSamples(local_samples, [pd.concat([lsource, gright_df]),
-                                                                                          pd.concat([rsource, gleft_df])],
-                                                                          predict_fn, lprefix, rprefix, predicted_class,
-                                                                          check=mode == 'closed',
-                                                                          discard_bad=mode == 'closed',
-                                                                          attr_length=attr_length,
-                                                                          return_top=False)
+        explanations, counterfactual_examples, triangles = triangles_method.explainSamples(local_samples, [
+            pd.concat([lsource, gright_df]),
+            pd.concat([rsource, gleft_df])],
+                                                                                           predict_fn, lprefix, rprefix,
+                                                                                           predicted_class,
+                                                                                           check=mode == 'closed',
+                                                                                           discard_bad=mode == 'closed',
+                                                                                           attr_length=attr_length,
+                                                                                           return_top=False)
 
         cf_summary = triangles_method.cf_summary(explanations)
 
