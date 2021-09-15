@@ -126,8 +126,8 @@ class EMTERModel(ERModel):
                                                self.model_type)
 
         result = evaluation.evaluate(self.model, device, -1)
-        l0 = result['report'].split('\n')[2].split('       ')[2].split('      ')
-        l1 = result['report'].split('\n')[3].split('       ')[2].split('      ')
+        l0 = result.split('\n')[2].split('       ')[2].split('      ')
+        l1 = result.split('\n')[3].split('       ')[2].split('      ')
         p = l1[0]
         r = l1[1]
         f1 = l1[2]
