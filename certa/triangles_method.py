@@ -168,7 +168,10 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
     r2_df = pd.DataFrame(r2_copy, index=np.arange(len(perturbations)))
     # _renameColumnsWithPrefix(rprefix, r2_df)
     # _renameColumnsWithPrefix(lprefix, perturbations_df)
-    allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
+    if perturbations_df.columns[0].startswith(lprefix):
+        allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
+    else:
+        allPerturbations = pd.concat([r2_df, perturbations_df], axis=1)
     allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
     allPerturbations['alteredAttributes'] = perturbedAttributes
     allPerturbations['droppedValues'] = droppedValues
@@ -419,11 +422,11 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
         perturbations_df = pd.DataFrame(perturbations)
     currPerturbedAttr = perturbations_df.alteredAttributes.values
     predictions = predict_fn(perturbations_df)
-    predictions = predictions.drop(columns=['alteredAttributes'])
+    #predictions = predictions.drop(columns=['alteredAttributes'])
     proba = predictions[['nomatch_score', 'match_score']].values
     if contrastive:
         class_to_explain = abs(1 - class_to_explain)
-    curr_flippedPredictions = perturbations_df[proba[:, class_to_explain] < 0.5]
+    curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
     flippedPredictions.append(curr_flippedPredictions)
     ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
     rankings.append(ranking)
