@@ -126,14 +126,20 @@ class EMTERModel(ERModel):
                                                self.model_type)
 
         result = evaluation.evaluate(self.model, device, -1)
-        l0 = result.split('\n')[2].split('       ')[2].split('      ')
-        l1 = result.split('\n')[3].split('       ')[2].split('      ')
+        try:
+            l0 = result.split('\n')[2].split('       ')[2].split('      ')
+            l1 = result.split('\n')[3].split('       ')[2].split('      ')
+        except:
+            l0 = result['report'].split('\n')[2].split('       ')[2].split('      ')
+            l1 = result['report'].split('\n')[3].split('       ')[2].split('      ')
+
         p = l1[0]
         r = l1[1]
         f1 = l1[2]
         pnm = l0[0]
         rnm = l0[1]
         f1nm = l0[2]
+
         os.remove(tmpf)
 
         return p, r, f1

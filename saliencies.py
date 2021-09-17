@@ -247,7 +247,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    type = 'deeper'
+    type = 'dm'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
                          'amazon_google',  'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar', ]
