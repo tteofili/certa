@@ -246,11 +246,10 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    samples = -1
+    samples = 50
     type = 'deeper'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'beers','abt_buy', 'fodo_zaga',
                          'amazon_google',  'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar',  'dblp_acm']
+                         'dblp_scholar', ]
     model = from_type(type)
-    evaluate(model, samples=50, filtered_datasets=filtered_datasets, max_predict=-1, fast=False)
+    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=False)

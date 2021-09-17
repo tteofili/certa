@@ -122,6 +122,11 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
 
             saliency_df = pd.DataFrame(data=[sal.values()], columns=sal.keys())
 
+        if len(counterfactual_examples) > 0:
+            counterfactual_examples['attr_count'] = counterfactual_examples.alteredAttributes.astype(str)\
+                .str.split(',').str.len()
+            counterfactual_examples = counterfactual_examples.sort_values(by=['attr_count'])
+
         return saliency_df, cf_summary, counterfactual_examples, triangles
     else:
         logging.warning('no triangles found -> empty explanation')
