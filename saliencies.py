@@ -216,7 +216,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                         examples = examples.append(item, ignore_index=True)
                         print(item)
                         print(i)
-                    except Exception as e:
+                    except:
                         print(traceback.format_exc())
                         print(f'skipped item {str(i)}')
                         item.head()
