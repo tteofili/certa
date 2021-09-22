@@ -49,12 +49,10 @@ def get_confidence(base_dir: str):
     np.random.seed(1)
     saliency_names = ['certa', 'landmark', 'mojito_c', 'mojito_d', 'shap']
     all_y = []
-    examples_df = pd.read_csv(os.path.join(base_dir, 'examples.csv'))
+    ci = dict()
     for saliency in saliency_names:
         print(saliency)
         test_scores = []
-
-        print(base_dir)
 
         # full_model_path = os.path.join(args.models_dir, model_path)
         # predictsions_path = full_model_path + '.predictions'
@@ -107,7 +105,7 @@ def get_confidence(base_dir: str):
         for i, instance in enumerate(saliencies):
             _cls = class_preds[i]
             instance_saliency = saliencies[i]
-            instance_logits = np.fromstring(logits[i].replace('[','').replace(']',''), dtype=float, sep=' ')
+            instance_logits = np.fromstring(logits[i].replace('[', '').replace(']', ''), dtype=float, sep=' ')
 
             confidence_pred = instance_logits[_cls]
             saliency_pred = np.array(instance_saliency[_cls])
@@ -158,13 +156,24 @@ def get_confidence(base_dir: str):
             coefs.append(reg.coef_)
 
             test_scores.append([np.mean([_s[i] for _s in scores]) for i in
-                            range(len(scores[0]))])
+                                range(len(scores[0]))])
+
+        ci_sal = dict()
+        for l in range(len(test_scores[0])):
+            d = dict()
+            mu = np.mean([_s[l] for _s in test_scores])
+            sigma = np.std([_s[l] for _s in test_scores])
+            d['mean'] = mu
+            d['std'] = sigma
+            ci_sal[l] = d
+        ci[saliency] = ci_sal
 
         print(' '.join([f"{np.mean([_s[l] for _s in test_scores]):.3f} "
-                    f"($\pm$ {np.std([_s[l] for _s in test_scores]):.3f})"
-                    for l in range(len(test_scores[0]))]), flush=True)
-
+                        f"($\pm$ {np.std([_s[l] for _s in test_scores]):.3f})"
+                        for l in range(len(test_scores[0]))]), flush=True)
+    return ci
 
 
 if __name__ == "__main__":
-    get_confidence('/home/tteofili/dev/certa/quantitative/beers/deeper')
+    ci = get_confidence('/home/tteofili/dev/certa/quantitative/fodo_zaga/deeper')
+    print(ci)
