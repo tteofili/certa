@@ -1,48 +1,13 @@
 """Evaluate confidence measure."""
-import argparse
 import json
 import os
-import random
-from collections import defaultdict
 
-import pandas as pd
 import numpy as np
-from scipy.special import softmax
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import max_error, mean_absolute_error
 from sklearn.model_selection import ShuffleSplit
 from sklearn.preprocessing import MinMaxScaler
-
-
-def sample(X, y, mode='up'):
-    buckets_idx = defaultdict(lambda: [])
-    buckets_size = defaultdict(lambda: 0)
-    for i, _y in enumerate(y):
-        buckets_size[int(_y * 10)] += 1
-        buckets_idx[int(_y * 10)].append(i)
-
-    if mode == 'up':
-        sample_size = max(list(buckets_size.values()))
-
-    if mode == 'down':
-        sample_size = min(list(buckets_size.values()))
-
-    if mode == 'mid':
-        sample_size = (max(list(buckets_size.values())) - min(
-            list(buckets_size.values()))) // 2
-
-    new_idx = []
-
-    for _, bucket_ids in buckets_idx.items():
-        do_replace = True
-        if sample_size <= len(bucket_ids):
-            do_replace = False
-        chosen = np.random.choice(bucket_ids, sample_size, replace=do_replace)
-        new_idx += chosen.tolist()
-
-    random.shuffle(new_idx)
-
-    return X[new_idx], y[new_idx]
 
 
 def get_confidence(base_dir: str):
@@ -53,11 +18,6 @@ def get_confidence(base_dir: str):
     for saliency in saliency_names:
         print(saliency)
         test_scores = []
-
-        # full_model_path = os.path.join(args.models_dir, model_path)
-        # predictsions_path = full_model_path + '.predictions'
-        saliency_path = os.path.join(base_dir,
-                                     f"{saliency}.csv")
 
         saliency_df = pd.read_csv(os.path.join(base_dir, saliency + '.csv'))
 

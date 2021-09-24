@@ -11,7 +11,6 @@ from sklearn.metrics import auc
 from transformers import BertConfig, BertForSequenceClassification, \
     BertTokenizer
 
-from models import train_lstm_cnn, train_transformers
 from models.data_loader import BucketBatchSampler, DatasetSaliency, \
     collate_threshold, get_collate_fn, get_dataset
 from models.model_builder import CNN_MODEL, LSTM_MODEL

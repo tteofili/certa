@@ -183,14 +183,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
     r1r2 = get_row(r1, r2)
     originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
 
-    # r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
-    # r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
-    # r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
-    # r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
-    # r1r2 = pd.concat([r1_df, r2_df], axis=1)
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-    # originalPrediction = \
-    #     predict_fn(r1r2.drop([lprefix + 'id', rprefix + 'id'], axis=1))[['nomatch_score', 'match_score']].values[0]
 
     generated_records_left_df = pd.DataFrame()
     generated_records_right_df = pd.DataFrame()
@@ -275,9 +268,11 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
                                                         max=max_predict, lprefix=lprefix, rprefix=rprefix)
         else:
             if use_y:
-                candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True, lprefix=lprefix, rprefix=rprefix)
+                candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True,
+                                                lprefix=lprefix, rprefix=rprefix)
             if use_w:
-                candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False, lprefix=lprefix, rprefix=rprefix)
+                candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False,
+                                                lprefix=lprefix, rprefix=rprefix)
     else:
         if use_predict:
             if use_y:
@@ -288,9 +283,11 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
                                                         max=max_predict, lprefix=lprefix, rprefix=rprefix)
         else:
             if use_y:
-                candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True, lprefix=lprefix, rprefix=rprefix)
+                candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True,
+                                                lprefix=lprefix, rprefix=rprefix)
             if use_w:
-                candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False, lprefix=lprefix, rprefix=rprefix)
+                candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False,
+                                                lprefix=lprefix, rprefix=rprefix)
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     id4explanation.to_csv(os.path.join(datadir, tmp_name), index=False)
