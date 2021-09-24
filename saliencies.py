@@ -121,8 +121,8 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
 
                         t0 = time.perf_counter()
 
-                        saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource,
-                                                                                              rsource, predict_fn, datadir,
+                        saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource[:2*max_predict],
+                                                                                              rsource[:2*max_predict], predict_fn, datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast, max_predict=max_predict)
 
