@@ -1,0 +1,12 @@
+,explanation,label,latency,match,prediction,row,type
+0,"{'rtable_Beer_Name': 0.06048387096774194, 'rtable_Brew_Factory_Name': 0.05241935483870968, 'rtable_ABV': 0.04838709677419355, 'ltable_Beer_Name': 0.06854838709677419, 'ltable_ABV': 0.06048387096774194, 'ltable_Brew_Factory_Name': 0.028225806451612902}",1.0,59.480988185,0.0,[0.98110193 0.01889805],3917-2224,certa
+1,"{'ltable_ABV': 0.015, 'ltable_Beer_Name': 0.01}",1.0,70.22062966899989,0.0,[0.6809916  0.31900838],271-1410,certa
+3,"{'ltable_Beer_Name': 0.010714285714285714, 'ltable_ABV': 0.010714285714285714, 'ltable_Brew_Factory_Name': 0.007142857142857143}",0.0,59.23544450999998,0.0,[0.9965545  0.00344548],1024-37,certa
+4,"{'ltable_Brew_Factory_Name': 0.06818181818181818, 'ltable_Beer_Name': 0.09090909090909091, 'ltable_ABV': 0.07386363636363637}",1.0,51.91238208000004,0.0,[0.9943751  0.00562495],1780-685,certa
+7,"{'ltable_Style': 0.66875, 'ltable_Beer_Name': 0.52875, 'ltable_Brew_Factory_Name': 0.47875, 'ltable_ABV': 0.43375, 'rtable_Beer_Name': 0.27, 'rtable_Style': 0.28125, 'rtable_Brew_Factory_Name': 0.21125, 'rtable_ABV': 0.205}",0.0,148.11804951400018,1.0,[0.08583776 0.9141623 ],4068-2374,certa
+9,"{'ltable_Brew_Factory_Name': 0.01293103448275862, 'ltable_ABV': 0.01293103448275862}",0.0,57.1613295520001,0.0,[0.9934731  0.00652685],2572-221,certa
+13,"{'ltable_Beer_Name': 0.585, 'ltable_Brew_Factory_Name': 0.59375, 'ltable_Style': 0.6, 'ltable_ABV': 0.585, 'rtable_Beer_Name': 0.3875, 'rtable_Brew_Factory_Name': 0.38875, 'rtable_Style': 0.4, 'rtable_ABV': 0.3875}",1.0,143.14061432300014,1.0,[0.21524641 0.7847536 ],2558-1284,certa
+16,"{'ltable_Brew_Factory_Name': 0.013392857142857142, 'ltable_ABV': 0.017857142857142856, 'ltable_Beer_Name': 0.008928571428571428}",1.0,84.75548159600021,0.0,[0.99354    0.00646005],563-1177,certa
+20,"{'ltable_Brew_Factory_Name': 0.44375, 'ltable_Style': 0.69625, 'ltable_Beer_Name': 0.48125, 'ltable_ABV': 0.415, 'rtable_Beer_Name': 0.28875, 'rtable_Style': 0.28625, 'rtable_ABV': 0.22, 'rtable_Brew_Factory_Name': 0.2325}",0.0,148.69985782799995,1.0,[0.05427973 0.9457203 ],4181-2300,certa
+21,"{'rtable_Brew_Factory_Name': 0.04846938775510204, 'rtable_ABV': 0.047193877551020405, 'ltable_Brew_Factory_Name': 0.006377551020408163, 'ltable_ABV': 0.007653061224489796}",0.0,95.36105538900028,0.0,[0.99375945 0.0062405 ],982-348,certa
+23,"{'ltable_Brew_Factory_Name': 0.028846153846153848, 'ltable_ABV': 0.028846153846153848}",1.0,89.1906796129997,0.0,[0.8992441  0.10075581],2007-203,certa

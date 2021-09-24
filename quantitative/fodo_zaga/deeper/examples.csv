@@ -1,0 +1,18 @@
+,ltable_id,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_id,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,match
+0,6,citrus,' 6703 melrose ave. ',` los angeles ',213/857 -0034,californian,6,230,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` los angeles ',213-655-8880,` french bistro ',12,6.220429e-05
+1,38,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38,256,` jo jo ',' 160 e. 64th st. ',` new york city ',212-223-5656,` french bistro ',38,0.23067825
+2,384,` beesley \ 's of buckhead ',' 260 e. paces ferry road ',atlanta,404/264 -1334,continental,384,300,` hedgerose heights inn the ',' 490 e. paces ferry rd. ne ',atlanta,404-233-7673,continental,82,6.9638764e-07
+3,83,` heera of india ',' 595 piedmont ave. rio shopping mall ',atlanta,404/876 -4408,asian,83,301,` heera of india ',' 595 piedmont ave. ',atlanta,404-876-4408,indian,83,0.62266874
+4,197,bruno,' 240 e. 58th st. ',` new york ',212/688 -4190,italian,195,251,felidia,' 243 e. 58th st. ',` new york city ',212-758-1479,italian,33,0.8413513
+5,42,` les celebrites ',' 160 central park s ',` new york ',212/484 -5113,french,42,275,` san domenico ',' 240 central park s. ',` new york city ',212-265-5959,italian,57,0.008581647
+6,131,dive !,' 10250 santa monica blvd. ',` los angeles ',310/788 -,` dive american ',128,233,` palm the ( los angeles ) ',' 9001 santa monica blvd. ',` w. hollywood ',310-550-8811,steakhouses,15,0.022408377
+7,50,oceana,'55 e. 54th st. ',` new york ',212/759 -5941,seafood,50,242,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,24,0.011980104
+8,443,` mandarin court ',' 1510 e. flamingo rd. ',` las vegas ',702/737 -1234,asian,443,126,` fiore rotisserie & grille ',' 3700 w. flamingo rd. ',` las vegas ',702-252-7702,italian,660,5.965291e-06
+9,442,` lillie langtry \ 's ',' 129 e. fremont st. ',` las vegas ',702/385 -7111,asian,442,289,` second street grill ',' 200 e. fremont st. ',` las vegas ',702-385-6277,` pacific rim ',71,2.025542e-05
+10,410,palisades,' 1829 peachtree rd. ',atlanta,404/350 -6755,continental,410,295,` brasserie le coze ',' 3393 peachtree rd. ',atlanta,404-266-1440,` french bistro ',77,9.335274e-09
+11,165,` schatzi on main ',' 3110 main st. ',` los angeles ',310/399 -4800,continental,162,223,` chinois on main ',' 2709 main st. ',` santa monica ',310-392-9025,` pacific new wave ',5,0.00022085913
+12,37,` island spice ',' 402 w. 44th st. ',` new york ',212/765 -1737,` tel caribbean ',37,255,` island spice ',' 402 w. 44th st. ',` new york city ',212-765-1737,caribbean,37,0.99120986
+13,82,` hedgerose heights inn ',' 490 e. paces ferry rd. ',atlanta,404/233 -7673,international,82,141,' 103 west ',' 103 w. paces ferry rd. ',atlanta,404-233-5993,continental,675,0.05068128
+14,146,joss,' 9255 sunset blvd. ',` los angeles ',310/276 -1886,asian,143,225,` fenix at the argyle ',' 8358 sunset blvd. ',` w. hollywood ',213-848-6677,` french ( new ) ',7,7.857714e-05
+15,494,manora,' 3226 mission st. ',` san francisco ',415/861 -6224,asian,494,193,` dusit thai ',' 3221 mission st. ',` san francisco ',415-826-4639,thai,728,0.004333059
+16,170,` tommy tang \ 's ',' 7313 melrose ave. ',` los angeles ',213/937 -5733,asian,167,224,citrus,' 6703 melrose ave. ',` los angeles ',213-857-0034,californian,6,1.227048e-05

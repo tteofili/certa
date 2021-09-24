@@ -1,0 +1,12 @@
+,ltable_id,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_id,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,match
+0,3917,Honey Basil Amber,Rude Hippo Brewing Company,American Amber / Red Ale,7.40 %,2224,Rude Hippo Honey Basil Amber,18th Street Brewery,Amber Ale,7.40 %,0.018898055
+1,271,Real McCoy Amber Ale,Mammoth Brewing Company,American Amber / Red Ale,4.50 %,1410,Mammoth Real McCoy Amber Ale,Mammoth Brewing Company,Altbier,4.50 %,0.31900838
+3,1024,Rocket City Red,Straight To Ale,American Amber / Red Ale,5.00 %,37,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Spice/Herb/Vegetable,5.20 %,0.0034454765
+4,1780,Jazz Beer Tarraco Amber,Tarraco Beer,American Amber / Red Ale,6.90 %,685,Jazz Beer Tarraco Amber,Ca l_Arenys - Cervezas Guineu,Amber Ale,6.90 %,0.005624953
+7,4068,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,2374,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,11.25 %,0.9141623
+9,2572,Red Rock Opie Red Ale,Red Rock Brewing Company,American Amber / Red Ale,4.00 %,221,Council Rock Sleeping Lion Red Ale,Council Rock Brewery,Irish Ale,6 %,0.0065268455
+13,2558,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,1284,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0.7847536
+16,563,Amber Waves Ale,Capitol City Brewing,American Amber / Red Ale,5.40 %,1177,Capitol City Amber Waves Ale,Capitol City Brewing Company,Amber Ale,5.60 %,0.0064600487
+20,4181,Inception Series - Runnin ' With The Devil,Nebraska Brewing Company,American Barleywine,11.90 %,2300,18th Street Deal With the Devil Pale Ale,18th Street Brewery,Imperial IPA,8.50 %,0.9457203
+21,982,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,348,Baranof Island Redoubt Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0.006240502
+23,2007,Bushfire American Red,Granite Falls Brewing Co. .,American Amber / Red Ale,5.00 %,203,Granite Falls Bushfire American Red Ale,Granite Falls Brewing Company,Amber Ale,5 %,0.10075581

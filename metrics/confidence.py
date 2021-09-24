@@ -135,5 +135,5 @@ def get_confidence(base_dir: str):
 
 
 if __name__ == "__main__":
-    ci = get_confidence('/home/tteofili/dev/certa/quantitative/fodo_zaga/deeper')
+    ci = get_confidence('/home/tteofili/dev/certa/quantitative/beers/emt')
     print(ci)
