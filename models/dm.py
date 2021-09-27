@@ -243,7 +243,7 @@ class DMERModel(ERModel):
 
         logging.debug("TRAINING with {} samples", len(trainLab))
         # train default model with standard dataset
-        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth')
+        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth', epochs=15)
 
         stats = self.model.run_eval(validationLab)
 
