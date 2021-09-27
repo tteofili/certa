@@ -234,7 +234,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    type = 'dm'
-    filtered_datasets = ['dblp_scholar']
+    type = 'deeper'
+    filtered_datasets = []
     model = from_type(type)
     evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=3000, fast=True)

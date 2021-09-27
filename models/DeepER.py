@@ -468,7 +468,7 @@ class DeepERModel(ERModel):
         super(DeepERModel, self).__init__()
         self.name = 'deeper'
         if not os.path.exists('models/glove.6B.300d.txt'):
-            word_vectors = api.load("glove-wiki-gigaword-50")
+            word_vectors = api.load("glove-wiki-gigaword-300")
             word_vectors.save_word2vec_format('models/glove.6B.300d.txt', binary=False)
 
         self.embeddings_index = init_embeddings_index('models/glove.6B.300d.txt')
