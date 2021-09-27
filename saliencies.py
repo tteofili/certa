@@ -234,10 +234,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    type = 'emt'
-    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                          'itunes_amazon', 'walmart_amazon', 'amazon_google'
-                         'fodo_zaga', 'beers', 'abt-buy',
-                         'dblp_scholar', 'dblp_acm']
+    type = 'dm'
+    filtered_datasets = ['dblp_scholar']
     model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=1000, fast=False)
+    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=3000, fast=True)

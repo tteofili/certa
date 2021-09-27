@@ -1,118 +1,56 @@
-"""Computing Faithfulness measure for the saliency scores."""
-import argparse
+"""Evaluate confidence measure."""
+import json
+import operator
 import os
-import random
-from argparse import Namespace
-from functools import partial
 
 import numpy as np
-import torch
+import pandas as pd
 from sklearn.metrics import auc
-from transformers import BertConfig, BertForSequenceClassification, \
-    BertTokenizer
 
-from models.data_loader import BucketBatchSampler, DatasetSaliency, \
-    collate_threshold, get_collate_fn, get_dataset
-from models.model_builder import CNN_MODEL, LSTM_MODEL
+from models.ermodel import ERModel
+from models.utils import from_type
 
 
-def get_model(model_path):
-    checkpoint = torch.load(model_path,
-                            map_location=lambda storage, loc: storage)
-    model_args = Namespace(**checkpoint['args'])
-    if args.model == 'lstm':
-        model_cp = LSTM_MODEL(tokenizer, model_args,
-                              n_labels=checkpoint['args']['labels']).to(device)
-    elif args.model == 'trans':
-        transformer_config = BertConfig.from_pretrained('bert-base-uncased',
-                                                        num_labels=model_args.labels)
-        model_cp = BertForSequenceClassification.from_pretrained(
-            'bert-base-uncased', config=transformer_config).to(
-            device)
-    else:
-        model_cp = CNN_MODEL(tokenizer, model_args,
-                             n_labels=checkpoint['args']['labels']).to(device)
+def get_faithfullness(model: ERModel, base_dir: str):
+    np.random.seed(1)
+    saliency_names = ['certa', 'landmark', 'mojito_c', 'mojito_d', 'shap']
+    all_y = []
+    np.random.seed(0)
 
-    model_cp.load_state_dict(checkpoint['model'])
+    model_scores = []
+    thresholds = [0.1, 0.2, 0.33, 0.5, 0.7, 0.9]
 
-    return model_cp, model_args
+    examples_df = pd.read_csv(os.path.join(base_dir, 'examples.csv')).drop(['match', 'Unnamed: 0'], axis=1)
+    attr_len = len(examples_df.columns) - 2
+    aucs = []
+    for saliency in saliency_names:
+        print(saliency)
+
+        saliency_df = pd.read_csv(os.path.join(base_dir, saliency + '.csv'))
+        for threshold in thresholds:
+            top_k = int(threshold * attr_len)
+            test_set_df = examples_df.copy()
+            for i in range(len(saliency_df)):
+                explanation = saliency_df.iloc[i]['explanation']
+                attributes_dict = json.loads(explanation.replace("'", "\""))
+                sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1))
+                top_k_attributes = sorted_attributes_dict[:top_k]
+                for t in top_k_attributes:
+                    test_set_df.at[i, t[0]] = ''
+            evaluation = model.evaluation(test_set_df)
+            model_scores.append(evaluation[2])
+        print(thresholds, model_scores)
+        auc_sal = auc(thresholds, model_scores)
+        aucs.append(auc_sal)
+        print(f'auc:{auc_sal} for {saliency}')
+
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--gpu", help="Flag for running on gpu",
-                        action='store_true', default=False)
-    parser.add_argument("--saliency", help='Name of the saliency', type=str)
-    parser.add_argument("--dataset", choices=['snli', 'imdb', 'tweet'])
-    parser.add_argument("--dataset_dir",
-                        help="Path to the direcory with the datasets",
-                        default='data/e-SNLI/dataset/',
-                        type=str)
-    parser.add_argument("--test_saliency_dir",
-                        help="Path to the saliency files", type=str)
-    parser.add_argument("--model_path", help="Directory with all of the models",
-                        type=str, nargs='+')
-    parser.add_argument("--models_dir", help="Directory with all of the models",
-                        type=str)
-    parser.add_argument("--model", help="Type of model",
-                        choices=['trans', 'lstm', 'cnn'])
-
-    args = parser.parse_args()
-
-    device = torch.device("cuda") if args.gpu else torch.device("cpu")
-
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    thresholds = list(range(0, 110, 10))
-    aucs = []
-
-    coll_call = get_collate_fn(dataset=args.dataset, model=args.model)
-    return_attention_masks = args.model == 'trans'
-
-    if args.model == 'trans':
-        eval_fn = train_transformers.eval_model
-    else:
-        eval_fn = train_lstm_cnn.eval_model
-
-    for model_path in os.listdir(args.models_dir):
-        if model_path.endswith('.predictions'):
-            continue
-        print('Model', model_path, flush=True)
-        model_full_path = os.path.join(args.models_dir, model_path)
-        model, model_args = get_model(model_full_path)
-
-        random.seed(model_args.seed)
-        torch.manual_seed(model_args.seed)
-        torch.cuda.manual_seed_all(model_args.seed)
-        torch.backends.cudnn.deterministic = True
-        np.random.seed(model_args.seed)
-
-        model_scores = []
-        for threshold in thresholds:
-            collate_fn = partial(collate_threshold,
-                                 tokenizer=tokenizer,
-                                 device=device,
-                                 return_attention_masks=return_attention_masks,
-                                 pad_to_max_length=False,
-                                 threshold=threshold,
-                                 collate_orig=coll_call,
-                                 n_classes=3 if args.dataset in ['snli',
-                                                                 'tweet']
-                                 else 2)
-
-            saliency_path_test = os.path.join(args.test_saliency_dir,
-                                              f'{model_path}_{args.saliency}')
-            test = get_dataset(mode='test', dataset=args.dataset,
-                               path=args.dataset_dir)
-            test = DatasetSaliency(test, saliency_path_test)
-
-            test_dl = BucketBatchSampler(batch_size=model_args.batch_size,
-                                         dataset=test,
-                                         collate_fn=collate_fn)
-
-            results = eval_fn(model, test_dl, model_args.labels)
-            model_scores.append(results[2])
-
-        print(thresholds, model_scores)
-        aucs.append(auc(thresholds, model_scores))
-
-    print(f'{np.mean(aucs):.2f} ($\pm${np.std(aucs):.2f})')
+    model_type = 'dm'
+    model = from_type('%s' % model_type)
+    dataset = 'fodo_zaga'
+    base_dir = '/home/tteofili/dev/certa/'
+    model.load('%smodels/%s/%s' % (base_dir, model_type, dataset))
+    faithfullness = get_faithfullness(model, '%squantitative/%s/%s' % (base_dir, dataset, model_type))
+    print(faithfullness)
