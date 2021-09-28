@@ -327,7 +327,7 @@ def model_statistics_prf(data, model, embeddings_model, tokenizer):
     no_match_count = 0
     match_count = 0
     for tri in data:
-        if tri[2] == 1:
+        if int(tri[2]) == 1:
             match_count += 1
         else:
             no_match_count += 1
@@ -355,7 +355,7 @@ def model_statistics_prf(data, model, embeddings_model, tokenizer):
         if np.argmax(prediction) == 1:
             match_retrieved.append(data[i])
             # Conta predizioni di match corrette
-            if data[i][2] == 1:
+            if int(data[i][2]) == 1:
                 true_match += 1
         # if i % (corpus_size // 10) == 0:
         #     print('=', end='', flush=True)

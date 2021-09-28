@@ -6,7 +6,7 @@
 4,"{'rtable_name': 0.0325, 'rtable_description': 0.0325, 'rtable_price': 0.02, 'ltable_name': 0.0275, 'ltable_description': 0.0275, 'ltable_price': 0.015}",0.0,7.121304191998206,0.0,[0.86740214 0.13259783],643-636,certa
 5,"{'rtable_name': 0.0175, 'rtable_description': 0.0175, 'rtable_price': 0.01, 'ltable_name': 0.0075, 'ltable_description': 0.0075, 'ltable_price': 0.005}",0.0,6.5051694480353035,0.0,[0.965851 0.034149],495-578,certa
 6,"{'rtable_name': 0.02, 'rtable_description': 0.02, 'rtable_price': 0.0125}",0.0,227.25967017404037,0.0,[0.99729365 0.00270633],994-336,certa
-7,{},0.0,226.61280662199715,0.0,[0.9735527  0.02644733],808-127,certa
+7,"{'ltable_name': 0.0075,'ltable_description': 0.0075, 'ltable_price': 0.005}",0.0,226.61280662199715,0.0,[0.9735527  0.02644733],808-127,certa
 8,"{'rtable_name': 0.04, 'rtable_description': 0.04, 'rtable_price': 0.025, 'ltable_name': 0.0175, 'ltable_description': 0.0175, 'ltable_price': 0.01}",0.0,6.35903159895679,0.0,[0.8839233  0.11607669],987-980,certa
 9,"{'ltable_name': 0.0225, 'ltable_description': 0.0225, 'ltable_price': 0.0125, 'rtable_name': 0.0325, 'rtable_description': 0.03, 'rtable_price': 0.025}",0.0,6.30844510497991,0.0,[0.9726782  0.02732181],332-237,certa
 10,"{'ltable_name': 0.0175, 'ltable_description': 0.0175, 'ltable_price': 0.0075, 'rtable_name': 0.015, 'rtable_description': 0.015, 'rtable_price': 0.01}",0.0,219.7418037269963,0.0,[0.98360956 0.01639043],994-732,certa

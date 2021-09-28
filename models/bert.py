@@ -142,7 +142,7 @@ class EMTERModel(ERModel):
 
         os.remove(tmpf)
 
-        return p, r, f1
+        return float(p), float(r), float(f1)
 
     def predict(self, x, mojito=False, **kwargs):
         original = x.copy()

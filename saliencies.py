@@ -211,6 +211,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                         shaps = shaps.append(shap_row, ignore_index=True)
 
                         item['match'] = prediction[1]
+                        item['label'] = label
                         examples = examples.append(item, ignore_index=True)
                         print(item)
                         print(i)
