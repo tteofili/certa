@@ -117,7 +117,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                     try:
                         # CERTA
                         print('certa')
-                        num_triangles = 10
+                        num_triangles = 100
 
                         t0 = time.perf_counter()
 
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     samples = 50
     type = 'dm'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'abt_buy', 'fodo_zaga',
+                         'abt_buy', 'fodo_zaga', 'beers',
                          'amazon_google',  'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar',  'dblp_acm']
     model = from_type(type)
