@@ -29,7 +29,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
         for dir in dirs:
             if dir not in filtered_datasets:
                 continue
-            for robust in [False, True]:
+            for robust in [False]:
                 os.makedirs(exp_dir + dir, exist_ok=True)
                 model_name = model.name
                 if robust:
@@ -51,12 +51,12 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                 train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'],
                                          robust=robust)
 
-                # mojito = Mojito(test_df.columns,
-                #                 attr_to_copy='left',
-                #                 split_expression=" ",
-                #                 class_names=['no_match', 'match'],
-                #                 lprefix='', rprefix='',
-                #                 feature_selection='lasso_path')
+                mojito = Mojito(test_df.columns,
+                                attr_to_copy='left',
+                                split_expression=" ",
+                                class_names=['no_match', 'match'],
+                                lprefix='', rprefix='',
+                                feature_selection='lasso_path')
 
                 save_path = 'models/' + model_name + '/' + dir
                 if robust:
@@ -87,12 +87,12 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                 def predict_fn_mojito(x):
                     return model.predict(x, mojito=True)
 
-                # landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
-                #                               exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
-                #                               split_expression=r' ')
-                #
-                # shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
-                #                                       train_df.drop(['label'], axis=1).astype(str)[:50], link='identity')
+                landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
+                                              exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
+                                              split_expression=r' ')
+
+                shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
+                                                      train_df.drop(['label'], axis=1).astype(str)[:50], link='identity')
 
                 examples = pd.DataFrame()
                 certas = pd.DataFrame()
@@ -137,78 +137,78 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
 
 
                         # # Mojito
-                        # print('mojito')
-                        # t0 = time.perf_counter()
-                        # mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
-                        #                               num_features=15,
-                        #                               num_perturbation=100)
-                        #
-                        # latency_m = time.perf_counter() - t0
-                        #
-                        # mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
-                        #
-                        # if 'id' in mojito_exp:
-                        #     mojito_exp.pop('id', None)
-                        #
-                        #
-                        # mojito_row = {'explanation': mojito_exp, 'type': 'mojito-c', 'latency': latency_m,
-                        #            'match': class_to_explain,
-                        #            'label': label, 'row': row_id, 'prediction': prediction}
-                        # mojitos_c = mojitos_c.append(mojito_row, ignore_index=True)
-                        #
-                        # t0 = time.perf_counter()
-                        # mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
-                        #                               num_features=15,
-                        #                               num_perturbation=100)
-                        #
-                        # latency_m = time.perf_counter() - t0
-                        #
-                        # mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
-                        #
-                        # if 'id' in mojito_exp:
-                        #     mojito_exp.pop('id', None)
-                        #
-                        # mojito_row = {'explanation': mojito_exp, 'type': 'mojito-d', 'latency': latency_m,
-                        #               'match': class_to_explain,
-                        #               'label': label, 'row': row_id, 'prediction': prediction}
-                        # mojitos_d = mojitos_d.append(mojito_row, ignore_index=True)
-                        #
-                        # # landmark
-                        # print('landmark')
-                        # labelled_item = item.copy()
-                        # labelled_item['label'] = int(label)
-                        # labelled_item['id'] = i
-                        #
-                        # t0 = time.perf_counter()
-                        # land_explanation = landmark_explainer.explain(labelled_item)
-                        # latency_l = time.perf_counter() - t0
-                        #
-                        # land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
-                        #
-                        # land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
-                        #            'match': class_to_explain,
-                        #            'label': label, 'row': row_id, 'prediction': prediction}
-                        # landmarks = landmarks.append(land_row, ignore_index=True)
-                        #
-                        # # SHAP
-                        # print('shap')
-                        # shap_instance = test_df.iloc[i, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
-                        #
-                        # t0 = time.perf_counter()
-                        # shap_values = shap_explainer.shap_values(shap_instance, nsamples=100)
-                        #
-                        # latency_s = time.perf_counter() - t0
-                        #
-                        # match_shap_values = shap_values
-                        #
-                        # shap_saliency = dict()
-                        # for sv in range(len(match_shap_values)):
-                        #     shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
-                        #
-                        # shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
-                        #             'match': class_to_explain,
-                        #             'label': label, 'row': row_id, 'prediction': prediction}
-                        # shaps = shaps.append(shap_row, ignore_index=True)
+                        print('mojito')
+                        t0 = time.perf_counter()
+                        mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
+                                                      num_features=15,
+                                                      num_perturbation=100)
+
+                        latency_m = time.perf_counter() - t0
+
+                        mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
+
+                        if 'id' in mojito_exp:
+                            mojito_exp.pop('id', None)
+
+
+                        mojito_row = {'explanation': mojito_exp, 'type': 'mojito-c', 'latency': latency_m,
+                                   'match': class_to_explain,
+                                   'label': label, 'row': row_id, 'prediction': prediction}
+                        mojitos_c = mojitos_c.append(mojito_row, ignore_index=True)
+
+                        t0 = time.perf_counter()
+                        mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
+                                                      num_features=15,
+                                                      num_perturbation=100)
+
+                        latency_m = time.perf_counter() - t0
+
+                        mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
+
+                        if 'id' in mojito_exp:
+                            mojito_exp.pop('id', None)
+
+                        mojito_row = {'explanation': mojito_exp, 'type': 'mojito-d', 'latency': latency_m,
+                                      'match': class_to_explain,
+                                      'label': label, 'row': row_id, 'prediction': prediction}
+                        mojitos_d = mojitos_d.append(mojito_row, ignore_index=True)
+
+                        # landmark
+                        print('landmark')
+                        labelled_item = item.copy()
+                        labelled_item['label'] = int(label)
+                        labelled_item['id'] = i
+
+                        t0 = time.perf_counter()
+                        land_explanation = landmark_explainer.explain(labelled_item)
+                        latency_l = time.perf_counter() - t0
+
+                        land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
+
+                        land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
+                                   'match': class_to_explain,
+                                   'label': label, 'row': row_id, 'prediction': prediction}
+                        landmarks = landmarks.append(land_row, ignore_index=True)
+
+                        # SHAP
+                        print('shap')
+                        shap_instance = test_df.iloc[i, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
+
+                        t0 = time.perf_counter()
+                        shap_values = shap_explainer.shap_values(shap_instance, nsamples=100)
+
+                        latency_s = time.perf_counter() - t0
+
+                        match_shap_values = shap_values
+
+                        shap_saliency = dict()
+                        for sv in range(len(match_shap_values)):
+                            shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
+
+                        shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
+                                    'match': class_to_explain,
+                                    'label': label, 'row': row_id, 'prediction': prediction}
+                        shaps = shaps.append(shap_row, ignore_index=True)
 
                         item['match'] = prediction[1]
                         item['label'] = label
@@ -221,12 +221,12 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                         item.head()
 
 
-                # mojitos_d.to_csv(exp_dir + dir + '/' + model_name + '/mojito_d.csv')
-                # mojitos_c.to_csv(exp_dir + dir + '/' + model_name + '/mojito_c.csv')
-                # landmarks.to_csv(exp_dir + dir + '/' + model_name + '/landmark.csv')
+                mojitos_d.to_csv(exp_dir + dir + '/' + model_name + '/mojito_d.csv')
+                mojitos_c.to_csv(exp_dir + dir + '/' + model_name + '/mojito_c.csv')
+                landmarks.to_csv(exp_dir + dir + '/' + model_name + '/landmark.csv')
                 certas.to_csv(exp_dir + dir + '/' + model_name + '/certa.csv')
-                # shaps.to_csv(exp_dir + dir + '/' + model_name + '/shap.csv')
-                # examples.to_csv(exp_dir + dir + '/' + model_name + '/examples.csv')
+                shaps.to_csv(exp_dir + dir + '/' + model_name + '/shap.csv')
+                examples.to_csv(exp_dir + dir + '/' + model_name + '/examples.csv')
 
 
 
@@ -237,7 +237,7 @@ if __name__ == "__main__":
     samples = 50
     type = 'dm'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'beers','abt_buy', 'fodo_zaga',
+                         'abt_buy', 'fodo_zaga',
                          'amazon_google',  'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar',  'dblp_acm']
     model = from_type(type)
