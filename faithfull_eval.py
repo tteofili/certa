@@ -7,13 +7,17 @@ from certa.utils import merge_sources
 from metrics.faithfulness import get_faithfullness
 from models.utils import from_type
 
-model_type = 'emt'
+model_type = 'dm'
 experiments_dir = 'quantitative/'
 root_datadir = 'datasets/'
 base_dir = ''
 samples = 50
-whitelist = ['abt_buy']
+whitelist = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         'beers','abt_buy', 'fodo_zaga',
+                         'amazon_google',  'itunes_amazon', 'walmart_amazon',
+                         'dblp_scholar',  'dblp_acm']
 
+faithfulness_dict = dict()
 for subdir, dirs, files in os.walk(experiments_dir):
     for dataset in dirs:
         if dataset not in whitelist:
@@ -32,7 +36,10 @@ for subdir, dirs, files in os.walk(experiments_dir):
             faithfulness = get_faithfullness(model, '%s%s%s/%s' % (base_dir, experiments_dir, dataset, model_type),
                                              test_df)
             print(f'{model_type}: faithfulness for {dataset}: {faithfulness}')
+            faithfulness_dict[dataset] = faithfulness
         except:
             print(traceback.format_exc())
             print(f'skipped {dataset}')
             pass
+
+print(faithfulness_dict)

@@ -29,7 +29,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
         for dir in dirs:
             if dir not in filtered_datasets:
                 continue
-            for robust in [False, True]:
+            for robust in [False]:
                 os.makedirs(exp_dir + dir, exist_ok=True)
                 model_name = model.name
                 if robust:
@@ -117,12 +117,12 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                     try:
                         # CERTA
                         print('certa')
-                        num_triangles = 100
+                        num_triangles = 10
 
                         t0 = time.perf_counter()
 
-                        saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource[:2*max_predict],
-                                                                                              rsource[:2*max_predict], predict_fn, datadir,
+                        saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource,
+                                                                                              rsource, predict_fn, datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast, max_predict=max_predict)
 
@@ -136,7 +136,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                         certas = certas.append(certa_row, ignore_index=True)
 
 
-                        # Mojito
+                        # # Mojito
                         print('mojito')
                         t0 = time.perf_counter()
                         mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
@@ -236,6 +236,9 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     samples = 50
     type = 'dm'
-    filtered_datasets = ['dirty_amazon_itunes']
+    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         'abt_buy', 'fodo_zaga',
+                         'amazon_google',  'itunes_amazon', 'walmart_amazon',
+                         'dblp_scholar',  'dblp_acm']
     model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=1000, fast=True)
+    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=300, fast=True)

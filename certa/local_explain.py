@@ -269,10 +269,10 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
         else:
             if use_y:
                 candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True,
-                                                lprefix=lprefix, rprefix=rprefix)
+                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
             if use_w:
                 candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False,
-                                                lprefix=lprefix, rprefix=rprefix)
+                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
     else:
         if use_predict:
             if use_y:
@@ -284,10 +284,10 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
         else:
             if use_y:
                 candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True,
-                                                lprefix=lprefix, rprefix=rprefix)
+                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
             if use_w:
                 candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False,
-                                                lprefix=lprefix, rprefix=rprefix)
+                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     id4explanation.to_csv(os.path.join(datadir, tmp_name), index=False)
