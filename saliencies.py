@@ -235,7 +235,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    type = 'deeper'
-    filtered_datasets = []
+    type = 'dm'
+    filtered_datasets = ['dirty_amazon_itunes']
     model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=3000, fast=True)
+    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=1000, fast=True)
