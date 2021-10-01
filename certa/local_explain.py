@@ -229,7 +229,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         generated_records_left_df = pd.concat([generated_records_left_df, generated_copies_left_df])
         generated_records_right_df = pd.concat([generated_records_right_df, generated_copies_right_df])
 
-        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, predict_fn, generated_df,
+        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, predict_fn, generated_df[:max_predict],
                                                               report=False)], axis=0)
         logging.debug('perturbed neighborhood', len(neighborhood))
 

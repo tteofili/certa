@@ -117,14 +117,15 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                     try:
                         # CERTA
                         print('certa')
-                        num_triangles = 100
+                        num_triangles = 10
 
                         t0 = time.perf_counter()
 
                         saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource,
                                                                                               rsource, predict_fn, datadir,
                                                                                               num_triangles=num_triangles,
-                                                                                              fast=fast, max_predict=max_predict)
+                                                                                              fast=fast, max_predict=max_predict,
+                                                                                              token_parts=False, attr_length=4)
 
                         latency_c = time.perf_counter() - t0
 
@@ -195,7 +196,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                         shap_instance = test_df.iloc[i, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
 
                         t0 = time.perf_counter()
-                        shap_values = shap_explainer.shap_values(shap_instance, nsamples=100)
+                        shap_values = shap_explainer.shap_values(shap_instance, nsamples=10)
 
                         latency_s = time.perf_counter() - t0
 
@@ -236,9 +237,6 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     samples = 50
     type = 'dm'
-    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'abt_buy', 'fodo_zaga', 'beers',
-                         'amazon_google',  'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar',  'dblp_acm']
+    filtered_datasets = ['dirty_walmart_amazon']
     model = from_type(type)
     evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=300, fast=True)
