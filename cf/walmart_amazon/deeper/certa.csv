@@ -1,0 +1,140 @@
+,summary,type,latency,match,label,row,prediction
+0,"rtable_title/rtable_category/rtable_modelno/rtable_price    0.6
+dtype: float64",certa,6.078980632999446,0.0,0.0,1853-2139,[9.9972993e-01 2.7002697e-04]
+1,"rtable_title       1.0
+rtable_category    1.0
+rtable_price       1.0
+rtable_brand       1.0
+dtype: float64",certa,30.62630812199859,1.0,0.0,621-3167,[0.3214046 0.6785954]
+2,"ltable_title/ltable_category/ltable_modelno    0.9
+dtype: float64",certa,3.6138120779996825,0.0,0.0,2115-8789,[1.000000e+00 2.665814e-10]
+3,"rtable_title    0.5
+dtype: float64",certa,3.713352066999505,0.0,0.0,278-9064,[9.999906e-01 9.439126e-06]
+4,"ltable_title/ltable_modelno    0.5
+dtype: float64",certa,6.628179090999765,0.0,0.0,1673-13279,[0.99031913 0.00968093]
+5,"rtable_brand    0.7
+dtype: float64",certa,3.626018472999931,0.0,0.0,2305-2948,[0.80668163 0.1933184 ]
+6,"ltable_title/ltable_category    0.6
+dtype: float64",certa,2.683434586000658,0.0,0.0,1543-10366,[0.9112306  0.08876935]
+7,"rtable_title    1.0
+dtype: float64",certa,29.860104878998754,1.0,1.0,88-3269,[0.04470094 0.955299  ]
+8,"ltable_modelno     0.428571
+ltable_price       0.428571
+ltable_category    0.428571
+ltable_brand       0.428571
+rtable_brand       0.428571
+rtable_price       0.428571
+dtype: float64",certa,9.075986874000591,0.0,0.0,1718-11835,[0.86085016 0.13914984]
+9,"rtable_title       0.8
+rtable_category    0.8
+rtable_price       0.8
+rtable_brand       0.8
+dtype: float64",certa,29.685447297999417,1.0,1.0,1624-5013,[0.31897926 0.6810207 ]
+10,"rtable_title/rtable_category    0.7
+dtype: float64",certa,2.270569471998897,0.0,0.0,614-5969,[9.9980718e-01 1.9280867e-04]
+11,"rtable_title/rtable_category    0.5
+dtype: float64",certa,2.133802275000562,0.0,0.0,768-10397,[9.9975735e-01 2.4265355e-04]
+12,"rtable_title/rtable_category/rtable_brand/rtable_price    0.8
+dtype: float64",certa,4.2548848949991225,0.0,0.0,2476-18730,[9.9998248e-01 1.7571228e-05]
+13,"rtable_title    0.8
+dtype: float64",certa,2.6586780380002892,0.0,1.0,470-10874,[0.94608635 0.0539137 ]
+14,"rtable_title       1.0
+rtable_category    1.0
+rtable_price       1.0
+rtable_brand       1.0
+dtype: float64",certa,30.278381052999976,1.0,0.0,2223-10753,[0.13909057 0.86090946]
+15,"ltable_title/ltable_category/ltable_price    0.6
+dtype: float64",certa,3.05797977399925,0.0,0.0,1512-19684,[9.9999559e-01 4.3902887e-06]
+16,"rtable_category    0.8
+dtype: float64",certa,2.7612486819998594,0.0,0.0,1136-17384,[0.9981869  0.00181313]
+17,"rtable_category    0.6
+dtype: float64",certa,2.3229638320008235,0.0,0.0,2089-687,[0.9950954  0.00490462]
+18,"rtable_category    1.0
+rtable_brand       1.0
+dtype: float64",certa,2.558600362999641,0.0,0.0,2020-18153,[9.998754e-01 1.245500e-04]
+19,"rtable_title/rtable_category/rtable_brand/rtable_price    0.8
+rtable_title/rtable_category/rtable_modelno               0.8
+dtype: float64",certa,2.5604074399998353,0.0,0.0,95-12,[0.9913619  0.00863812]
+20,"rtable_title/rtable_category/rtable_price    0.5
+dtype: float64",certa,3.419959122000364,0.0,0.0,2248-4299,[0.99329126 0.00670879]
+21,"rtable_category    1.0
+rtable_price       1.0
+rtable_brand       1.0
+dtype: float64",certa,3.8313186889990902,0.0,0.0,896-1632,[0.7100996 0.2899004]
+22,"ltable_category    0.5
+ltable_price       0.5
+dtype: float64",certa,3.6386773079993873,0.0,1.0,1534-1090,[0.9713507  0.02864927]
+23,"ltable_price    0.7
+dtype: float64",certa,2.2448018649993173,0.0,0.0,2118-5344,[0.9795775  0.02042248]
+24,"rtable_title    1.0
+dtype: float64",certa,29.824637404000896,1.0,0.0,54-649,[0.02181043 0.9781895 ]
+25,"ltable_title/ltable_category    0.75
+dtype: float64",certa,2.8173774639999465,0.0,0.0,417-8786,[9.9997866e-01 2.1376098e-05]
+26,"ltable_title    0.6
+dtype: float64",certa,4.8355959849996,0.0,0.0,1468-4568,[0.9502251  0.04977496]
+27,"ltable_category    0.8
+ltable_price       0.8
+ltable_modelno     0.8
+ltable_brand       0.8
+dtype: float64",certa,4.158791539000958,0.0,0.0,1455-14080,[0.83046263 0.16953729]
+28,"ltable_title/ltable_category/ltable_brand/ltable_price    0.4
+dtype: float64",certa,3.640333441999246,0.0,0.0,296-13803,[9.99988437e-01 1.16066785e-05]
+29,"ltable_title    0.7
+dtype: float64",certa,2.8883875139999873,0.0,0.0,280-17506,[1.0000000e+00 4.2645887e-08]
+30,"ltable_title    0.4
+dtype: float64",certa,5.806474225999409,0.0,0.0,2364-17917,[9.9916399e-01 8.3607284e-04]
+31,"ltable_title/ltable_brand/ltable_modelno/ltable_price       0.9
+ltable_title/ltable_category/ltable_brand/ltable_price      0.9
+ltable_title/ltable_category/ltable_brand/ltable_modelno    0.9
+dtype: float64",certa,2.720025668000744,0.0,0.0,1816-1832,[9.9970621e-01 2.9371172e-04]
+32,"ltable_category    0.6
+ltable_price       0.6
+ltable_modelno     0.6
+ltable_brand       0.6
+dtype: float64",certa,3.76562477600055,0.0,0.0,2258-8795,[0.9593243  0.04067564]
+33,"rtable_title       1.0
+rtable_category    1.0
+rtable_price       1.0
+rtable_brand       1.0
+dtype: float64",certa,31.058375492999403,1.0,0.0,340-363,[0.44436586 0.55563414]
+34,"ltable_title/ltable_category/ltable_modelno/ltable_price    0.7
+dtype: float64",certa,3.680527902999529,0.0,0.0,2126-17202,[0.9951983 0.0048017]
+35,"rtable_title/rtable_brand    0.7
+dtype: float64",certa,4.787448881999808,0.0,0.0,421-17564,[9.9921381e-01 7.8612985e-04]
+36,"rtable_title    0.8
+dtype: float64",certa,30.465314843999295,1.0,0.0,222-6546,[0.04162036 0.9583796 ]
+37,"ltable_title/ltable_category    0.4
+dtype: float64",certa,3.67701481199947,0.0,0.0,1296-17892,[9.9924135e-01 7.5862231e-04]
+38,"ltable_category    0.5
+ltable_price       0.5
+ltable_modelno     0.5
+ltable_brand       0.5
+dtype: float64",certa,2.5149276049996843,0.0,0.0,1631-7137,[0.9615765 0.0384235]
+39,"rtable_brand    0.6
+dtype: float64",certa,3.8829710459995113,0.0,0.0,1365-8795,[0.64753497 0.35246506]
+40,"rtable_title    1.0
+dtype: float64",certa,30.11552622199997,1.0,0.0,934-13150,[0.01481031 0.9851896 ]
+41,"rtable_title      0.9
+rtable_price      0.9
+rtable_modelno    0.9
+dtype: float64",certa,2.5372526190003555,0.0,0.0,934-19677,[0.86409646 0.13590348]
+42,"rtable_title/rtable_category/rtable_modelno/rtable_price    0.8
+dtype: float64",certa,2.853993824999634,0.0,1.0,538-17174,[0.995665 0.004335]
+43,"ltable_title       0.0
+ltable_category    0.0
+ltable_price       0.0
+ltable_modelno     0.0
+ltable_brand       0.0
+dtype: float64",certa,2.6015277299993613,0.0,0.0,2472-16333,[1.0000000e+00 1.2668601e-08]
+44,"rtable_modelno    0.6
+dtype: float64",certa,3.8518529209995904,0.0,0.0,672-14737,[0.62642026 0.37357977]
+45,"rtable_title    1.0
+dtype: float64",certa,30.008385181999984,1.0,0.0,2290-8322,[0.02681027 0.9731897 ]
+46,"ltable_title/ltable_modelno/ltable_price    0.5
+dtype: float64",certa,3.6618775430015376,0.0,0.0,2149-2867,[9.9915564e-01 8.4438489e-04]
+47,"rtable_title    0.9
+dtype: float64",certa,30.465117296000244,1.0,0.0,41-8856,[0.16281953 0.8371805 ]
+48,"ltable_title/ltable_category    0.1
+dtype: float64",certa,2.648809309999706,0.0,0.0,1559-18207,[0.6880797 0.3119203]
+49,"rtable_title/rtable_price    0.8
+dtype: float64",certa,2.806168439999965,0.0,0.0,1845-2204,[9.9999917e-01 8.6480571e-07]

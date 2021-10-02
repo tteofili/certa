@@ -1,0 +1,3 @@
+,ltable_title,ltable_authors,ltable_venue,ltable_year,rtable_title,rtable_authors,rtable_venue,rtable_year,alteredAttributes,droppedValues,copiedValues,nomatch_score,match_score,attr_count
+0,interview with jim gray,,,2003,finding pearls in an ocean of data,e larson,"computerworld ,",,"('rtable_title', 'rtable_venue')","['interview with authors', 'san diego ,']","['finding pearls in an ocean of data', 'computerworld ,']",0.14994894,0.85005105,2
+1,interview with jim gray,,,2003,finding pearls in an ocean of data,e larson,"computerworld ,",,"('rtable_title', 'rtable_venue', 'rtable_year')","['interview with authors', 'san diego ,', nan]","['finding pearls in an ocean of data', 'computerworld ,', nan]",0.14994894,0.85005105,3

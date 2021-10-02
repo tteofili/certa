@@ -1,0 +1,183 @@
+,summary,type,latency,match,label,row,prediction
+0,"ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.8090457449998212,0.0,0.0,393-831,[9.9999607e-01 3.9897959e-06]
+1,"rtable_title    0.375
+dtype: float64",certa,1.5727926520003166,0.0,0.0,559-324,[9.9999845e-01 1.5700032e-06]
+2,"rtable_title    0.1
+dtype: float64",certa,1.4038956430003964,0.0,0.0,558-3023,[9.9999666e-01 3.2887554e-06]
+3,"rtable_title    0.1
+dtype: float64",certa,1.616821949000041,0.0,0.0,762-1618,[1.000000e+00 1.978578e-12]
+4,"ltable_title/ltable_manufacturer    0.333333
+dtype: float64",certa,1.4555277079998632,0.0,0.0,1262-2860,[1.000000e+00 9.307308e-09]
+5,"rtable_title/rtable_manufacturer    0.4
+rtable_title/rtable_price           0.4
+dtype: float64",certa,2.2962172279994775,0.0,0.0,971-2804,[9.99999881e-01 1.16963825e-07]
+6,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.5411696800001664,0.0,0.0,654-1183,[1.0000000e+00 3.3288923e-13]
+7,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,0.9523678460000156,0.0,0.0,423-2847,[9.9976522e-01 2.3475858e-04]
+8,"ltable_title    0.2
+dtype: float64",certa,1.2411073779994695,0.0,0.0,858-1805,[9.9980718e-01 1.9288536e-04]
+9,"ltable_title    0.7
+dtype: float64",certa,1.4951998590004223,0.0,0.0,722-2331,[9.9987519e-01 1.2484775e-04]
+10,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.028678396000032,0.0,0.0,1198-3033,[1.0000000e+00 1.1938511e-09]
+11,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.0026023039999927,0.0,0.0,522-1512,[9.9991214e-01 8.7827684e-05]
+12,"rtable_title    0.1
+dtype: float64",certa,1.4680422439996619,0.0,0.0,561-1136,[9.999155e-01 8.456724e-05]
+13,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.8678246240006047,0.0,0.0,606-2867,[1.000000e+00 5.507394e-10]
+14,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.4593141300001662,0.0,0.0,1170-861,[1.0000000e+00 1.6583738e-13]
+15,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.8587868539998453,0.0,0.0,614-945,[9.999201e-01 7.986333e-05]
+16,"rtable_title    0.1
+dtype: float64",certa,1.6493464360000871,0.0,0.0,1241-3145,[1.000000e+00 1.508892e-14]
+17,"ltable_title/ltable_price    0.5
+dtype: float64",certa,1.3465752530000827,0.0,0.0,1111-2755,[9.999906e-01 9.364313e-06]
+18,"ltable_title    0.3
+dtype: float64",certa,1.5325995430002877,0.0,0.0,270-2177,[9.9999964e-01 3.3411402e-07]
+19,"rtable_title    0.1
+dtype: float64",certa,1.6180178000004162,0.0,0.0,225-2837,[1.000000e+00 8.819249e-12]
+20,"ltable_manufacturer    0.5
+dtype: float64",certa,1.3549601530003201,0.0,0.0,597-242,[9.9999988e-01 1.6559908e-07]
+21,"ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.358377518999987,0.0,0.0,661-946,[0.9696032  0.03039681]
+22,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.6911425859998417,0.0,0.0,705-2054,[9.999994e-01 5.676406e-07]
+23,"ltable_title    0.3
+dtype: float64",certa,1.0851867749997837,0.0,1.0,1191-567,[0.99547607 0.00452394]
+24,"ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.5281611099999282,0.0,0.0,606-1485,[9.9999976e-01 2.3515079e-07]
+25,"ltable_price    1.0
+dtype: float64",certa,1.1829646669993963,0.0,1.0,1030-2320,[0.5767148  0.42328522]
+26,"ltable_title    0.1
+dtype: float64",certa,1.543853696000042,0.0,0.0,1105-783,[9.9999094e-01 9.0736885e-06]
+27,"ltable_title    0.4
+dtype: float64",certa,1.139822537999862,0.0,0.0,1225-2383,[9.9999988e-01 1.6767818e-07]
+28,"ltable_manufacturer    0.7
+dtype: float64",certa,1.561494013999436,0.0,1.0,536-750,[0.9871739 0.0128261]
+29,"rtable_title/rtable_price    0.3
+dtype: float64",certa,1.044410421000066,0.0,0.0,375-532,[0.97236866 0.02763128]
+30,"rtable_title    0.1
+dtype: float64",certa,1.6835689150002509,0.0,0.0,1022-2865,[9.9999917e-01 7.8787576e-07]
+31,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.5003866890001518,0.0,0.0,781-3199,[1.0000000e+00 8.3611286e-13]
+32,"rtable_title    0.181818
+dtype: float64",certa,1.3320204280007601,0.0,0.0,93-3160,[0.9969812  0.00301875]
+33,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.3203388329993686,0.0,0.0,578-2195,[9.9998999e-01 1.0041531e-05]
+34,"rtable_manufacturer    0.8
+rtable_price           0.8
+dtype: float64",certa,1.1593276170005993,0.0,1.0,276-3022,[0.9859248  0.01407516]
+35,"rtable_title    0.2
+dtype: float64",certa,1.8934335840003769,0.0,0.0,646-836,[1.0000000e+00 4.2246675e-08]
+36,"rtable_title    0.333333
+dtype: float64",certa,1.6203616530001455,0.0,0.0,511-2821,[9.999999e-01 7.232011e-08]
+37,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.874049508999633,0.0,0.0,490-1514,[9.9999976e-01 2.9337951e-07]
+38,"ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.5522984930003076,0.0,0.0,587-1001,[1.00000000e+00 1.21367485e-08]
+39,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.8194210949995977,0.0,0.0,1109-2852,[1.0000000e+00 6.4546737e-09]
+40,"rtable_title    0.2
+dtype: float64",certa,2.1100165429998015,0.0,0.0,799-1592,[9.9999976e-01 2.3413442e-07]
+41,"ltable_title           0.5
+ltable_manufacturer    0.5
+ltable_price           0.5
+rtable_title           0.5
+rtable_manufacturer    0.5
+rtable_price           0.5
+dtype: float64",certa,4.172034500999871,1.0,1.0,1269-1433,[0.00567813 0.9943218 ]
+42,"rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+dtype: float64",certa,1.3015655200006222,0.0,0.0,1258-2490,[9.9969709e-01 3.0293904e-04]
+43,"ltable_title           0.0
+ltable_manufacturer    0.0
+ltable_price           0.0
+rtable_title           0.0
+rtable_manufacturer    0.0
+rtable_price           0.0
+dtype: float64",certa,1.4341527159995167,0.0,0.0,553-897,[1.0000000e+00 2.4026008e-09]
+44,"rtable_title           0.1
+ltable_manufacturer    0.1
+dtype: float64",certa,1.478543286999411,0.0,0.0,539-1311,[0.9896808  0.01031917]
+45,"ltable_title/ltable_manufacturer    0.363636
+ltable_title/ltable_price           0.363636
+dtype: float64",certa,0.9878457939994405,0.0,0.0,897-3017,[0.8500134  0.14998664]
+46,"ltable_manufacturer    0.1
+dtype: float64",certa,1.68873375900057,0.0,1.0,22-1435,[9.9998009e-01 1.9918873e-05]
+47,"rtable_title    0.2
+dtype: float64",certa,0.9757397920002404,0.0,0.0,997-1599,[0.7989686  0.20103139]
+48,"rtable_title    0.1
+dtype: float64",certa,1.4592270630000712,0.0,0.0,348-239,[1.0000000e+00 2.6318043e-09]
+49,"rtable_title    0.3
+ltable_title    0.3
+dtype: float64",certa,1.533366355999533,0.0,0.0,112-3119,[1.0000000e+00 6.3095536e-13]

@@ -1,0 +1,5 @@
+,ltable_title,ltable_authors,ltable_venue,ltable_year,rtable_title,rtable_authors,rtable_venue,rtable_year,alteredAttributes,droppedValues,copiedValues,nomatch_score,match_score,attr_count
+0,guest editorial,,,2003.0,guest editorial,aw czarnik,,,"('rtable_title', 'rtable_authors')","[""guest editor 's introduction"", 'portal.acm.org']","['guest editorial', 'aw czarnik']",0.19983773,0.80016226,2
+1,guest editorial,,,2003.0,guest editorial,portal.acm.org,"acc . chem . res ,",,"('rtable_title', 'rtable_venue')","[""guest editor 's introduction"", nan]","['guest editorial', 'acc . chem . res ,']",0.2586773,0.74132276,2
+2,guest editorial,,,2003.0,guest editorial,aw czarnik,,,"('rtable_title', 'rtable_authors', 'rtable_year')","[""guest editor 's introduction"", 'portal.acm.org', nan]","['guest editorial', 'aw czarnik', nan]",0.19983773,0.80016226,3
+3,guest editorial,,,2003.0,guest editorial,portal.acm.org,"acc . chem . res ,",,"('rtable_title', 'rtable_venue', 'rtable_year')","[""guest editor 's introduction"", nan, nan]","['guest editorial', 'acc . chem . res ,', nan]",0.2586776,0.74132234,3
