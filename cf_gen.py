@@ -147,4 +147,4 @@ if __name__ == "__main__":
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar', 'dblp_acm']
     model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=300, fast=True)
+    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)

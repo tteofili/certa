@@ -24,7 +24,8 @@ def wrapdm_mojito(model, ignore_columns=['label', 'id']):
 
         with open(os.devnull, 'w') as devnull:
             with contextlib.redirect_stdout(devnull):
-                data_processed = dm.data.process_unlabeled(tmp_name, trained_model=model, ignore_columns=['ltable_id', 'rtable_id'])
+                data_processed = dm.data.process_unlabeled(tmp_name, trained_model=model,
+                                                           ignore_columns=['ltable_id', 'rtable_id'])
                 out_proba = model.run_prediction(data_processed, output_attributes=True)
                 out_proba = out_proba['match_score'].values.reshape(-1)
 
@@ -35,27 +36,29 @@ def wrapdm_mojito(model, ignore_columns=['label', 'id']):
 
     return wrapper
 
-def wrapDm(test_df,model,ignore_columns=['label', 'id', 'ltable_id', 'rtable_id'],
-           outputAttributes=True,batch_size=4):
-    data = test_df.copy().drop([c for c in ignore_columns if c in test_df.columns],axis=1)
+
+def wrapDm(test_df, model, ignore_columns=['label', 'id', 'ltable_id', 'rtable_id'],
+           outputAttributes=True, batch_size=4):
+    data = test_df.copy().drop([c for c in ignore_columns if c in test_df.columns], axis=1)
     names = []
     if data.columns[0] == 0:
         names = model.state_meta.all_left_fields + model.state_meta.all_right_fields
         data.columns = names
 
-    if not('id' in data.columns):
+    if not ('id' in data.columns):
         data['id'] = np.arange(len(data))
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
-    data.to_csv(tmp_name,index=False)
+    data.to_csv(tmp_name, index=False)
     with open(os.devnull, 'w') as devnull:
         with contextlib.redirect_stdout(devnull):
             data_processed = dm.data.process_unlabeled(tmp_name, trained_model=model,
                                                        ignore_columns=['ltable_id', 'rtable_id', 'label', 'id',
                                                                        'originalRightId', 'alteredAttributes',
                                                                        'droppedValues', 'copiedValues'])
-            predictions = model.run_prediction(data_processed, output_attributes= outputAttributes, batch_size=batch_size)
+            predictions = model.run_prediction(data_processed, output_attributes=outputAttributes,
+                                               batch_size=batch_size)
             out_proba = predictions['match_score'].values
-    multi_proba = np.dstack((1-out_proba, out_proba)).squeeze()
+    multi_proba = np.dstack((1 - out_proba, out_proba)).squeeze()
     os.remove(tmp_name)
     if outputAttributes:
         if len(names) == 0:
@@ -99,7 +102,9 @@ def pairs_to_string(df, lprefix, rprefix, ignore_columns=['id', 'label']):
         pairs_string.append(" ".join(this_row_str))
     return pairs_string
 
+
 an_re = re.compile('[R|L]\d\_.+')
+
 
 def makeRow(pair_str, attributes, lprefix, rprefix):
     row_map = defaultdict(list)
@@ -159,7 +164,9 @@ def pair_str_to_df(pair_str, columns, lprefix, rprefix):
     row['id'] = 0
     return pd.DataFrame(data=[row.values], columns=row.index)
 
+
 an_re = re.compile('[R|L]\d\_.+')
+
 
 def makeRow(pair_str, attributes, lprefix, rprefix):
     row_map = defaultdict(list)
@@ -218,6 +225,7 @@ def pair_str_to_df(pair_str, columns, lprefix, rprefix):
     row = makeRow(pair_str, schema, 'ltable_', 'rtable_')
     row['id'] = 0
     return pd.DataFrame(data=[row.values], columns=row.index)
+
 
 class DMERModel(ERModel):
 
@@ -230,8 +238,8 @@ class DMERModel(ERModel):
         self.model.initialize(data)
 
     def train(self, label_train, label_valid, dataset_name):
-        train_file = dataset_name+'_dm_train.csv'
-        valid_file = dataset_name+'_dm_valid.csv'
+        train_file = dataset_name + '_dm_train.csv'
+        valid_file = dataset_name + '_dm_valid.csv'
         label_train.to_csv(train_file, index=False)
         label_valid.to_csv(valid_file, index=False)
 
@@ -243,7 +251,8 @@ class DMERModel(ERModel):
 
         logging.debug("TRAINING with {} samples", len(trainLab))
         # train default model with standard dataset
-        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth', epochs=15)
+        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth',
+                             epochs=15)
 
         stats = self.model.run_eval(validationLab)
 
@@ -269,17 +278,17 @@ class DMERModel(ERModel):
 
         # read dataset
         testLab = dm.data.process(path='', test=test_file, left_prefix='ltable_',
-                                                  right_prefix='rtable_', cache=None)
+                                  right_prefix='rtable_', cache=None)
 
         f1 = self.model.run_eval(testLab)
         return 0, 0, f1
 
     def load(self, path):
         if not path.endswith('.pth'):
-            path = path+'.pth'
+            path = path + '.pth'
         self.model.load_state(path)
 
     def save(self, path):
         if not path.endswith('.pth'):
-            path = path+'.pth'
+            path = path + '.pth'
         self.model.save_state(path, True)
