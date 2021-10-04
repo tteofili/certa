@@ -108,7 +108,8 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                                                                                               datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast,
-                                                                                              max_predict=max_predict)
+                                                                                              max_predict=max_predict,
+                                                                                              saliency=False)
 
                         latency_c = time.perf_counter() - t0
 
@@ -141,7 +142,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    type = 'deeper'
+    type = 'dm'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
                          'abt_buy', 'fodo_zaga', 'beers',
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
