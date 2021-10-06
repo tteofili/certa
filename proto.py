@@ -18,7 +18,7 @@ simple = False
 shap_c = True
 
 dataset = 'beers'
-model_type = 'dm'
+model_type = 'deeper'
 model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
