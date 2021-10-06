@@ -31,3 +31,6 @@ class ERModel:
     def evaluation(self, test_set):
         pass
 
+    def predict_proba(self, x, **kwargs):
+        pass
+

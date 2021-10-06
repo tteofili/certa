@@ -542,6 +542,9 @@ class DeepERModel(ERModel):
         self.model = load_model(path)
         return self
 
+    def predict_proba(self, x, **kwargs):
+        return self.predict(x, mojito=True, expand_dim=True)
+
 
 def to_deeper_data(df: pd.DataFrame):
     res = []

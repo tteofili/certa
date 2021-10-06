@@ -297,3 +297,6 @@ class DMERModel(ERModel):
         if not path.endswith('.pth'):
             path = path + '.pth'
         self.model.save_state(path, True)
+
+    def predict_proba(self, x, **kwargs):
+        return self.predict(x, mojito=True, expand_dim=True)

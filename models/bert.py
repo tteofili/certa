@@ -4,6 +4,7 @@ import string
 import random
 import pandas as pd
 import numpy as np
+from torch import Tensor
 
 import emt.model
 import emt.config
@@ -144,7 +145,7 @@ class EMTERModel(ERModel):
 
         return float(p), float(r), float(f1)
 
-    def predict(self, x, mojito=False, **kwargs):
+    def predict(self, x, mojito=False, expand_dim=False, **kwargs):
         original = x.copy()
         if isinstance(x, np.ndarray):
             x_index = np.arange(len(x))
@@ -178,6 +179,8 @@ class EMTERModel(ERModel):
         predictions.index = np.arange(len(predictions))
         if mojito:
             full_df = np.dstack((predictions['nomatch_score'], predictions['match_score'])).squeeze()
+            if expand_dim:
+                full_df = np.expand_dims(full_df, axis=1)
         else:
             names = list(xc.columns)
             names.extend(['classes', 'labels', 'nomatch_score', 'match_score'])
@@ -199,3 +202,6 @@ class EMTERModel(ERModel):
 
     def save(self, path):
         emt.model.save_model(self.model, path, path, tokenizer=self.tokenizer)
+
+    def predict_proba(self, x, **kwargs):
+        return self.predict(x, mojito=True, expand_dim=True)
