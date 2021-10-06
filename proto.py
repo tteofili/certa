@@ -5,6 +5,7 @@ import numpy as np
 from alibi.explainers import Counterfactual, CounterfactualProto
 from sklearn.base import BaseEstimator
 
+from baselines.shap_c import ShapCounterfactual
 from certa.explain import explain
 from certa.utils import merge_sources
 from models.utils import from_type
@@ -14,6 +15,7 @@ import dice_ml
 dice = True
 proto = False
 simple = False
+shap_c = True
 
 dataset = 'beers'
 model_type = 'dm'
@@ -42,8 +44,14 @@ for idx in range(10):
     r_tuple = rsource.iloc[r_id]
     rand_row.head()
 
-    if dice:
+    if shap_c:
+        classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
+        shapc_explainer = ShapCounterfactual(classifier_fn, 0.5,
+                 train_df.columns)
+        sc_exp = shapc_explainer.explanation(pd.DataFrame(rand_row).transpose())
+        print(f'{idx}- shap-c:{sc_exp}')
 
+    if dice:
         d = dice_ml.Data(dataframe=pd.concat([train_df, test_df]),
                           continuous_features=[],
                           outcome_name='label')

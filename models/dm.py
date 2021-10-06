@@ -10,6 +10,8 @@ import random
 import os
 import string
 
+from scipy.sparse import csr_matrix
+
 from models.ermodel import ERModel
 
 
@@ -37,14 +39,21 @@ def wrapdm_mojito(model, ignore_columns=['label', 'id']):
     return wrapper
 
 
-def wrapDm(test_df, model, ignore_columns=['label', 'id', 'ltable_id', 'rtable_id'],
+def wrapDm(test_df, model, given_columns=None, ignore_columns=['label', 'id', 'ltable_id', 'rtable_id'],
            outputAttributes=True, batch_size=4):
+    if isinstance(test_df, csr_matrix):
+        test_df = pd.DataFrame(data=np.zeros(test_df.shape))
+        if given_columns is not None:
+            test_df.columns = given_columns
     data = test_df.copy().drop([c for c in ignore_columns if c in test_df.columns], axis=1)
     names = []
     if data.columns[0] == 0:
         try:
-            names = model.state_meta.all_left_fields + model.state_meta.all_right_fields
-            data.columns = names
+            if given_columns is not None:
+                data.columns = given_columns
+            else:
+                names = model.state_meta.all_left_fields + model.state_meta.all_right_fields
+                data.columns = names
         except:
             pass
 
@@ -299,4 +308,4 @@ class DMERModel(ERModel):
         self.model.save_state(path, True)
 
     def predict_proba(self, x, **kwargs):
-        return self.predict(x, mojito=True, expand_dim=True)
+        return self.predict(x, mojito=True, expand_dim=True, **kwargs)
