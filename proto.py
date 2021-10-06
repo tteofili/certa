@@ -12,18 +12,18 @@ from models.utils import from_type
 
 import dice_ml
 
-dice = True
-proto = False
-simple = False
-shap_c = True
+dice = False
+proto = True
+simple = True
+shap_c = False
 
 dataset = 'beers'
-model_type = 'deeper'
+model_type = 'dm'
 model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
 def predict_fn(x):
-    return model.predict(x, mojito=True, expand_dim=True)
+    return model.predict(x)
 
 datadir = 'datasets/' + dataset
 lsource = pd.read_csv(datadir + '/tableA.csv')
@@ -32,8 +32,10 @@ gt = pd.read_csv(datadir + '/train.csv')
 valid = pd.read_csv(datadir + '/valid.csv')
 test = pd.read_csv(datadir + '/test.csv')
 
-test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
-train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
+test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])
+train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])
+
+test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
 #tf.compat.v1.disable_eager_execution()
 for idx in range(10):
@@ -44,44 +46,54 @@ for idx in range(10):
     r_tuple = rsource.iloc[r_id]
     rand_row.head()
 
+    classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
     if shap_c:
-        classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
-        shapc_explainer = ShapCounterfactual(classifier_fn, 0.5,
-                 train_df.columns)
-        sc_exp = shapc_explainer.explanation(pd.DataFrame(rand_row).transpose())
-        print(f'{idx}- shap-c:{sc_exp}')
+        print('shap-c')
+        try:
+            shapc_explainer = ShapCounterfactual(classifier_fn, 0.5,
+                     train_df.columns)
+            sc_exp = shapc_explainer.explanation(pd.DataFrame(rand_row).transpose())
+            print(f'{idx}- shap-c:{sc_exp}')
+        except:
+            pass
 
     if dice:
-        d = dice_ml.Data(dataframe=pd.concat([train_df, test_df]),
+        print('dice')
+        try:
+            d = dice_ml.Data(dataframe=test_df,
                           continuous_features=[],
-                          outcome_name='label')
+                          outcome_name='outcome')
 
-        m = dice_ml.Model(model=model, backend='sklearn')
-        exp = dice_ml.Dice(d, m, method='random')
-        query_instance = rand_row.copy().to_dict()
-        dice_exp = exp.generate_counterfactuals(pd.DataFrame(rand_row).transpose().drop(['label'], axis=1),
-                                                total_CFs=5, desired_class="opposite")
-        dice_exp_df = dice_exp.visualize_as_dataframe()
-        print(f'{idx}:{dice_exp_df}')
+            m = dice_ml.Model(model=model, backend='sklearn')
+            exp = dice_ml.Dice(d, m, method='random')
+            query_instance = rand_row.copy().to_dict()
+            dice_exp = exp.generate_counterfactuals(pd.DataFrame(rand_row).transpose().drop(['outcome'], axis=1),
+                                                    total_CFs=5, desired_class="opposite")
+            dice_exp_df = dice_exp.visualize_as_dataframe()
+            print(f'{idx}:{dice_exp_df}')
+        except:
+            pass
 
 
     shape = (1,) + ((len(train_df.columns)),)
-    target_proba = 1.0
-    tol = 0.01 # want counterfactuals with p(class)>0.99
-    target_class = 'other' # any class other than 7 will do
-    max_iter = 1000
-    lam_init = 1e-1
-    max_lam_steps = 10
-    learning_rate_init = 0.1
-    feature_range = (0,1)
 
-
+    instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id', 'rtable_id'], axis=1).values
     if proto:
-        instance = pd.DataFrame(rand_row).transpose().drop(['label', 'ltable_id', 'rtable_id'], axis=1)
-        cf_proto = CounterfactualProto(predict_fn, shape, feature_range=(train_df.min(axis=0), train_df.max(axis=0)))
-        cf_proto.fit(train_df.values)
-        cf_proto.explain(instance)
+        print('proto')
+        try:
+            cf_proto = CounterfactualProto(predict_fn, shape, feature_range=(train_df.min(axis=0), train_df.max(axis=0)))
+            cf_proto.fit(train_df.values)
+            proto_ex = cf_proto.explain(instance)
+            print(f'{proto_ex}')
+        except:
+            pass
 
     if simple:
-        cf = Counterfactual(predict_fn, shape=shape, feature_range=(train_df.min(axis=0), train_df.max(axis=0)))
+        print('simple')
+        try:
+            cf = Counterfactual(predict_fn, shape=shape, feature_range=(train_df.min(axis=0), train_df.max(axis=0)))
+            simple_ex = cf.explain(instance)
+            print(f'{simple_ex}')
+        except:
+            pass
 

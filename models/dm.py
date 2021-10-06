@@ -282,8 +282,9 @@ class DMERModel(ERModel):
         res = wrapDm(xc, self.model, **kwargs)
         if mojito:
             res = np.dstack((res['nomatch_score'], res['match_score'])).squeeze()
-            if expand_dim:
-                res = np.expand_dims(res, axis=1)
+            res_shape = res.shape
+            if len(res_shape) == 1 and expand_dim:
+                res = np.expand_dims(res, axis=1).T
         return res
 
     def evaluation(self, test_set):

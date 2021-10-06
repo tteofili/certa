@@ -2,6 +2,7 @@ import os
 
 import pandas as pd
 import numpy as np
+from scipy.sparse import csr_matrix
 from tensorflow.keras.layers import Input, Embedding, LSTM, concatenate, subtract, Dense, Bidirectional, Lambda
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.initializers import Constant
@@ -516,7 +517,11 @@ class DeepERModel(ERModel):
 
         return precision, recall, fmeasure
 
-    def predict(self, x, mojito=False, expand_dim=False, ignore_columns=[], **kwargs):
+    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=[], **kwargs):
+        if isinstance(x, csr_matrix):
+            x = pd.DataFrame(data=np.zeros(x.shape))
+            if given_columns is not None:
+                x.columns = given_columns
         if isinstance(x, np.ndarray):
             data = to_deeper_data_np(x)
             x_index = np.arange(len(x))
@@ -531,8 +536,9 @@ class DeepERModel(ERModel):
         res = pd.concat([x_copy, out_df], axis=1)
         if mojito:
             res = np.dstack((res['nomatch_score'], res['match_score'])).squeeze()
-            if expand_dim:
-                res = np.expand_dims(res, axis=1)
+            res_shape = res.shape
+            if len(res_shape) == 1 and expand_dim:
+                res = np.expand_dims(res, axis=1).T
         return res
 
     def save(self, path):

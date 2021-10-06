@@ -4,6 +4,7 @@ import string
 import random
 import pandas as pd
 import numpy as np
+from scipy.sparse import csr_matrix
 from torch import Tensor
 
 import emt.model
@@ -145,7 +146,11 @@ class EMTERModel(ERModel):
 
         return float(p), float(r), float(f1)
 
-    def predict(self, x, mojito=False, expand_dim=False, **kwargs):
+    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, **kwargs):
+        if isinstance(x, csr_matrix):
+            x = pd.DataFrame(data=np.zeros(x.shape))
+            if given_columns is not None:
+                x.columns = given_columns
         original = x.copy()
         if isinstance(x, np.ndarray):
             x_index = np.arange(len(x))
@@ -179,8 +184,9 @@ class EMTERModel(ERModel):
         predictions.index = np.arange(len(predictions))
         if mojito:
             full_df = np.dstack((predictions['nomatch_score'], predictions['match_score'])).squeeze()
-            if expand_dim:
-                full_df = np.expand_dims(full_df, axis=1)
+            res_shape = full_df.shape
+            if len(res_shape) == 1 and expand_dim:
+                res = np.expand_dims(res, axis=1).T
         else:
             names = list(xc.columns)
             names.extend(['classes', 'labels', 'nomatch_score', 'match_score'])
