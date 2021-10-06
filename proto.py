@@ -1,3 +1,5 @@
+import traceback
+
 import sklearn.pipeline
 import tensorflow as tf
 import pandas as pd
@@ -12,9 +14,9 @@ from models.utils import from_type
 
 import dice_ml
 
-dice = False
-proto = True
-simple = True
+dice = True
+proto = False
+simple = False
 shap_c = False
 
 dataset = 'beers'
@@ -23,7 +25,7 @@ model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
 def predict_fn(x):
-    return model.predict(x)
+    return model.predict_proba(x)
 
 datadir = 'datasets/' + dataset
 lsource = pd.read_csv(datadir + '/tableA.csv')
@@ -37,7 +39,7 @@ train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label
 
 test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
-#tf.compat.v1.disable_eager_execution()
+tf.compat.v1.disable_eager_execution()
 for idx in range(10):
     rand_row = test_df.iloc[idx]
     l_id = int(rand_row['ltable_id'])
@@ -75,25 +77,29 @@ for idx in range(10):
             pass
 
 
-    shape = (1,) + ((len(train_df.columns)),)
+    shape = (1,) + ((len(train_df.columns) - 2),)
 
     instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id', 'rtable_id'], axis=1).values
     if proto:
         print('proto')
         try:
-            cf_proto = CounterfactualProto(predict_fn, shape, feature_range=(train_df.min(axis=0), train_df.max(axis=0)))
-            cf_proto.fit(train_df.values)
+            cf_proto = CounterfactualProto(predict_fn, shape, feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
+            cf_proto.fit(train_df.drop(['ltable_id', 'rtable_id'], axis=1).values)
             proto_ex = cf_proto.explain(instance)
             print(f'{proto_ex}')
         except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
             pass
 
     if simple:
         print('simple')
         try:
-            cf = Counterfactual(predict_fn, shape=shape, feature_range=(train_df.min(axis=0), train_df.max(axis=0)))
+            cf = Counterfactual(predict_fn, shape=shape, feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
             simple_ex = cf.explain(instance)
             print(f'{simple_ex}')
         except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
             pass
 
