@@ -1,12 +1,14 @@
 import traceback
 
-import sklearn.pipeline
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.pipeline import make_pipeline
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 from alibi.explainers import Counterfactual, CounterfactualProto
 from sklearn.base import BaseEstimator
 
+from baselines.lime_c import Preprocess_LimeCounterfactual, LimeCounterfactual
 from baselines.shap_c import ShapCounterfactual
 from certa.explain import explain
 from certa.utils import merge_sources
@@ -18,11 +20,12 @@ dice = True
 proto = False
 simple = False
 shap_c = False
+lime_c = True
 
 dataset = 'beers'
-model_type = 'dm'
+model_type = 'deeper'
 model = from_type(model_type)
-model.load('models/' + model_type + '/' + dataset)
+#model.load('models/' + model_type + '/' + dataset)
 
 def predict_fn(x):
     return model.predict_proba(x)
@@ -39,7 +42,6 @@ train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label
 
 test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
-tf.compat.v1.disable_eager_execution()
 for idx in range(10):
     rand_row = test_df.iloc[idx]
     l_id = int(rand_row['ltable_id'])
@@ -49,6 +51,20 @@ for idx in range(10):
     rand_row.head()
 
     classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
+
+    if lime_c:
+        print('lime-c')
+        try:
+            vectorizer = CountVectorizer()
+            pipeline = model
+            limec_explainer = LimeCounterfactual(pipeline, model, vectorizer, 0.5, train_df.columns)
+            limec_exp = limec_explainer.explanation(pd.DataFrame(rand_row).transpose())
+            print(limec_exp)
+        except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
+            pass
+
     if shap_c:
         print('shap-c')
         try:
@@ -79,7 +95,7 @@ for idx in range(10):
 
     shape = (1,) + ((len(train_df.columns) - 2),)
 
-    instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id', 'rtable_id'], axis=1).values
+    instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id', 'rtable_id', 'outcome'], axis=1).values
     if proto:
         print('proto')
         try:
