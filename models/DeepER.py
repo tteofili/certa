@@ -155,8 +155,8 @@ def data2InputsUnlabel(data, tokenizer):
     for t1, t2 in data:
         # Sperimentale: ordino gli attributi per lunghezza decrescente
         # Attributi con molti tokens conengono più informazioni utili
-        table1.append(' '.join(t1).replace(', ', ' '))
-        table2.append(' '.join(t2).replace(', ', ' '))
+        table1.append(' '.join(str(t1)).replace(', ', ' '))
+        table2.append(' '.join(str(t2)).replace(', ', ' '))
     table1 = tokenizer.texts_to_sequences(table1)
     table1 = pad_sequences(table1, padding='post')
     table2 = tokenizer.texts_to_sequences(table2)
@@ -516,7 +516,7 @@ class DeepERModel(ERModel):
 
         return precision, recall, fmeasure
 
-    def predict(self, x, mojito=False, ignore_columns=[], **kwargs):
+    def predict(self, x, mojito=False, expand_dim=False, ignore_columns=[], **kwargs):
         if isinstance(x, np.ndarray):
             data = to_deeper_data_np(x)
             x_index = np.arange(len(x))
@@ -531,6 +531,8 @@ class DeepERModel(ERModel):
         res = pd.concat([x_copy, out_df], axis=1)
         if mojito:
             res = np.dstack((res['nomatch_score'], res['match_score'])).squeeze()
+            if expand_dim:
+                res = np.expand_dims(res, axis=1)
         return res
 
     def save(self, path):

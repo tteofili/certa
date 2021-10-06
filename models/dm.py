@@ -42,8 +42,11 @@ def wrapDm(test_df, model, ignore_columns=['label', 'id', 'ltable_id', 'rtable_i
     data = test_df.copy().drop([c for c in ignore_columns if c in test_df.columns], axis=1)
     names = []
     if data.columns[0] == 0:
-        names = model.state_meta.all_left_fields + model.state_meta.all_right_fields
-        data.columns = names
+        try:
+            names = model.state_meta.all_left_fields + model.state_meta.all_right_fields
+            data.columns = names
+        except:
+            pass
 
     if not ('id' in data.columns):
         data['id'] = np.arange(len(data))
@@ -258,7 +261,7 @@ class DMERModel(ERModel):
 
         return stats
 
-    def predict(self, x, mojito=False, **kwargs):
+    def predict(self, x, mojito=False, expand_dim=False, **kwargs):
         if isinstance(x, np.ndarray):
             # data = to_deeper_data_np(x)
             x_index = np.arange(len(x))
@@ -270,6 +273,8 @@ class DMERModel(ERModel):
         res = wrapDm(xc, self.model, **kwargs)
         if mojito:
             res = np.dstack((res['nomatch_score'], res['match_score'])).squeeze()
+            if expand_dim:
+                res = np.expand_dims(res, axis=1)
         return res
 
     def evaluation(self, test_set):
