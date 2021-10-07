@@ -20,7 +20,7 @@ lime_c = False
 
 dataset = 'beers'
 model_type = 'deeper'
-model = from_type(model_type, proba=False)
+model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
 def predict_fn(x):
