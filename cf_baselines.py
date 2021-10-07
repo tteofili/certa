@@ -1,16 +1,12 @@
 import traceback
 
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.pipeline import make_pipeline
-import tensorflow as tf
 import pandas as pd
 import numpy as np
 from alibi.explainers import Counterfactual, CounterfactualProto
-from sklearn.base import BaseEstimator
 
 from baselines.lime_c import Preprocess_LimeCounterfactual, LimeCounterfactual
 from baselines.shap_c import ShapCounterfactual
-from certa.explain import explain
 from certa.utils import merge_sources
 from models.utils import from_type
 
@@ -20,12 +16,12 @@ dice = True
 proto = False
 simple = False
 shap_c = False
-lime_c = True
+lime_c = False
 
 dataset = 'beers'
 model_type = 'deeper'
-model = from_type(model_type)
-#model.load('models/' + model_type + '/' + dataset)
+model = from_type(model_type, proba=False)
+model.load('models/' + model_type + '/' + dataset)
 
 def predict_fn(x):
     return model.predict_proba(x)
@@ -42,7 +38,7 @@ train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label
 
 test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
-for idx in range(10):
+for idx in range(50):
     rand_row = test_df.iloc[idx]
     l_id = int(rand_row['ltable_id'])
     l_tuple = lsource.iloc[l_id]
@@ -73,23 +69,41 @@ for idx in range(10):
             sc_exp = shapc_explainer.explanation(pd.DataFrame(rand_row).transpose())
             print(f'{idx}- shap-c:{sc_exp}')
         except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
             pass
 
     if dice:
         print('dice')
         try:
-            d = dice_ml.Data(dataframe=test_df,
-                          continuous_features=[],
-                          outcome_name='outcome')
-
+            instance = pd.DataFrame(rand_row).transpose().drop(['outcome','ltable_id','rtable_id'], axis=1)
+            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
+                             continuous_features=[],
+                             outcome_name='outcome')
+            # random
             m = dice_ml.Model(model=model, backend='sklearn')
             exp = dice_ml.Dice(d, m, method='random')
-            query_instance = rand_row.copy().to_dict()
-            dice_exp = exp.generate_counterfactuals(pd.DataFrame(rand_row).transpose().drop(['outcome'], axis=1),
+            dice_exp = exp.generate_counterfactuals(instance,
                                                     total_CFs=5, desired_class="opposite")
-            dice_exp_df = dice_exp.visualize_as_dataframe()
-            print(f'{idx}:{dice_exp_df}')
+            dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
+            print(f'random:{idx}:{dice_exp_df}')
+
+            # genetic
+            # exp = dice_ml.Dice(d, m, method='genetic')
+            # dice_exp = exp.generate_counterfactuals(instance,
+            #                                         total_CFs=5, desired_class="opposite")
+            # dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
+            # print(f'genetic:{idx}:{dice_exp_df}')
+
+            # kdtree
+            # exp = dice_ml.Dice(d, m, method='kdtree')
+            # dice_exp = exp.generate_counterfactuals(instance,
+            #                                         total_CFs=5, desired_class="opposite")
+            # dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
+            # print(f'kdtree:{idx}:{dice_exp_df}')
         except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
             pass
 
 
@@ -100,7 +114,7 @@ for idx in range(10):
         print('proto')
         try:
             cf_proto = CounterfactualProto(predict_fn, shape, feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
-            cf_proto.fit(train_df.drop(['ltable_id', 'rtable_id'], axis=1).values)
+            cf_proto.fit(train_df.instance(['ltable_id', 'rtable_id'], axis=1).values)
             proto_ex = cf_proto.explain(instance)
             print(f'{proto_ex}')
         except:
