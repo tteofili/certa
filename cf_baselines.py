@@ -125,9 +125,12 @@ for idx in range(50):
             m = dice_ml.Model(model=model, backend='sklearn')
             exp = dice_ml.Dice(d, m, method='random')
             dice_exp = exp.generate_counterfactuals(instance,
-                                                    total_CFs=5, desired_class="opposite")
+                                                    total_CFs=len(test_df), desired_class="opposite")
             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
             print(f'random:{idx}:{dice_exp_df}')
+            if dice_exp_df is not None:
+                #dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
+                dice_exp_df.to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
 
             # genetic
             # exp = dice_ml.Dice(d, m, method='genetic')
