@@ -6,20 +6,23 @@ import numpy as np
 from alibi.explainers import Counterfactual, CounterfactualProto
 
 from baselines.lime_c import Preprocess_LimeCounterfactual, LimeCounterfactual
+from baselines.sedc import SEDC_Explainer
 from baselines.shap_c import ShapCounterfactual
 from certa.utils import merge_sources
 from models.utils import from_type
 
 import dice_ml
 
-dice = True
+dice_r = True
+dice_g = False
+dice_k = False
 proto = False
 simple = False
 shap_c = False
 lime_c = False
 
-dataset = 'beers'
-model_type = 'deeper'
+dataset = 'abt_buy'
+model_type = 'dm'
 model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
@@ -45,7 +48,7 @@ for idx in range(50):
     r_id = int(rand_row['rtable_id'])
     r_tuple = rsource.iloc[r_id]
     rand_row.head()
-
+    instance = pd.DataFrame(rand_row).transpose().drop(['outcome', 'ltable_id', 'rtable_id'], axis=1)
     classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
 
     if lime_c:
@@ -73,10 +76,48 @@ for idx in range(50):
             print(f'skipped item {str(idx)}')
             pass
 
-    if dice:
-        print('dice')
+    if dice_g:
+        print('dice_g')
         try:
-            instance = pd.DataFrame(rand_row).transpose().drop(['outcome','ltable_id','rtable_id'], axis=1)
+
+            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
+                             continuous_features=[],
+                             outcome_name='outcome')
+            # genetic
+            m = dice_ml.Model(model=model, backend='sklearn')
+            exp = dice_ml.Dice(d, m, method='genetic')
+            dice_exp = exp.generate_counterfactuals(instance,
+                                                    total_CFs=5, desired_class="opposite")
+            dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
+            print(f'genetic:{idx}:{dice_exp_df}')
+        except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
+            pass
+
+    if dice_k:
+        print('dice_k')
+        try:
+
+            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
+                             continuous_features=[],
+                             outcome_name='outcome')
+            # kdtree
+            m = dice_ml.Model(model=model, backend='sklearn')
+            exp = dice_ml.Dice(d, m, method='kdtree')
+            dice_exp = exp.generate_counterfactuals(instance,
+                                                    total_CFs=5, desired_class="opposite")
+            dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
+            print(f'kdtree:{idx}:{dice_exp_df}')
+        except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
+            pass
+
+    if dice_r:
+        print('dice_r')
+        try:
+
             d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
                              continuous_features=[],
                              outcome_name='outcome')
