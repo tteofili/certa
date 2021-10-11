@@ -1,0 +1,114 @@
+,label,latency,match,prediction,row,summary,type
+0,0.0,644.7687364899903,0.0,[0.99160516 0.00839487],1219-2470,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+1,0.0,1909.4987580039888,0.0,[0.9927441  0.00725596],492-1635,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.666667
+dtype: float64",certa
+2,1.0,1210.0553933099727,1.0,[0.05400956 0.94599044],3917-2224,"ltable_Style    0.48
+dtype: float64",certa
+3,0.0,1881.8635650569922,0.0,[0.9921327  0.00786724],2155-2948,"rtable_ABV          0.0
+rtable_Style        0.0
+rtable_Beer_Name    0.0
+dtype: float64",certa
+4,1.0,1232.1904045650153,1.0,[0.14883298 0.8511671 ],271-1410,"ltable_Style    0.54
+dtype: float64",certa
+5,0.0,1128.268940627051,0.0,[0.99189293 0.00810706],3309-716,"rtable_Beer_Name/rtable_Brew_Factory_Name/rtable_ABV    0.02
+dtype: float64",certa
+6,0.0,1822.3281819940312,0.0,[0.9823591  0.01764093],1024-37,"ltable_Beer_Name/ltable_Brew_Factory_Name/ltable_ABV    0.4
+dtype: float64",certa
+7,1.0,2013.149382811971,0.0,[0.7744108 0.2255892],1780-685,"ltable_Brew_Factory_Name/ltable_ABV    0.75
+dtype: float64",certa
+8,0.0,3815.9842208999908,0.0,[0.9875916  0.01240838],1479-1563,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.441176
+dtype: float64",certa
+9,0.0,1892.0643612099811,0.0,[0.9927263  0.00727372],2026-1679,"Series([], dtype: float64)",certa
+10,0.0,1906.1472834260203,0.0,[0.992331   0.00766898],2155-1261,"rtable_ABV          0.0
+rtable_Style        0.0
+rtable_Beer_Name    0.0
+dtype: float64",certa
+11,0.0,1910.6434663069667,0.0,[0.99228644 0.00771357],525-433,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.571429
+dtype: float64",certa
+12,0.0,1917.4371439290117,0.0,[0.99268734 0.00731262],3-641,"Series([], dtype: float64)",certa
+13,0.0,1271.9706134040025,1.0,[0.06922163 0.9307783 ],4068-2374,"ltable_Style    0.79
+dtype: float64",certa
+14,0.0,938.791882813035,0.0,[0.98285884 0.01714116],4203-2425,"ltable_Beer_Name/ltable_Brew_Factory_Name/ltable_ABV    0.375
+dtype: float64",certa
+15,0.0,2055.313777878997,0.0,[0.9809637  0.01903627],2572-221,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.553846
+dtype: float64",certa
+16,0.0,2043.4138693559798,0.0,[0.9922685  0.00773147],309-2621,"Series([], dtype: float64)",certa
+17,0.0,1976.3520043090102,0.0,[0.9925298  0.00747023],309-418,"Series([], dtype: float64)",certa
+18,0.0,1104.8350433490123,0.0,[0.5516493  0.44835073],200-559,"ltable_Brew_Factory_Name/ltable_ABV    0.68
+dtype: float64",certa
+19,0.0,1885.5564493899583,0.0,[0.992615 0.007385],3963-63,"Series([], dtype: float64)",certa
+20,0.0,2017.280622413964,0.0,[0.98353714 0.0164629 ],2633-2143,"rtable_Beer_Name/rtable_Brew_Factory_Name    0.578947
+dtype: float64",certa
+21,1.0,1276.9230703589856,1.0,[0.04796411 0.95203584],2558-1284,"ltable_Beer_Name/ltable_Brew_Factory_Name/ltable_Style/ltable_ABV    0.32
+dtype: float64",certa
+22,0.0,809.7540116169839,0.0,[0.99153155 0.00846837],1218-2463,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+23,0.0,2030.809678250982,0.0,[0.99237823 0.00762182],285-411,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.08
+dtype: float64",certa
+24,0.0,2030.2433826759807,0.0,[0.9906833  0.00931664],184-1889,"rtable_Beer_Name/rtable_Brew_Factory_Name/rtable_ABV    0.146341
+dtype: float64",certa
+25,0.0,1952.094242258987,0.0,[0.99227434 0.00772569],1178-1255,"Series([], dtype: float64)",certa
+26,0.0,1970.458530076954,0.0,[0.9922937 0.0077063],501-216,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+27,0.0,1967.2699793420034,0.0,[0.9927757  0.00722438],29-2883,"rtable_ABV          0.0
+rtable_Style        0.0
+rtable_Beer_Name    0.0
+dtype: float64",certa
+28,0.0,2063.275385151035,0.0,[0.9926219  0.00737809],184-1255,"rtable_ABV          0.0
+rtable_Style        0.0
+rtable_Beer_Name    0.0
+dtype: float64",certa
+29,1.0,2097.350295091048,0.0,[0.76579523 0.2342048 ],563-1177,"ltable_Beer_Name/ltable_Brew_Factory_Name/ltable_ABV    0.717949
+dtype: float64",certa
+30,0.0,2030.4067947340081,0.0,[0.9915686  0.00843138],507-716,"rtable_Beer_Name/rtable_Brew_Factory_Name    0.285714
+dtype: float64",certa
+31,0.0,1989.2771664340398,0.0,[0.99253476 0.00746526],1755-1635,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.666667
+dtype: float64",certa
+32,0.0,2025.6334423150402,0.0,[0.99123377 0.00876626],1904-2681,"rtable_Beer_Name/rtable_Brew_Factory_Name    0.08
+dtype: float64",certa
+33,0.0,1900.7873195849825,0.0,[0.99227965 0.00772036],3402-1889,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+34,0.0,1912.6569000539603,0.0,[0.9924837  0.00751638],1251-812,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+35,0.0,2068.842897769995,0.0,[0.9902654  0.00973455],113-475,"rtable_Beer_Name/rtable_Brew_Factory_Name    0.065217
+ltable_Beer_Name/ltable_Brew_Factory_Name    0.065217
+dtype: float64",certa
+36,0.0,1979.860072468,0.0,[0.9912266  0.00877341],2596-2124,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+37,0.0,1346.4141818759963,0.0,[0.9922018  0.00779815],406-2071,"Series([], dtype: float64)",certa
+38,0.0,2077.9376238069963,0.0,[0.98601544 0.0139846 ],1900-333,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.638554
+dtype: float64",certa
+39,0.0,700.7325580790057,0.0,[0.9741542  0.02584587],4181-2300,"rtable_Beer_Name/rtable_Brew_Factory_Name/rtable_Style/rtable_ABV    0.25
+dtype: float64",certa
+40,0.0,2135.2833663079655,0.0,[0.98487943 0.01512053],982-348,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.39
+dtype: float64",certa
+41,1.0,2230.8264773350093,0.0,[0.9222518  0.07774816],1621-548,"rtable_Beer_Name    0.181818
+dtype: float64",certa
+42,0.0,2118.865668163984,0.0,[0.99054456 0.0094554 ],184-1679,"rtable_Beer_Name/rtable_Brew_Factory_Name/rtable_ABV    0.25
+dtype: float64",certa
+43,0.0,2245.0334834770183,0.0,[0.9928455 0.0071545],487-1519,"Series([], dtype: float64)",certa
+44,0.0,308.2973367420491,0.0,[0.98738956 0.01261045],4168-2381,"ltable_Beer_Name/ltable_Brew_Factory_Name    0.133333
+dtype: float64",certa
+45,0.0,2245.072735988011,0.0,[0.9926871  0.00731294],3963-980,"Series([], dtype: float64)",certa
+46,1.0,1415.1814808770432,1.0,[0.13087836 0.8691216 ],2007-203,"ltable_Style    0.6
+dtype: float64",certa
+47,0.0,2109.3550386389834,0.0,[0.99231166 0.00768834],1218-1445,"ltable_ABV          0.0
+ltable_Style        0.0
+ltable_Beer_Name    0.0
+dtype: float64",certa
+48,0.0,2662.108101818012,0.0,[0.99250716 0.00749288],833-2728,"Series([], dtype: float64)",certa
+49,0.0,2431.318576389982,0.0,[0.9922497  0.00775026],3842-1853,"rtable_Beer_Name/rtable_Brew_Factory_Name    0.083333
+dtype: float64",certa
