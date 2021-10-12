@@ -249,13 +249,12 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                         print(f'skipped item {str(i)}')
                         item.head()
 
-            if compare:
-                mojitos.to_csv(exp_dir + dir + '/' + model_name + '/mojito.csv')
-                landmarks.to_csv(exp_dir + dir + '/' + model_name + '/landmark.csv')
-                shaps.to_csv(exp_dir + dir + '/' + model_name + '/shap.csv')
-                examples.to_csv(exp_dir + dir + '/' + model_name + '/examples.csv')
-            certas.to_csv(exp_dir + dir + '/' + model_name + '/certa.csv')
 
+            mojitos.to_csv(exp_dir + dir + '/' + model_name + '/mojito.csv')
+            landmarks.to_csv(exp_dir + dir + '/' + model_name + '/landmark.csv')
+            shaps.to_csv(exp_dir + dir + '/' + model_name + '/shap.csv')
+            examples.to_csv(exp_dir + dir + '/' + model_name + '/examples.csv')
+            certas.to_csv(exp_dir + dir + '/' + model_name + '/certa.csv')
 
 
 def check_saliency(l_tuple, r_tuple, predict_fn, saliency, k, score):
@@ -331,8 +330,8 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    samples = 50
+    samples = -1
     type = 'deeper'
-    filtered_datasets = ['abt_buy']
+    filtered_datasets = ['beers']
     model = from_type(type)
     evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=False, compare=False)
