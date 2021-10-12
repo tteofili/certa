@@ -4,6 +4,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 import numpy as np
 from alibi.explainers import Counterfactual, CounterfactualProto
+from sklearn.pipeline import make_pipeline
 
 from baselines.lime_c import Preprocess_LimeCounterfactual, LimeCounterfactual
 from baselines.sedc import SEDC_Explainer
@@ -20,9 +21,10 @@ proto = True
 simple = True
 shap_c = True
 lime_c = True
+sedc = True
 
-dataset = 'abt_buy'
-model_type = 'dm'
+dataset = 'beers'
+model_type = 'deeper'
 model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
@@ -54,11 +56,25 @@ for idx in range(50):
     if lime_c:
         print('lime-c')
         try:
-            vectorizer = CountVectorizer()
-            pipeline = model
-            limec_explainer = LimeCounterfactual(pipeline, model, vectorizer, 0.5, train_df.columns)
-            limec_exp = limec_explainer.explanation(pd.DataFrame(rand_row).transpose())
+            preprocess_cf = Preprocess_LimeCounterfactual(False)
+            instance_text = str(instance.values)
+            vectorizer, feature_names = preprocess_cf.fit_vectorizer(instance)
+            # c = make_pipeline(vectorizer, model)
+            limec_explainer = LimeCounterfactual(classifier_fn, classifier_fn, vectorizer, 0.5, feature_names)
+            limec_exp = limec_explainer.explanation(instance)
             print(limec_exp)
+        except:
+            print(traceback.format_exc())
+            print(f'skipped item {str(idx)}')
+            pass
+
+    if sedc:
+        print('sedc')
+        try:
+            sedc_explainer = SEDC_Explainer(train_df.columns, classifier_fn, 0.5)
+            sedc_exp = sedc_explainer.explanation(instance_text)
+
+            print(f'{idx}- sedc:{sedc_exp}')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
@@ -69,7 +85,7 @@ for idx in range(50):
         try:
             shapc_explainer = ShapCounterfactual(classifier_fn, 0.5,
                      train_df.columns)
-            sc_exp = shapc_explainer.explanation(pd.DataFrame(rand_row).transpose())
+            sc_exp = shapc_explainer.explanation(instance)
             print(f'{idx}- shap-c:{sc_exp}')
         except:
             print(traceback.format_exc())
@@ -87,7 +103,7 @@ for idx in range(50):
             m = dice_ml.Model(model=model, backend='sklearn')
             exp = dice_ml.Dice(d, m, method='genetic')
             dice_exp = exp.generate_counterfactuals(instance,
-                                                    total_CFs=5, desired_class="opposite")
+                                                    total_CFs=10, desired_class="opposite")
             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
             print(f'genetic:{idx}:{dice_exp_df}')
         except:
@@ -106,7 +122,7 @@ for idx in range(50):
             m = dice_ml.Model(model=model, backend='sklearn')
             exp = dice_ml.Dice(d, m, method='kdtree')
             dice_exp = exp.generate_counterfactuals(instance,
-                                                    total_CFs=5, desired_class="opposite")
+                                                    total_CFs=10, desired_class="opposite")
             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
             print(f'kdtree:{idx}:{dice_exp_df}')
         except:
@@ -125,7 +141,7 @@ for idx in range(50):
             m = dice_ml.Model(model=model, backend='sklearn')
             exp = dice_ml.Dice(d, m, method='random')
             dice_exp = exp.generate_counterfactuals(instance,
-                                                    total_CFs=len(test_df), desired_class="opposite")
+                                                    total_CFs=10, desired_class="opposite")
             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
             print(f'random:{idx}:{dice_exp_df}')
             if dice_exp_df is not None:

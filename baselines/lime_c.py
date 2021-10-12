@@ -7,7 +7,6 @@ Import libraries
 """
 from lime.lime_text import LimeTextExplainer
 import time
-import numpy as np
 
 
 class LimeCounterfactual(object):
@@ -109,7 +108,7 @@ class LimeCounterfactual(object):
 
         instance_sparse = self.vectorizer.transform([instance])
         nb_active_features = np.size(instance_sparse)
-        score_predicted = self.classifier_fn(instance_sparse)
+        score_predicted = self.classifier_fn(instance)
         explainer = LimeTextExplainer(class_names=self.class_names)
 
         classifier = self.c_fn.predict_proba
@@ -221,7 +220,7 @@ class Preprocess_LimeCounterfactual(object):
         """Function to fit vectorizer object for (behavioral) big data based on CountVectorizer()"""
         instance_text1=''
         instance_text2=''
-        for element in range(np.size(instance_idx.toarray())):
+        for element in range(np.size(instance_idx)):
             instance_text1+=" "+'a'+np.str(element)
             instance_text2+=" "+'a'+np.str(element)
         artificial_text = [instance_text1, instance_text2]
