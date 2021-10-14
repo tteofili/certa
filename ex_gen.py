@@ -21,7 +21,7 @@ experiments_dir = 'examples/'
 
 
 def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
-             fast: bool = False, max_predict: int = -1, compare=True):
+             fast: bool = False, max_predict: int = -1):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
 
@@ -132,9 +132,6 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                                 mojito_exp.pop('id', None)
 
 
-                            mojito_row = {'explanation': mojito_exp, 'type': 'mojito-c', 'latency': latency_m,
-                                          'match': class_to_explain,
-                                          'label': label, 'row': row_id, 'prediction': prediction}
                         else:
                             t0 = time.perf_counter()
                             mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
@@ -148,14 +145,14 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                             if 'id' in mojito_exp:
                                 mojito_exp.pop('id', None)
 
-                            mojito_row = {'explanation': mojito_exp, 'type': 'mojito-d', 'latency': latency_m,
-                                          'match': class_to_explain,
-                                          'label': label, 'row': row_id, 'prediction': prediction}
-
                         mojito_exp['type'] = 'mojito'
                         check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, mojito_exp, k, prediction[1])
                         if check:
                             continue
+                        mojito_row = {'explanation': mojito_exp, 'type': 'mojito-d', 'latency': latency_m,
+                                      'match': class_to_explain,
+                                      'label': label, 'row': row_id, 'prediction': prediction,
+                                      'score_drop': effect_eval['score_drop'], 'score_copy': effect_eval['score_copy']}
 
                         # landmark
                         print('landmark')
@@ -169,14 +166,15 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
 
                         land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
 
-                        land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
-                                    'match': class_to_explain,
-                                    'label': label, 'row': row_id, 'prediction': prediction}
 
                         land_exp['type'] = 'landmark'
                         check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, land_exp, k, prediction[1])
                         if check:
                             continue
+                        land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
+                                    'match': class_to_explain,
+                                    'label': label, 'row': row_id, 'prediction': prediction,
+                                    'score_drop': effect_eval['score_drop'], 'score_copy': effect_eval['score_copy']}
 
                         # SHAP
                         print('shap')
@@ -193,14 +191,15 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                         for sv in range(len(match_shap_values)):
                             shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
 
-                        shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
-                                    'match': class_to_explain,
-                                    'label': label, 'row': row_id, 'prediction': prediction}
 
                         shap_saliency['type'] = 'shap'
                         check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, shap_saliency, k, prediction[1])
                         if check:
                             continue
+                        shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
+                                    'match': class_to_explain,
+                                    'label': label, 'row': row_id, 'prediction': prediction,
+                                    'score_drop': effect_eval['score_drop'], 'score_copy': effect_eval['score_copy']}
 
 
                         # CERTA
@@ -221,19 +220,20 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                             continue
 
                         certa_saliency = saliency_df.transpose().to_dict()[0]
-                        certa_row = {'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
-                                     'match': class_to_explain,
-                                     'label': label, 'row': row_id, 'prediction': prediction}
 
                         certa_saliency['type'] = 'certa'
                         check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, certa_saliency, k,
                                                             prediction[1])
                         if check:
                             continue
+                        certa_row = {'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
+                                     'match': class_to_explain,
+                                     'label': label, 'row': row_id, 'prediction': prediction,
+                                     'score_drop': effect_eval['score_drop'], 'score_copy': effect_eval['score_copy']}
 
                         item['match'] = prediction[1]
                         item['label'] = label
-                        item['cf_summary'] = cf_summary
+                        item['cf_summary'] = str(cf_summary.to_dict())
 
                         mojitos = mojitos.append(mojito_row, ignore_index=True)
                         landmarks = landmarks.append(land_row, ignore_index=True)
@@ -255,6 +255,7 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
             shaps.to_csv(exp_dir + dir + '/' + model_name + '/shap.csv')
             examples.to_csv(exp_dir + dir + '/' + model_name + '/examples.csv')
             certas.to_csv(exp_dir + dir + '/' + model_name + '/certa.csv')
+            cf.to_csv(exp_dir + dir + '/' + model_name + '/cf.csv')
 
 
 def check_saliency(l_tuple, r_tuple, predict_fn, saliency, k, score):
@@ -294,8 +295,8 @@ def check_saliency(l_tuple, r_tuple, predict_fn, saliency, k, score):
         score_drop = modified_tuple_prediction[1]
         class_drop = np.argmax(modified_tuple_prediction)
         eval_series['top_' + exp_type + '_' + model.name] = explanation_attributes
-        eval_series['score_drop_' + exp_type + '_' + model.name] = score_drop
-        eval_series['class_drop_' + exp_type + '_' + model.name] = class_drop
+        eval_series['score_drop'] = score_drop
+        eval_series['class_drop'] = class_drop
         if class_drop != orig_class:
             check = True
     except Exception as e:
@@ -316,8 +317,8 @@ def check_saliency(l_tuple, r_tuple, predict_fn, saliency, k, score):
         # print(modified_tuple_prediction)
         score_copy = modified_tuple_prediction[1]
         class_copy = np.argmax(modified_tuple_prediction)
-        eval_series['score_copy_' + exp_type + '_' + model.name] = score_copy
-        eval_series['class_copy_' + exp_type + '_' + model.name] = class_copy
+        eval_series['score_copy'] = score_copy
+        eval_series['class_copy'] = class_copy
         if not check and class_copy != orig_class:
             check = True
     except Exception as e:
@@ -330,8 +331,11 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    samples = -1
-    type = 'deeper'
-    filtered_datasets = ['beers']
+    samples = 100
+    type = 'dm'
+    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         'abt_buy', 'fodo_zaga', 'beers',
+                         'amazon_google', 'itunes_amazon', 'walmart_amazon',
+                         'dblp_scholar', 'dblp_acm']
     model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=False, compare=False)
+    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=3000, fast=True)

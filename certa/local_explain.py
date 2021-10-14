@@ -292,13 +292,16 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
                 candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False,
                                                 lprefix=lprefix, rprefix=rprefix)[:max_predict]
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
-    tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
-    id4explanation.to_csv(os.path.join(datadir, tmp_name), index=False)
-    unlabeled_df = __generate_unlabeled(datadir, tmp_name, lprefix=lprefix, rprefix=rprefix)
-    os.remove(os.path.join(datadir, tmp_name))
-    neighborhood = pd.DataFrame()
-    if len(unlabeled_df) > 0:
-        neighborhood = get_neighbors(findPositives, predict_fn, unlabeled_df, lprefix=lprefix, rprefix=rprefix)
+    if len(id4explanation) > 0:
+        tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
+        id4explanation.to_csv(os.path.join(datadir, tmp_name), index=False)
+        unlabeled_df = __generate_unlabeled(datadir, tmp_name, lprefix=lprefix, rprefix=rprefix)
+        os.remove(os.path.join(datadir, tmp_name))
+        neighborhood = pd.DataFrame()
+        if len(unlabeled_df) > 0:
+            neighborhood = get_neighbors(findPositives, predict_fn, unlabeled_df, lprefix=lprefix, rprefix=rprefix)
+    else:
+        neighborhood = pd.DataFrame()
     return findPositives, neighborhood
 
 
