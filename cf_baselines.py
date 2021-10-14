@@ -15,13 +15,13 @@ from models.utils import from_type
 import dice_ml
 
 dice_r = True
-dice_g = True
-dice_k = True
-proto = True
-simple = True
+dice_g = False
+dice_k = False
+proto = False
+simple = False
 shap_c = True
 lime_c = True
-sedc = True
+sedc = False
 
 dataset = 'beers'
 model_type = 'deeper'
@@ -50,43 +50,40 @@ for idx in range(50):
     r_id = int(rand_row['rtable_id'])
     r_tuple = rsource.iloc[r_id]
     rand_row.head()
-    instance = pd.DataFrame(rand_row).transpose().drop(['outcome', 'ltable_id', 'rtable_id'], axis=1)
+    instance = pd.DataFrame(rand_row).transpose().drop(['outcome', 'ltable_id', 'rtable_id'], axis=1).astype(str)
     classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
+    instance_text = str(instance.values)
 
     if lime_c:
         print('lime-c')
         try:
             preprocess_cf = Preprocess_LimeCounterfactual(False)
-            instance_text = str(instance.values)
             vectorizer, feature_names = preprocess_cf.fit_vectorizer(instance)
             # c = make_pipeline(vectorizer, model)
-            limec_explainer = LimeCounterfactual(classifier_fn, classifier_fn, vectorizer, 0.5, feature_names)
+            limec_explainer = LimeCounterfactual(model, predict_fn, vectorizer, 0.5, feature_names)
             limec_exp = limec_explainer.explanation(instance)
             print(limec_exp)
+            if limec_exp is not None:
+                #dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
+                pd.DataFrame(limec_exp).to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/limec.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
             pass
 
-    if sedc:
-        print('sedc')
-        try:
-            sedc_explainer = SEDC_Explainer(train_df.columns, classifier_fn, 0.5)
-            sedc_exp = sedc_explainer.explanation(instance_text)
 
-            print(f'{idx}- sedc:{sedc_exp}')
-        except:
-            print(traceback.format_exc())
-            print(f'skipped item {str(idx)}')
-            pass
 
     if shap_c:
         print('shap-c')
         try:
-            shapc_explainer = ShapCounterfactual(classifier_fn, 0.5,
+            shap_predict = lambda x: predict_fn(x)['match_score'].values
+            shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
                      train_df.columns)
-            sc_exp = shapc_explainer.explanation(instance)
+            sc_exp = shapc_explainer.explanation(instance, train_df.drop(['ltable_id', 'rtable_id'], axis=1).astype(str)[:50])
             print(f'{idx}- shap-c:{sc_exp}')
+            if sc_exp is not None:
+                #dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
+                pd.DataFrame(sc_exp).to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/shapc.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
@@ -95,7 +92,6 @@ for idx in range(50):
     if dice_g:
         print('dice_g')
         try:
-
             d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
                              continuous_features=[],
                              outcome_name='outcome')

@@ -1,12 +1,14 @@
 """
 Function for explaining classified instances using evidence counterfactuals.
 """
+from baselines.mojito import Mojito
 
 """
 Import libraries 
 """
 from lime.lime_text import LimeTextExplainer
 import time
+import pandas as pd
 
 
 class LimeCounterfactual(object):
@@ -106,16 +108,35 @@ class LimeCounterfactual(object):
 
         tic = time.time()  # start timer
 
-        instance_sparse = self.vectorizer.transform([instance])
+        instance_text = str(instance.values)
+        if isinstance(instance, pd.DataFrame):
+            instance_sparse = self.vectorizer.transform([instance_text])
+        else:
+            instance_sparse = self.vectorizer.transform([instance])
         nb_active_features = np.size(instance_sparse)
-        score_predicted = self.classifier_fn(instance)
-        explainer = LimeTextExplainer(class_names=self.class_names)
+        score_predicted = self.classifier_fn(instance)[0]
+        idx = np.argmax(score_predicted)
+        explainer = Mojito(instance.columns,
+                        attr_to_copy='left',
+                        split_expression=" ",
+                        class_names=['no_match', 'match'],
+                        lprefix='', rprefix='',
+                        feature_selection='lasso_path')
 
         classifier = self.c_fn.predict_proba
 
-        exp = explainer.explain_instance(instance, classifier, num_features=nb_active_features)
-        explanation_lime = exp.as_list()
 
+        exp = explainer.copy(classifier, instance,
+                                      num_features=nb_active_features,
+                                      num_perturbation=100)
+
+        #exp = explainer.explain_instance(instance_text, classifier, num_features=nb_active_features)
+        ell = exp.groupby('attribute')['weight'].mean().to_dict()
+        explanation_lime = []
+        for k, v in ell.items():
+            explanation_lime.append((k, v))
+
+        explanation_lime = sorted(explanation_lime, key=lambda x: x[1], reverse=idx == 1)
         """
         indices_features_lime = []
         feature_coefficient = []
@@ -132,7 +153,7 @@ class LimeCounterfactual(object):
             score_new = score_predicted
             k = 0
             number_perturbed = 0
-            while ((score_new[0] >= self.threshold_classifier) and (k != len(explanation_lime)) and (
+            while ((score_new[idx] >= self.threshold_classifier) and (k != len(explanation_lime)) and (
                     time.time() - tic <= self.time_maximum) and (number_perturbed < self.max_features)):
                 number_perturbed = 0
                 feature_names_full_index = []
@@ -140,7 +161,7 @@ class LimeCounterfactual(object):
                 k += 1
                 perturbed_instance = instance_sparse.copy()
                 for feature in explanation_lime[0:k]:
-                    if feature[1] > 0:
+                    if (feature[1] > 0 and idx == 1) or (feature[1] < 0 and idx == 0):
                         index_feature = np.argwhere(np.array(self.feature_names_full) == feature[0])
                         number_perturbed += 1
                         if (len(index_feature) != 0):
@@ -148,9 +169,9 @@ class LimeCounterfactual(object):
                             perturbed_instance[:, index_feature] = 0
                             feature_names_full_index.append(index_feature)
                             feature_coefficient.append(feature[1])
-                score_new = self.classifier_fn(perturbed_instance)
+                score_new = self.classifier_fn(perturbed_instance)[0]
 
-            if (score_new[0] < self.threshold_classifier):
+            if (score_new[idx] < self.threshold_classifier):
                 time_elapsed = time.time() - tic
                 minimum_size_explanation = number_perturbed
                 minimum_size_explanation_rel = number_perturbed / nb_active_features

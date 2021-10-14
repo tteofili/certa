@@ -57,7 +57,7 @@ class ShapCounterfactual(object):
         self.feature_names_full = feature_names_full
         self.time_maximum = time_maximum
 
-    def explanation(self, instance):
+    def explanation(self, instance, background):
         """ Generates evidence counterfactual explanation for the instance.
 
         Args:
@@ -101,8 +101,8 @@ class ShapCounterfactual(object):
         reference = np.reshape(np.zeros(np.shape(instance)[1]), (1, len(np.zeros(np.shape(instance)[1]))))
         reference = sparse.csr_matrix(reference)
 
-        explainer = shap.KernelExplainer(self.classifier_fn, reference, link="identity")
-        shap_values = explainer.shap_values(instance, nsamples=5000, l1_reg="aic")
+        explainer = shap.KernelExplainer(self.classifier_fn, background, link="identity")
+        shap_values = explainer.shap_values(instance, nsamples=50, l1_reg="aic")
 
         nb_active_feature_instance_idx = np.size(instance)
         instance_dense = np.reshape(instance, (1, len(self.feature_names_full)))
