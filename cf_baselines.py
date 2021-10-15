@@ -1,3 +1,4 @@
+import os
 import traceback
 
 from sklearn.feature_extraction.text import CountVectorizer
@@ -24,7 +25,7 @@ lime_c = True
 sedc = False
 
 dataset = 'beers'
-model_type = 'deeper'
+model_type = 'dm'
 model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
@@ -46,7 +47,16 @@ train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1).astype(str)
 
 test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
+basedir = 'cf/' + dataset + '/' + model_type + '/'
+if not os.path.exists(basedir):
+    os.mkdir(basedir)
+
 for idx in range(50):
+
+    item_dir = basedir + '/' + str(idx)
+    if not os.path.exists(item_dir):
+        os.mkdir(item_dir)
+
     rand_row = test_df.iloc[idx]
     l_id = int(rand_row['ltable_id'])
     l_tuple = lsource.iloc[l_id]
@@ -63,11 +73,11 @@ for idx in range(50):
             preprocess_cf = Preprocess_LimeCounterfactual(False)
             vectorizer, feature_names = preprocess_cf.fit_vectorizer(instance)
             # c = make_pipeline(vectorizer, model)
-            limec_explainer = LimeCounterfactual(model, predict_fn, vectorizer, 0.5, train_noids.columns)
+            limec_explainer = LimeCounterfactual(model, predict_fn, vectorizer, 0.5, train_noids.columns, time_maximum=300)
             limec_exp = limec_explainer.explanation(instance)
             print(limec_exp)
             if limec_exp is not None:
-                pd.DataFrame.from_dict(limec_exp).to_csv('cf/' + dataset + '/' + model_type + '/' + str(idx) + '/limec.csv')
+                pd.DataFrame.from_dict(limec_exp).to_csv(basedir + str(idx) + '/limec.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
@@ -78,12 +88,12 @@ for idx in range(50):
         try:
             shap_predict = lambda x: predict_fn(x)['match_score'].values
             shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
-                                                 train_noids.columns)
+                                                 train_noids.columns, time_maximum=300)
 
             sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
             print(f'{idx}- shap-c:{sc_exp}')
             if sc_exp is not None:
-                pd.DataFrame.from_dict(sc_exp).to_csv('cf/' + dataset + '/' + model_type + '/' + str(idx) + '/shapc.csv')
+                pd.DataFrame.from_dict(sc_exp).to_csv(basedir + str(idx) + '/shapc.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
@@ -142,7 +152,7 @@ for idx in range(50):
             print(f'random:{idx}:{dice_exp_df}')
             if dice_exp_df is not None:
                 # dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
-                dice_exp_df.to_csv('cf/' + dataset + '/' + model_type + '/' + str(idx) + '/dice_random.csv')
+                dice_exp_df.to_csv(basedir + str(idx) + '/dice_random.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
