@@ -216,7 +216,7 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                 valid = pd.read_csv(datadir + '/valid.csv')
                 test = pd.read_csv(datadir + '/test.csv')
 
-                test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])[:samples]
+                test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])[:samples]
                 train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])
                 train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1).astype(str)
 
@@ -316,7 +316,7 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'emt'
+    mtype = 'deeper'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
                          'abt_buy', 'fodo_zaga', 'beers',
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
