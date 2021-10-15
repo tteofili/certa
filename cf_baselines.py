@@ -1,6 +1,8 @@
 import os
 import traceback
 import logging
+
+import numpy as np
 import pandas as pd
 
 from baselines.lime_c import LimeCounterfactual
@@ -243,6 +245,8 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
 
                 def predict_fn(x):
                     return model.predict_proba(x)
+
+                test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
                 for idx in range(len(test_df)):
                     rand_row = test_df.iloc[idx]
