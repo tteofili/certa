@@ -13,14 +13,14 @@ from models.utils import from_type
 import dice_ml
 
 dice_r = True
-dice_g = False
-dice_k = False
-proto = False
-simple = False
 shap_c = True
 lime_c = True
-sedc = False
 
+# dice_g = False
+# dice_k = False
+# proto = False
+# simple = False
+# sedc = False
 # dataset = 'beers'
 # model_type = 'dm'
 # model = from_type(model_type)
@@ -316,9 +316,9 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'dm'
+    mtype = 'emt'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'abt_buy', 'fodo_zaga', #'beers',
+                         'abt_buy', 'fodo_zaga', 'beers',
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar', 'dblp_acm']
     model = from_type(mtype)
