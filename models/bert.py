@@ -186,7 +186,7 @@ class EMTERModel(ERModel):
             full_df = np.dstack((predictions['nomatch_score'], predictions['match_score'])).squeeze()
             res_shape = full_df.shape
             if len(res_shape) == 1 and expand_dim:
-                res = np.expand_dims(res, axis=1).T
+                full_df = np.expand_dims(full_df, axis=1).T
         else:
             names = list(xc.columns)
             names.extend(['classes', 'labels', 'nomatch_score', 'match_score'])
