@@ -312,10 +312,10 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
 
 if __name__ == "__main__":
     samples = 50
-    type = 'dm'
+    mtype = 'dm'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
                          'abt_buy', 'fodo_zaga', #'beers',
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar', 'dblp_acm']
-    model = from_type(type)
+    model = from_type(mtype)
     baselines_gen(model, samples=samples, filtered_datasets=filtered_datasets)
