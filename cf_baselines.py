@@ -2,11 +2,9 @@ import os
 import traceback
 import logging
 import pandas as pd
-import numpy as np
 
-from baselines.lime_c import Preprocess_LimeCounterfactual, LimeCounterfactual
+from baselines.lime_c import LimeCounterfactual
 from baselines.shap_c import ShapCounterfactual
-from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
 from models.utils import from_type
 
@@ -190,7 +188,6 @@ warnings.filterwarnings("ignore")
 root_datadir = 'datasets/'
 experiments_dir = 'cf/'
 
-
 def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_dir,):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
@@ -218,8 +215,7 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                 test = pd.read_csv(datadir + '/test.csv')
 
                 test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])[:samples]
-                train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'],
-                                         robust=robust)
+                train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])
                 train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1).astype(str)
 
                 save_path = 'models/' + model_name + '/' + dir
@@ -245,38 +241,22 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                     text_file.close()
                     model.save(save_path)
 
-                classifier_fn = lambda x: model.predict_proba(x, given_columns=train_df.columns)[1, :]
-
                 def predict_fn(x):
                     return model.predict_proba(x)
 
                 for idx in range(len(test_df)):
                     rand_row = test_df.iloc[idx]
-                    l_id = int(rand_row['ltable_id'])
-                    l_tuple = lsource.iloc[l_id]
-                    r_id = int(rand_row['rtable_id'])
-                    r_tuple = rsource.iloc[r_id]
 
-                    prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
-                    class_to_explain = np.argmax(prediction)
-
-                    label = rand_row["label"]
-                    row_id = str(l_id) + '-' + str(r_id)
-                    item = get_row(l_tuple, r_tuple)
                     basedir = exp_dir + dir + '/' + model_name + '/' + str(idx)
 
                     try:
                         instance = pd.DataFrame(rand_row).transpose().drop(['outcome', 'ltable_id', 'rtable_id'],
                                                                            axis=1).astype(str)
-                        instance_text = str(instance.values)
 
                         if lime_c:
                             print('lime-c')
                             try:
-                                preprocess_cf = Preprocess_LimeCounterfactual(False)
-                                vectorizer, feature_names = preprocess_cf.fit_vectorizer(instance)
-                                # c = make_pipeline(vectorizer, model)
-                                limec_explainer = LimeCounterfactual(model, predict_fn, vectorizer, 0.5,
+                                limec_explainer = LimeCounterfactual(model, predict_fn, None, 0.5,
                                                                      train_noids.columns, time_maximum=300)
                                 limec_exp = limec_explainer.explanation(instance)
                                 print(limec_exp)
@@ -290,7 +270,6 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                         if shap_c:
                             print('shap-c')
                             try:
-                                shap_predict = lambda x: predict_fn(x)['match_score'].values
                                 shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
                                                                      train_noids.columns, time_maximum=300)
 
