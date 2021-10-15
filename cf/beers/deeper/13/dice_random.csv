@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Pike Old Bawdy Barley Wine,Bier Kaffee Aqula,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,9.50 %,1
-1,Aqula American Amber Ale,The Pike Brewing Company,American Barleywine,5.30 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,11.25 %,1
-2,Pike Old Bawdy Barley Wine,Bitter Root Brewing,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,11.25 %,1
-3,Pike Old Bawdy Barley Wine,Due South Brewing Co. .,American Barleywine,6.00 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,11.25 %,1
-4,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Heist Brewery,Barley Wine,11.25 %,1
+0,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,6.50 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,8 %,1
+1,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Ballast Point Brewing Company,Barley Wine,10 %,1
+2,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,Big Bear Lake Sidewinder Red Ale,Blue Cat Brew Pub,Barley Wine,11.25 %,1
+3,Pike Old Bawdy Barley Wine,Nebraska Brewing Company,American Amber / Red Ale,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,11.25 %,1
+4,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Amber / Red Ale,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,6 %,1
+5,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Irish Ale,6 %,1
+6,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Thorn Street Brewery,Barley Wine,11.25 %,1
+7,Pike Old Bawdy Barley Wine,The Pike Brewing Company,American Barleywine,9.90 %,Three Heads Buffalo Soul Jah Imperial Red Ale,Bristol Brewing Company,Specialty Grain,11.25 %,1
+8,Blue Bridge Amber Dry Hopped,The Pike Brewing Company,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,11.25 %,1
+9,Pike Old Bawdy Barley Wine,RJ Rockers Brewing Company,American Barleywine,9.90 %,Bristol Old No. 23 Barley Wine,Bristol Brewing Company,Barley Wine,9.50 %,1

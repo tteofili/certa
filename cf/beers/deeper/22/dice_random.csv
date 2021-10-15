@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Red Dirt Imperial Red Ale,Revival Brewing Co. .,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,9.70 %,0
-1,Inception Series - Runnin ' With The Devil,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,9.70 %,0
-2,Bourbon Barrel Aged Horus Imperial Red,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Ale Mania Imperial Red Ale,Lompoc Brewing,Barley Wine,9.70 %,0
-3,Bourbon Barrel Aged Horus Imperial Red,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Kern River Dirty Hippie Imperial Red Ale,Lompoc Brewing,Barley Wine,9.70 %,0
-4,Ambleside Amber Ale,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Lompoc Brewing,Barley Wine,9.70 %,0
+0,Bourbon Barrel Aged Horus Imperial Red,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Big Time Lift Ticket American Red Ale,Lompoc Brewing,Barley Wine,9 %,0
+1,Bourbon Barrel Aged Horus Imperial Red,57 Brew Pub & Bistro,American Amber / Red Ale,-,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,9.70 %,1
+2,Inception Series - Runnin ' With The Devil,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,5.60 %,0
+3,Inception Series - Runnin ' With The Devil,Elevator Brewery & Draught Haus,American Barleywine,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,9.70 %,0
+4,Inception Series - Runnin ' With The Devil,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,9 %,0
+5,Bourbon Barrel Aged Horus Imperial Red,Central City Brewers + Distillers,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,7.09 %,0
+6,Bourbon Barrel Aged Horus Imperial Red,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Kern River Dirty Hippie Imperial Red Ale,Lompoc Brewing,Barley Wine,9.70 %,0
+7,Bourbon Barrel Aged Horus Imperial Red,Central City Brewers + Distillers,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,8.79 %,0
+8,Bourbon Barrel Aged Horus Imperial Red,Central City Brewers + Distillers,American Amber / Red Ale,12.00 %,Lompoc Bourbon Barrel Aged Old Tavern Rat,Lompoc Brewing,Barley Wine,9.70 %,0
+9,Bourbon Barrel Aged Horus Imperial Red,Elevator Brewery & Draught Haus,American Amber / Red Ale,12.00 %,Big Time Lift Ticket American Red Ale,Lompoc Brewing,Barley Wine,9.70 %,0

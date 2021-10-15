@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,` indigo coastal grill ',' 6182 w. flamingo rd. ',` san francisco ',310/289 -0660,asian,427.0,` jan \ 's family restaurant ',' 3 e. 52nd st. ',la,213-651-2866,italian,557.0,1
+1,` le colonial ',' 205 e. 45th st. ',atlanta,212/682 -8660,asian,144.0,` fiore rotisserie & grille ',' 8424 beverly blvd. ',` san francisco ',213-651-2866,` coffee shops ',557.0,0
+2,` indigo coastal grill ',' 6182 w. flamingo rd. ',` san francisco ',212/759 -5941,caribbean,427.0,` jan \ 's family restaurant ',' 3 e. 52nd st. ',la,212-765-1737,italian,557.0,1
+3,abruzzi,' 205 e. 45th st. ',atlanta,212/682 -8660,asian,144.0,` fiore rotisserie & grille ',' 8424 beverly blvd. ',` san francisco ',213-651-2866,` coffee shops ',557.0,0
+4,oritalia,' 3434 peachtree rd. ',` los angeles ',404/874 -2626,` dive american ',162.0,` jan \ 's family restaurant ',' 8424 beverly blvd. ',la,213-651-2866,californian,623.0,0
+5,abruzzi,' 205 e. 45th st. ',atlanta,212/682 -8660,asian,144.0,` fiore rotisserie & grille ',' 8424 beverly blvd. ',` san francisco ',213-651-2866,vegetarian,7.0,0
+6,abruzzi,' 205 e. 45th st. ',atlanta,212/682 -8660,asian,144.0,` fiore rotisserie & grille ',' 8424 beverly blvd. ',` san francisco ',213-651-2866,vegetarian,557.0,0
+7,` beesley \ 's of buckhead ',' 8783 beverly blvd. ',` new york ',404/351 -9533,asian,84.0,` heera of india ',' 1870 fillmore st. ',` santa monica ',213-651-2866,` coffee shops ',5.0,0
+8,` le colonial ',' 205 e. 45th st. ',atlanta,310/289 -0660,asian,144.0,` fiore rotisserie & grille ',' 8424 beverly blvd. ',` san francisco ',213-651-2866,` coffee shops ',557.0,0
+9,` indigo coastal grill ',' 6182 w. flamingo rd. ',` san francisco ',310/289 -0660,caribbean,427.0,` jan \ 's family restaurant ',' 3 e. 52nd st. ',la,212-765-1737,italian,557.0,1

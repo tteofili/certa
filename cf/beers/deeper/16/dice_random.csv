@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Inception Series - Runnin ' With The Devil,Smuttynose Brewing Company,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
-1,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Kern River Dirty Hippie Imperial Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
-2,Red Dread Imperial Red Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Ale Mania Imperial Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
-3,Rabbit Mountain Red Ale,Cervejaria AmazÃ ´ nia Ltda .,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
-4,Ambleside Amber Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Tighthead Brewing Company,American Strong Ale,7.09 %,0
+0,Inception Series - Runnin ' With The Devil,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Rock Bottom La Jolla Ragtop Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
+1,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Big Time Brewery,Premium Bitter/ESB,7.09 %,0
+2,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,5.60 %,Kern River Dirty Hippie Imperial Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
+3,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Council Rock Brewery,Spice/Herb/Vegetable,7.09 %,0
+4,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,6.40 %,Big Time Lift Ticket American Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
+5,Inception Series - Runnin ' With The Devil,Fat Bottom Brewing,American Barleywine,6.10 %,Black Shirt American India Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
+6,Green Flash Hop Head Red Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Big Time Lift Ticket American Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0
+7,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Heist Brewery,Premium Bitter/ESB,7.09 %,0
+8,Ruby Red American Ale,Fat Bottom Brewing,American Amber / Red Ale,6.10 %,Black Shirt American India Red Ale,Sawdust City Brewing Company,Premium Bitter/ESB,7.09 %,0
+9,Ruby Red American Ale,Central City Brewers + Distillers,American Amber / Red Ale,6.10 %,Marble Imperial Red Ale,Black Shirt Brewing Company,American Strong Ale,7.09 %,0

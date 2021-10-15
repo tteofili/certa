@@ -1,0 +1,11 @@
+,ltable_title,ltable_authors,ltable_venue,ltable_year,rtable_title,rtable_authors,rtable_venue,rtable_year,outcome
+0,indexing the positions of continuously moving objects,"a balmin , v hristidis , n koudas , y papakonstantinou , d srivastava , t wang",vldb,2003.0,keyword search in databases,sv rajnikant,"new directions for program evaluation ,",nan,1
+1,multi-dimensional substring selectivity estimation,"a balmin , v hristidis , n koudas , y papakonstantinou , d srivastava , t wang",sigmod conference,2003.0,keyword search in databases,sv rajnikant,"proceedings of the 1997 acm sigmod international conference & hellip ; ,",nan,1
+2,indexing the positions of continuously moving objects,g colliat,vldb,2003.0,keyword search in databases,sv rajnikant,"intelligent data analysis ,",nan,0
+3,multi-dimensional substring selectivity estimation,"a balmin , v hristidis , n koudas , y papakonstantinou , d srivastava , t wang",sigmod conference,2000.0,keyword search in databases,sv rajnikant,"proceedings of the 1997 acm sigmod international conference & hellip ; ,",nan,1
+4,interview with jim gray,"k bіhm , t rakow",sigmod conference,1997.0,keyword search in databases,sv rajnikant,"proceedings of the 2005 acm sigmod international conference & hellip ; ,",nan,0
+5,multi-dimensional substring selectivity estimation,"a balmin , v hristidis , n koudas , y papakonstantinou , d srivastava , t wang",sigmod conference,2000.0,keyword search in databases,sv rajnikant,"proceedings of the 1997 acm sigmod international conference & hellip ; ,",1997.0,0
+6,interview with jim gray,"k bіhm , t rakow",sigmod conference,1997.0,keyword search in databases,"cc aggarwal , ps yu","proceedings of the 2005 acm sigmod international conference & hellip ; ,",nan,0
+7,indexing the positions of continuously moving objects,"w jonker , h schќtz",sigmod conference,2002.0,keyword search in databases,sv rajnikant,nan,1986.0,0
+8,indexing the positions of continuously moving objects,"h wang , c zaniolo",vldb,2003.0,keyword search in databases,"a tomasic , r amouroux , p bonnet , o kapitskaia , h",nan,1995.0,0
+9,mining fuzzy association rules in databases,"l liu , c pu , d buttler , w han , h paques , w tang",sigmod conference,2003.0,keyword search in databases,"s ramaswamy , s mahajan , a silberschatz",nan,nan,0

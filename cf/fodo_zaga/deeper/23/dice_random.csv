@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,oceana,'55 e. 54th st. ',` new york ',404/874 -2626,seafood,50.0,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,24.0,1
+1,oceana,' 260 e. paces ferry road ',` new york ',212/759 -5941,seafood,50.0,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,7.0,1
+2,oceana,' 1829 peachtree rd. ',` new york ',212/759 -5941,seafood,50.0,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,24.0,1
+3,joss,'55 e. 54th st. ',` new york ',310/659 -6919,seafood,50.0,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,24.0,1
+4,oceana,'55 e. 54th st. ',` new york ',212/759 -5941,` steak houses ',50.0,aquavit,'13 w. 54th st. ',` new york city ',702-369-6300,scandinavian,24.0,1
+5,oceana,'55 e. 54th st. ',` new york ',212/759 -5941,seafood,50.0,aquavit,'13 w. 54th st. ',` new york city ',404-237-2700,scandinavian,24.0,1
+6,oceana,'55 e. 54th st. ',` san francisco ',212/759 -5941,seafood,50.0,aquavit,'13 w. 54th st. ',queens,212-307-7311,scandinavian,24.0,1
+7,` lillie langtry \ 's ','55 e. 54th st. ',` new york ',212/759 -5941,seafood,50.0,` san domenico ','13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,24.0,0
+8,oceana,'55 e. 54th st. ',` new york ',212/759 -5941,french,50.0,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,scandinavian,682.0,0
+9,oceana,'55 e. 54th st. ',` new york ',212/759 -5941,seafood,50.0,aquavit,'13 w. 54th st. ',` new york city ',212-307-7311,eclectic,682.0,1

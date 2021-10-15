@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,404/874 -2626,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,vegetarian,662.0,1
+1,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,404/237 -2700,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,212-265-5959,` french bistro ',682.0,0
+2,` dining room ritz-carlton buckhead ',' 1510 e. flamingo rd. ',atlanta,404/237 -2700,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,vegetarian,682.0,1
+3,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,404/237 -2700,international,144.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,chicken,682.0,1
+4,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,404/237 -2700,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-261-8186,vegetarian,682.0,1
+5,` dining room ritz-carlton buckhead ',' 160 e. 64th st. ',atlanta,404/237 -2700,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,vegetarian,682.0,1
+6,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,404/351 -9533,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,indian,682.0,1
+7,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,702/733 -3111,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,702-737-7111,vegetarian,682.0,1
+8,` dining room ritz-carlton buckhead ',' 1915 fillmore st. ',atlanta,404/237 -2700,international,90.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,vegetarian,682.0,1
+9,` dining room ritz-carlton buckhead ',' 3434 peachtree rd. ',atlanta,404/237 -2700,french,50.0,` brookhaven cafe ',' 4274 peachtree rd. ',atlanta,404-231-5907,vegetarian,682.0,1

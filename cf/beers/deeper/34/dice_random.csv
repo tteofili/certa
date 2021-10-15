@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,8.70 %,Ale Mania Imperial Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
-1,Legends Of The Bay Giant 's Tomb,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
-2,Red Racer India Style Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Ale Mania Imperial Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
-3,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Ale Mania Imperial Red Ale,Big Bear Lake Brewing Company,Specialty Grain,8.50 %,0
-4,Big Red Ale,Revival Brewing Co. .,American Amber / Red Ale,5.70 %,Big Bear Lake Sidewinder Red Ale,Genesee Brewing Company &#40; North American Breweries &#41;,Amber Ale,8.50 %,0
+0,Sanibel Red Island Ale,Central City Brewers + Distillers,American Amber / Red Ale,5.70 %,Big Bear Lake Sidewinder Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
+1,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Kern River Dirty Hippie Imperial Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
+2,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Big Bear Lake Sidewinder Red Ale,Riverbend Brewing & Sports Pub,Spice/Herb/Vegetable,8.50 %,0
+3,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,8.10 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
+4,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
+5,Big Red Ale,Red Car Brewery and Restaurant,American Barleywine,5.70 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
+6,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Irish Ale,8.50 %,0
+7,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,7.40 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Amber Ale,8.50 %,0
+8,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Big Time Lift Ticket American Red Ale,Big Bear Lake Brewing Company,Amber Ale,7.09 %,0
+9,Big Red Ale,Red Car Brewery and Restaurant,American Amber / Red Ale,5.70 %,Big Bear Lake Sidewinder Red Ale,Thorn Street Brewery,Premium Bitter/ESB,8.50 %,0

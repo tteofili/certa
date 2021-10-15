@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Big Time Lift Ticket American Red Ale,Bainbridge Island Brewing Company,California Common,5.40 %,1
-1,Arrow Point Amber,Rogue Ales,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Altbier,5.40 %,0
-2,Arrow Point Amber,Silver Peak Restaurant & Brewery,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Altbier,5.40 %,1
-3,Ambleside Amber Ale,BJ 's Restaurant & Brewhouse,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0
-4,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Sick N Twisted Pleasure Victim Amber Ale,Bainbridge Island Brewing Company,Premium Bitter/ESB,5.40 %,0
+0,Arrow Point Amber,Tarraco Beer,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Spice/Herb/Vegetable,5.40 %,0
+1,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Big Time Lift Ticket American Red Ale,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0
+2,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Kern River Dirty Hippie Imperial Red Ale,Bainbridge Island Brewing Company,American Strong Ale,5.40 %,0
+3,Arrow Point Amber,Oskar Blues Grill & Brew,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Amber Ale,10 %,0
+4,Brass Ale Honey Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Amber Ale,-,0
+5,Alexander Keith 's Red Amber Ale,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Kern River Dirty Hippie Imperial Red Ale,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0
+6,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,9.20 %,Big Time Lift Ticket American Red Ale,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0
+7,Twisted Stick Amber Ale,Rock Bottom Restaurant & Brewery,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0
+8,Arrow Point Amber,Bainbridge Island Brewing Company,American Amber / Red Ale,5.40 %,Sawdust City Red Rocket Coffee Spiced Stout,Bainbridge Island Brewing Company,Premium Bitter/ESB,5.40 %,0
+9,Smuttynose Kindest Find Imperial Red Ale,Oskar Blues Grill & Brew,American Amber / Red Ale,5.40 %,Bainbridge Island Arrow Point Amber,Bainbridge Island Brewing Company,Amber Ale,5.40 %,0

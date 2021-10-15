@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Clifford 's Big Red Ale,Funky Buddha Brewery,American Barleywine,9.70 %,Big Island Red Giant Ale,Big Texan Brewery,American Strong Ale,6.50 %,1
-1,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,9.70 %,Capitol City Amber Waves Ale,406 Brewing Company,American Strong Ale,6.50 %,1
-2,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,9.70 %,Big Island Red Giant Ale,Ballast Point Brewing Company,American Strong Ale,6.50 %,1
-3,Red Dirt Imperial Red Ale,Straight To Ale,American Amber / Red Ale,9.70 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1
-4,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,9.70 %,Fox and Hound Red Fox Amber Ale,Big Island Brewhaus,India Pale Ale &#40; IPA &#41;,6.50 %,1
+0,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,9.70 %,Big Island Red Giant Ale,Big Island Brewhaus,Imperial IPA,6.50 %,1
+1,Clifford 's Big Red Ale,Howe Sound Inn & Brewing Company,American Amber / Red Ale,9.70 %,Rock Bottom La Jolla Ragtop Red Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1
+2,Clifford 's Big Red Ale,Rock Bottom Restaurant & Brewery,American Amber / Red Ale,6.10 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1
+3,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,9.70 %,Big Island Red Giant Ale,Scuttlebutt Brewing Co. .,American Strong Ale,6.50 %,1
+4,Jazz Beer Tarraco Amber,Point Ybel Brewing Company,American Amber / Red Ale,9.70 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1
+5,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,9.70 %,Heist American Style Red Ale,Big Island Brewhaus,Premium Bitter/ESB,6.50 %,0
+6,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,6.50 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,-,0
+7,Clifford 's Big Red Ale,Funky Buddha Brewery,American Barleywine,9.70 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1
+8,Clifford 's Big Red Ale,Funky Buddha Brewery,American Amber / Red Ale,8.10 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1
+9,Clifford 's Big Red Ale,Alexander Keith 's,American Barleywine,9.70 %,Big Island Red Giant Ale,Big Island Brewhaus,American Strong Ale,6.50 %,1

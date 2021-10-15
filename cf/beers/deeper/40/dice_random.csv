@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Imperial Red Ale ( Spring Seasonal ),Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Granite Falls Bushfire American Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,1
-1,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,8.10 %,AleSmith YuleSmith &#40; Winter &#41; Imperial Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
-2,Sanibel Red Island Ale,Howe Sound Inn & Brewing Company,American Amber / Red Ale,5.60 %,Intuition Barrel Aged Riverside Red,Baranof Island Brewing Company,Amber Ale,6 %,0
-3,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Kinetic Infrared Imperial Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
-4,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Intuition Barrel Aged Riverside Red,Baranof Island Brewing Company,Amber Ale,6 %,0
+0,Sanibel Red Island Ale,Central City Brewers + Distillers,American Amber / Red Ale,5.60 %,Baranof Island Redoubt Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
+1,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Brannon_s Deputation Imperial Red Ale,Baranof Island Brewing Company,American Strong Ale,6 %,1
+2,Sanibel Red Island Ale,Central City Brewers + Distillers,American Amber / Red Ale,11.90 %,Baranof Island Redoubt Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
+3,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Sick N Twisted Pleasure Victim Amber Ale,Custom Brewcrafters,Amber Ale,6 %,0
+4,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Good People Stepchild Belgian India Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
+5,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Kern River Dirty Hippie Imperial Red Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
+6,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Sick N Twisted Pleasure Victim Amber Ale,Baranof Island Brewing Company,Amber Ale,6 %,0
+7,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Baranof Island Redoubt Red Ale,Iron Horse Brewery,Premium Bitter/ESB,6 %,0
+8,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Baranof Island Brewing Company,Premium Bitter/ESB,6 %,0
+9,Sanibel Red Island Ale,Point Ybel Brewing Company,American Amber / Red Ale,5.60 %,Big Island Red Giant Ale,Genesee Brewing Company &#40; North American Breweries &#41;,Amber Ale,6 %,0

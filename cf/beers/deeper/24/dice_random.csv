@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Smuttynose Kindest Find Imperial Red Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Sick N Twisted Pleasure Victim Amber Ale,Capitol City Brewing Company,American Strong Ale,7.60 %,0
-1,Smuttynose Kindest Find Imperial Red Ale,Smuttynose Brewing Company,American Amber / Red Ale,11.20 %,Big Time Lift Ticket American Red Ale,Rock Bottom Orland Park,American Strong Ale,7.60 %,0
-2,Smuttynose Kindest Find Imperial Red Ale,Silver Peak Restaurant & Brewery,American Amber / Red Ale,8.50 %,Lagunitas Imperial Red Ale,Rock Bottom Orland Park,American Strong Ale,7.60 %,0
-3,Smuttynose Kindest Find Imperial Red Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Big Time Lift Ticket American Red Ale,Rock Bottom Orland Park,Irish Ale,7.60 %,0
-4,Easy Amber Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Rock Bottom Orland Park,Premium Bitter/ESB,7.60 %,0
+0,Smuttynose Kindest Find Imperial Red Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Big Time Lift Ticket American Red Ale,Rock Bottom Orland Park,American Strong Ale,-,0
+1,Inception Series - Runnin ' With The Devil,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Rock Bottom Orland Park,American Strong Ale,4.50 %,0
+2,Smuttynose Kindest Find Imperial Red Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Sawdust City Red Rocket Coffee Spiced Stout,Rock Bottom Orland Park,Premium Bitter/ESB,7.60 %,0
+3,Smuttynose Kindest Find Imperial Red Ale,Central City Brewers + Distillers,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Rock Bottom Orland Park,India Pale Ale &#40; IPA &#41;,7.60 %,0
+4,Smuttynose Kindest Find Imperial Red Ale,Central City Brewers + Distillers,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Rock Bottom La Jolla,American Strong Ale,7.60 %,0
+5,Smuttynose Kindest Find Imperial Red Ale,Oskar Blues Grill & Brew,American Amber / Red Ale,8.50 %,Mammoth Real McCoy Amber Ale,Rock Bottom Orland Park,American Strong Ale,7.60 %,0
+6,Smuttynose Kindest Find Imperial Red Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Riverbend Brewing & Sports Pub,Altbier,7.60 %,0
+7,Smuttynose Kindest Find Imperial Red Ale,Central City Brewers + Distillers,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Rock Bottom Orland Park,American Strong Ale,5 %,0
+8,Amber Waves Ale,Smuttynose Brewing Company,American Amber / Red Ale,8.50 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Council Rock Brewery,American Strong Ale,7.60 %,0
+9,Smuttynose Kindest Find Imperial Red Ale,Central City Brewers + Distillers,American Amber / Red Ale,9.90 %,Rock Bottom Orland Park King of Hearts Imperial Red Ale,Rock Bottom Orland Park,American Strong Ale,7.60 %,0

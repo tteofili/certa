@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,manora,' 6182 w. flamingo rd. ',atlanta,702/731 -7547,mexican,451.0,` fiore rotisserie & grille ',' 3700 w. flamingo rd. ',` las vegas ',702-252-7702,italian,660.0,0
+1,oritalia,' 6182 w. flamingo rd. ',atlanta,702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 3700 w. flamingo rd. ',` new york city ',702-252-7702,italian,660.0,0
+2,manora,' 260 e. paces ferry road ',atlanta,702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 3700 w. flamingo rd. ',` las vegas ',702-252-7702,asian,660.0,0
+3,manora,' 6182 w. flamingo rd. ',atlanta,702/731 -7547,mexican,451.0,` fiore rotisserie & grille ',' 3145 las vegas blvd. s. ',` las vegas ',702-252-7702,italian,660.0,1
+4,manora,' 6182 w. flamingo rd. ',atlanta,702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 3700 w. flamingo rd. ',` las vegas ',702-252-7702,italian,660.0,0
+5,` viva mercado \ 's ',' 6182 w. flamingo rd. ',atlanta,702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 155 e. 55th st. ',` new york city ',702-252-7702,italian,660.0,0
+6,` mambo restaurante cubano ',' 6182 w. flamingo rd. ',` las vegas ',702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 3434 peachtree rd. ne ',venice,212-758-1479,italian,660.0,1
+7,oceana,' 6182 w. flamingo rd. ',` las vegas ',702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 3221 mission st. ',` san francisco ',702-252-7702,italian,660.0,0
+8,` viva mercado \ 's ',' 6182 w. flamingo rd. ',` las vegas ',702/871 -8826,mexican,451.0,` fiore rotisserie & grille ',' 3221 mission st. ',` new york city ',702-252-7702,italian,6.0,0
+9,` viva mercado \ 's ',' 6182 w. flamingo rd. ',` las vegas ',702/871 -8826,mexican,494.0,` fiore rotisserie & grille ',' 3700 w. flamingo rd. ',` new york city ',702-252-7702,eclectic,667.0,0

@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` jo jo ',' 160 e. 64th st. ',` new york city ',818-585-0855,` french bistro ',38.0,1
+1,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` jo jo ',' 3060 peachtree rd. ',` new york city ',212-223-5656,` french bistro ',38.0,1
+2,` jack sprat \ 's grill ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` madame ching \ 's ',' 160 e. 64th st. ',` new york city ',212-223-5656,` french bistro ',38.0,1
+3,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` jo jo ',' 160 e. 64th st. ',` new york city ',212-223-5656,` french bistro ',728.0,1
+4,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,southwestern,38.0,` jo jo ',' 160 e. 64th st. ',` new york city ',310-652-4025,` french bistro ',38.0,1
+5,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,aquavit,' 160 e. 64th st. ',` new york city ',212-223-5656,` french bistro ',38.0,1
+6,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` ritz-carlton dining room ( buckhead ) ',' 160 e. 64th st. ',` new york city ',213-655-9045,` french bistro ',38.0,1
+7,` heera of india ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` jo jo ',' 160 e. 64th st. ',` new york city ',718-672-1232,` french bistro ',38.0,1
+8,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,` jo jo ',' 8284 melrose ave. ',` new york city ',212-223-5656,diners,38.0,1
+9,` jo jo ',' 160 e. 64th st. ',` new york ',212/223 -5656,american,38.0,moongate,' 9001 santa monica blvd. ',` new york city ',212-223-5656,` french bistro ',38.0,1

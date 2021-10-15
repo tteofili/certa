@@ -1,2 +1,11 @@
-,ltable_ABV,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,rtable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,outcome
-0,5.00 %,Arrow Point Amber,Salty Nut Brewery,American Amber / Red Ale,5 %,Baird Red Rose Amber Ale,Sawdust City Brewing Company,Imperial IPA,0
+,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
+0,Rocket City Red,Straight To Ale,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Spice/Herb/Vegetable,5 %,1
+1,Rocket City Red,Straight To Ale,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Brannon_s Pub and Brewery,Premium Bitter/ESB,5.20 %,1
+2,Rocket City Red,Straight To Ale,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Ca l_Arenys - Cervezas Guineu,Spice/Herb/Vegetable,7.40 %,1
+3,Rocket City Red,Mammoth Brewing Company,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Barley Wine,5.20 %,1
+4,Twisted Stick Amber Ale,Straight To Ale,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Irish Ale,5.20 %,1
+5,Rocket City Red,Smuttynose Brewing Company,American Amber / Red Ale,5.00 %,Heist American Style Red Ale,Sawdust City Brewing Company,Spice/Herb/Vegetable,5.20 %,1
+6,Rocket City Red,Straight To Ale,American Amber / Red Ale,8.70 %,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Specialty Grain,5.20 %,1
+7,Bushfire American Red,Straight To Ale,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Irish Ale,5.20 %,1
+8,Rocket City Red,Straight To Ale,American Amber / Red Ale,5.00 %,Sawdust City Red Rocket Coffee Spiced Stout,Sawdust City Brewing Company,Altbier,9.50 %,1
+9,Rocket City Red,Straight To Ale,American Amber / Red Ale,5.00 %,Winthrop Double Dry Hopped Amber,Sawdust City Brewing Company,Spice/Herb/Vegetable,4.90 %,1

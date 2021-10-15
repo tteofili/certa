@@ -1,0 +1,6 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,bistro,' 3400 las vegas blvd. s ',` las vegas ',702/791 -7111,continental,429.0,` fiore rotisserie & grille ',' 3060 peachtree rd. ',venice,718-672-1232,` french ( new ) ',22.0,0
+1,bistro,' 3400 las vegas blvd. s ',` las vegas ',702/791 -7111,continental,144.0,` fiore rotisserie & grille ',' 3060 peachtree rd. ',venice,718-672-1232,` french ( new ) ',22.0,0
+2,bistro,' b peachtree rd. ',` las vegas ',702/871 -8826,continental,429.0,felidia,' 3434 peachtree rd. ne ',` new york city ',702-733-4524,chicken,665.0,0
+3,` border grill ',' 3400 las vegas blvd. s ',` las vegas ',702/791 -7111,continental,144.0,` fiore rotisserie & grille ',' 3060 peachtree rd. ',venice,718-672-1232,` french ( new ) ',22.0,0
+4,bistro,' b peachtree rd. ',` las vegas ',702/871 -8826,continental,429.0,felidia,' 3434 peachtree rd. ne ',` new york city ',702-733-4524,chicken,33.0,0

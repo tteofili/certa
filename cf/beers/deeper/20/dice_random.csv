@@ -1,6 +1,11 @@
 ,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,outcome
-0,Brass Ale Honey Amber,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Brannon_s Deputation Imperial Red Ale,Winthrop Brewing Company,Amber Ale,-,0
-1,Imperial Moustache Red Ale,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Winthrop Double Dry Hopped Amber,Winthrop Brewing Company,Fruit Beer,-,0
-2,Blue Bridge Amber Dry Hopped,Galveston Island Brewing Company,American Barleywine,6.00 %,Ale Mania Imperial Red Ale,Winthrop Brewing Company,Amber Ale,-,0
-3,Red Dread Imperial Red Ale,Central City Brewers + Distillers,American Amber / Red Ale,6.00 %,Winthrop Double Dry Hopped Amber,Winthrop Brewing Company,Amber Ale,-,1
-4,Amber Waves Ale,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Winthrop Double Dry Hopped Amber,Winthrop Brewing Company,Irish Ale,-,0
+0,Rock Bottom Red Ale,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Kern River Dirty Hippie Imperial Red Ale,Winthrop Brewing Company,Amber Ale,-,0
+1,Brass Ale Honey Amber,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Brannon_s Deputation Imperial Red Ale,Winthrop Brewing Company,Amber Ale,-,0
+2,Red Hopper ( Imperial Red Ale ),Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Big Time Lift Ticket American Red Ale,Winthrop Brewing Company,Amber Ale,-,0
+3,Blue Bridge Amber Dry Hopped,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Big Time Lift Ticket American Red Ale,Winthrop Brewing Company,Amber Ale,-,0
+4,Good Medicine Strong Red Ale,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Big Time Lift Ticket American Red Ale,Winthrop Brewing Company,Amber Ale,-,0
+5,Red Headed Slut Amber Ale,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Winthrop Double Dry Hopped Amber,Winthrop Brewing Company,Premium Bitter/ESB,-,0
+6,Rocky Point Red Ale,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Kern River Dirty Hippie Imperial Red Ale,Winthrop Brewing Company,Amber Ale,-,0
+7,Blue Bridge Amber Dry Hopped,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,18th Street Deal With the Devil Pale Ale,Hopworks Urban Brewery,Amber Ale,-,1
+8,Blue Bridge Amber Dry Hopped,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Big Time Lift Ticket American Red Ale,Winthrop Brewing Company,Amber Ale,7.40 %,0
+9,Blue Bridge Amber Dry Hopped,Galveston Island Brewing Company,American Amber / Red Ale,6.00 %,Heist American Style Red Ale,Thorn Street Brewery,Amber Ale,-,0

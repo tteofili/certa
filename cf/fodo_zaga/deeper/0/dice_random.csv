@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,citrus,' 405 e. 52nd st. ',` san francisco ',213/857 -0034,californian,429.0,` le chardonnay ( los angeles ) ',' 3393 peachtree rd. ',` las vegas ',213-655-8880,` french bistro ',12.0,0
+1,joss,' 3434 peachtree rd. ',` san francisco ',213/857 -0034,californian,405.0,` brookhaven cafe ',' 8284 melrose ave. ',` new york city ',213-655-8880,` french bistro ',74.0,0
+2,citrus,' 405 e. 52nd st. ',` san francisco ',213/857 -0034,californian,6.0,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` san francisco ',213-655-8880,` french bistro ',12.0,0
+3,oritalia,' 1402 n. highland ave. ',` san francisco ',213/857 -0034,californian,145.0,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` santa monica ',212-371-8844,` french bistro ',12.0,0
+4,` heera of india ',' 4th st. ',` san francisco ',213/857 -0034,californian,6.0,` spago ( los angeles ) ',' 8284 melrose ave. ',pasadena,213-655-8880,` french bistro ',12.0,0
+5,oceana,' 260 e. paces ferry road ',atlanta,213/857 -0034,californian,6.0,` pink \ 's famous chili dogs ',' 8284 melrose ave. ',pasadena,213-655-8880,californian,12.0,0
+6,citrus,' 6182 w. flamingo rd. ',` san francisco ',404/876 -0676,californian,6.0,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` los angeles ',213-655-8880,scandinavian,706.0,0
+7,citrus,' 6182 w. flamingo rd. ',` san francisco ',213/857 -0034,californian,6.0,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` los angeles ',213-655-8880,scandinavian,12.0,0
+8,citrus,' 3226 mission st. ',` san francisco ',213/857 -0034,californian,6.0,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` los angeles ',213-655-8880,` french bistro ',33.0,0
+9,manora,' 2355 peachtree rd. . peachtree battle shopping center ',` los angeles ',310/451 -1655,californian,451.0,` le chardonnay ( los angeles ) ',' 8284 melrose ave. ',` los angeles ',213-655-8880,` french bistro ',74.0,0

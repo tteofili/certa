@@ -1,0 +1,11 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,` coyote cafe ',' 4th st. ',` las vegas ',404/876 -4408,californian,42.0,felidia,'13 w. 54th st. ',venice,718-672-1232,` french ( new ) ',6.0,0
+1,manora,' 3434 peachtree rd. ',` san francisco ',702/891 -7349,californian,116.0,` palace court ',' 3200 las vegas blvd. s. ',` las vegas ',404-266-1440,` coffee shops ',70.0,0
+2,` palace court ',' 3400 las vegas blvd. s ',` las vegas ',702/891 -7349,` coffee shops/diners ',84.0,` fiore rotisserie & grille ',' 3 e. 52nd st. ',venice,702-731-7110,` french ( new ) ',70.0,0
+3,manora,' 3434 peachtree rd. ',` san francisco ',702/891 -7349,californian,116.0,` palace court ',' 3200 las vegas blvd. s. ',` las vegas ',702-731-7110,` coffee shops ',70.0,0
+4,` coyote cafe ',' 3400 las vegas blvd. s ',` las vegas ',702/891 -7349,` coffee shops/diners ',84.0,` fiore rotisserie & grille ',' 3 e. 52nd st. ',venice,702-731-7110,` french ( new ) ',70.0,0
+5,manora,' 3434 peachtree rd. ',` san francisco ',702/891 -7349,californian,116.0,` palace court ',' 3200 las vegas blvd. s. ',` santa monica ',404-266-1440,` coffee shops ',70.0,0
+6,` coyote cafe ',' 2355 peachtree rd. . peachtree battle shopping center ',atlanta,415/861 -6224,mexican,68.0,felidia,' 155 e. 55th st. ',` san francisco ',702-731-7110,` french ( classic ) ',12.0,0
+7,` palace court ',' 3400 las vegas blvd. s ',` las vegas ',702/891 -7349,` coffee shops/diners ',84.0,` fiore rotisserie & grille ',' 3 e. 52nd st. ',venice,213-857-0034,chicken,22.0,0
+8,manora,' 3434 peachtree rd. ',` san francisco ',702/891 -7349,californian,68.0,` palace court ',' 3200 las vegas blvd. s. ',` las vegas ',702-731-7110,` coffee shops ',70.0,0
+9,` coyote cafe ',' 4th st. ',atlanta,404/876 -4408,californian,42.0,felidia,'13 w. 54th st. ',venice,718-672-1232,` french ( new ) ',6.0,0

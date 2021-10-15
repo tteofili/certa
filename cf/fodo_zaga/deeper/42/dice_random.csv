@@ -1,0 +1,10 @@
+,ltable_name,ltable_addr,ltable_city,ltable_phone,ltable_res_type,ltable_class,rtable_name,rtable_addr,rtable_city,rtable_phone,rtable_res_type,rtable_class,outcome
+0,` cafe roma ',' 6182 w. flamingo rd. ',atlanta,310/289 -0660,asian,144.0,` koo koo roo ',' 103 w. paces ferry rd. ',` new york city ',213-655-9045,chicken,567.0,0
+1,` cafe roma ',' 6182 w. flamingo rd. ',atlanta,310/399 -4800,asian,144.0,` koo koo roo ',' 103 w. paces ferry rd. ',` new york city ',213-655-9045,chicken,567.0,0
+2,` cafe roma ',' 6182 w. flamingo rd. ',atlanta,310/399 -4800,asian,76.0,` koo koo roo ',' 103 w. paces ferry rd. ',` new york city ',213-655-9045,chicken,567.0,0
+3,` cafe roma ',' 8783 beverly blvd. ',atlanta,212/759 -5941,asian,144.0,moongate,' 3221 mission st. ',` new york city ',818-585-0855,chicken,84.0,1
+4,` lillie langtry \ 's ',' 8783 beverly blvd. ',` new york ',310/289 -0660,caribbean,92.0,felidia,' 3393 peachtree rd. ',la,213-655-9045,diners,534.0,0
+5,` cafe roma ',' 8783 beverly blvd. ',atlanta,212/759 -5941,continental,144.0,moongate,' 3221 mission st. ',` new york city ',818-585-0855,chicken,84.0,1
+6,` cafe roma ',' 8783 beverly blvd. ',atlanta,212/759 -5941,continental,431.0,moongate,' 3221 mission st. ',` new york city ',818-585-0855,chicken,84.0,1
+7,` lillie langtry \ 's ',' 160 e. 64th st. ',` new york ',310/289 -0660,caribbean,92.0,felidia,' 3393 peachtree rd. ',la,213-655-9045,diners,534.0,0
+8,` le colonial ',' 8783 beverly blvd. ',` los angeles ',310/289 -0660,southwestern,406.0,aquavit,' 2355 peachtree rd. ne ',` san francisco ',213-651-2866,chicken,586.0,0
