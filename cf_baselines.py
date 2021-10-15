@@ -28,8 +28,10 @@ model_type = 'deeper'
 model = from_type(model_type)
 model.load('models/' + model_type + '/' + dataset)
 
+
 def predict_fn(x):
     return model.predict_proba(x)
+
 
 datadir = 'datasets/' + dataset
 lsource = pd.read_csv(datadir + '/tableA.csv')
@@ -40,6 +42,7 @@ test = pd.read_csv(datadir + '/test.csv')
 
 test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])
 train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, [], ['label'])
+train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1).astype(str)
 
 test_df['outcome'] = np.argmax(model.predict_proba(test_df), axis=1)
 
@@ -60,30 +63,27 @@ for idx in range(50):
             preprocess_cf = Preprocess_LimeCounterfactual(False)
             vectorizer, feature_names = preprocess_cf.fit_vectorizer(instance)
             # c = make_pipeline(vectorizer, model)
-            limec_explainer = LimeCounterfactual(model, predict_fn, vectorizer, 0.5, feature_names)
+            limec_explainer = LimeCounterfactual(model, predict_fn, vectorizer, 0.5, train_noids.columns)
             limec_exp = limec_explainer.explanation(instance)
             print(limec_exp)
             if limec_exp is not None:
-                #dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
-                pd.DataFrame(limec_exp).to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/limec.csv')
+                pd.DataFrame.from_dict(limec_exp).to_csv('cf/' + dataset + '/' + model_type + '/' + str(idx) + '/limec.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
             pass
-
-
 
     if shap_c:
         print('shap-c')
         try:
             shap_predict = lambda x: predict_fn(x)['match_score'].values
             shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
-                     train_df.columns)
-            sc_exp = shapc_explainer.explanation(instance, train_df.drop(['ltable_id', 'rtable_id'], axis=1).astype(str)[:50])
+                                                 train_noids.columns)
+
+            sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
             print(f'{idx}- shap-c:{sc_exp}')
             if sc_exp is not None:
-                #dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
-                pd.DataFrame(sc_exp).to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/shapc.csv')
+                pd.DataFrame.from_dict(sc_exp).to_csv('cf/' + dataset + '/' + model_type + '/' + str(idx) + '/shapc.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
@@ -92,7 +92,7 @@ for idx in range(50):
     if dice_g:
         print('dice_g')
         try:
-            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
+            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
                              continuous_features=[],
                              outcome_name='outcome')
             # genetic
@@ -111,7 +111,7 @@ for idx in range(50):
         print('dice_k')
         try:
 
-            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
+            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
                              continuous_features=[],
                              outcome_name='outcome')
             # kdtree
@@ -130,7 +130,7 @@ for idx in range(50):
         print('dice_r')
         try:
 
-            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'],axis=1),
+            d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
                              continuous_features=[],
                              outcome_name='outcome')
             # random
@@ -141,13 +141,12 @@ for idx in range(50):
             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
             print(f'random:{idx}:{dice_exp_df}')
             if dice_exp_df is not None:
-                #dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
-                dice_exp_df.to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
+                # dice_exp_df[dice_exp_df['outcome'] != test_df.iloc[idx]['outcome']].to_csv('cf/'+dataset+'/'+model_type+'/'+str(idx)+'/dice_random.csv')
+                dice_exp_df.to_csv('cf/' + dataset + '/' + model_type + '/' + str(idx) + '/dice_random.csv')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
             pass
-
 
     shape = (1,) + ((len(train_df.columns) - 2),)
 
@@ -155,7 +154,8 @@ for idx in range(50):
     if proto:
         print('proto')
         try:
-            cf_proto = CounterfactualProto(predict_fn, shape, feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
+            cf_proto = CounterfactualProto(predict_fn, shape,
+                                           feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
             cf_proto.fit(train_df.instance(['ltable_id', 'rtable_id'], axis=1).values)
             proto_ex = cf_proto.explain(instance)
             print(f'{proto_ex}')
@@ -167,11 +167,11 @@ for idx in range(50):
     if simple:
         print('simple')
         try:
-            cf = Counterfactual(predict_fn, shape=shape, feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
+            cf = Counterfactual(predict_fn, shape=shape,
+                                feature_range=(str(train_df.min(axis=0)), str(train_df.max(axis=0))))
             simple_ex = cf.explain(instance)
             print(f'{simple_ex}')
         except:
             print(traceback.format_exc())
             print(f'skipped item {str(idx)}')
             pass
-

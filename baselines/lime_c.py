@@ -159,14 +159,14 @@ class LimeCounterfactual(object):
                 feature_names_full_index = []
                 feature_coefficient = []
                 k += 1
-                perturbed_instance = instance_sparse.copy()
+                perturbed_instance = instance.copy()
                 for feature in explanation_lime[0:k]:
                     if (feature[1] > 0 and idx == 1) or (feature[1] < 0 and idx == 0):
                         index_feature = np.argwhere(np.array(self.feature_names_full) == feature[0])
                         number_perturbed += 1
                         if (len(index_feature) != 0):
                             index_feature = index_feature[0][0]
-                            perturbed_instance[:, index_feature] = 0
+                            perturbed_instance.iloc[:, index_feature] = 'nan'
                             feature_names_full_index.append(index_feature)
                             feature_coefficient.append(feature[1])
                 score_new = self.classifier_fn(perturbed_instance)[0]

@@ -101,12 +101,15 @@ class ShapCounterfactual(object):
         reference = np.reshape(np.zeros(np.shape(instance)[1]), (1, len(np.zeros(np.shape(instance)[1]))))
         reference = sparse.csr_matrix(reference)
 
+        proba = self.classifier_fn(instance)[0]
+        idx = np.argmax(proba)
+
         explainer = shap.KernelExplainer(self.classifier_fn, background, link="identity")
-        shap_values = explainer.shap_values(instance, nsamples=50, l1_reg="aic")
+        shap_values = explainer.shap_values(instance, nsamples=50, l1_reg="aic")[idx]
 
         nb_active_feature_instance_idx = np.size(instance)
         instance_dense = np.reshape(instance, (1, len(self.feature_names_full)))
-        instance_dense = instance_dense.toarray()
+        instance_dense = instance_dense.values
 
         explanation_shap = []
         indices_features_explanation_shap = []
@@ -135,9 +138,9 @@ class ShapCounterfactual(object):
 
         length = 0
         iteration = 0
-        score = self.classifier_fn(instance)
+        score = self.classifier_fn(instance)[0]
         score_new = score
-        while ((score_new[0] >= self.threshold_classifier) and (length != len(explanation_shap_sorted)) and (
+        while ((score_new[idx] >= self.threshold_classifier) and (length != len(explanation_shap_sorted)) and (
                 length < self.max_features) and ((time.time() - tic) < self.time_maximum)):
             indices_features_explanations_shap_abs_found = []
             coefficients_features_explanations_shap_abs_found = []
@@ -148,13 +151,13 @@ class ShapCounterfactual(object):
             j = 0
             for feature in indices_features_explanation_shap_abs[0:length]:
                 if (explanation_shap_sorted[j] >= 0):
-                    perturbed_instance[:, feature] = 0
+                    perturbed_instance.iloc[:, feature] = 'nan'
                     number_perturbed += 1
                     indices_features_explanations_shap_abs_found.append(feature[0])
                     feature_names_full_index.append(features_explanation_shap_abs[j])
                     coefficients_features_explanations_shap_abs_found.append(explanation_shap_sorted[j][0][0])
                 j += 1
-            score_new = self.classifier_fn(perturbed_instance)
+            score_new = self.classifier_fn(perturbed_instance)[0]
             iteration += 1
 
         if ((score_new[0] < self.threshold_classifier) and (~np.isnan(output_size_shap))):
