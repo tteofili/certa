@@ -1,6 +1,7 @@
 """
 Function for explaining classified instances using evidence counterfactuals.
 """
+import pandas as pd
 
 """
 Import libraries 
@@ -16,7 +17,7 @@ class ShapCounterfactual(object):
 
     def __init__(self, classifier_fn, threshold_classifier,
                  feature_names_full, max_features=30,
-                 time_maximum=120):
+                 time_maximum=120, off_value=''):
 
         """ Init function
 
@@ -51,6 +52,7 @@ class ShapCounterfactual(object):
             expressed in minutes. Default is set to 2 minutes (120 seconds).
         """
 
+        self.off_value = off_value
         self.classifier_fn = classifier_fn
         self.max_features = max_features
         self.threshold_classifier = threshold_classifier
@@ -151,7 +153,7 @@ class ShapCounterfactual(object):
             j = 0
             for feature in indices_features_explanation_shap_abs[0:length]:
                 if (explanation_shap_sorted[j] >= 0):
-                    perturbed_instance.iloc[:, feature] = 'nan'
+                    perturbed_instance.iloc[:, feature] = self.off_value
                     number_perturbed += 1
                     indices_features_explanations_shap_abs_found.append(feature[0])
                     feature_names_full_index.append(features_explanation_shap_abs[j])
@@ -170,6 +172,7 @@ class ShapCounterfactual(object):
             explanation_set = feature_names_full_index[0:number_perturbed]
             feature_coefficient_set = coefficients_features_explanations_shap_abs_found[0:number_perturbed]
             output_size_shap = output_size_shap
+            cf_example = perturbed_instance.copy()
         else:
             time_elapsed = np.nan
             minimum_size_explanation = np.nan
@@ -180,9 +183,11 @@ class ShapCounterfactual(object):
             explanation_set = []
             feature_coefficient_set = []
             output_size_shap = output_size_shap
+            cf_example = pd.DataFrame()
 
         return {'explanation set': explanation_set, 'feature coefficient set': feature_coefficient_set,
                 'number active elements': number_active_elements, 'size explanation': minimum_size_explanation,
                 'relative size explanation': minimum_size_explanation_rel, 'time elapsed': time_elapsed,
                 'original score': score[0], 'new score': score_new[0], 'difference scores': difference_scores,
-                'explanation SHAP coefficients': expl_shap, 'output size shap': output_size_shap}
+                'explanation SHAP coefficients': expl_shap, 'output size shap': output_size_shap, 'cf_example':
+                    cf_example}

@@ -16,7 +16,7 @@ class LimeCounterfactual(object):
 
     def __init__(self, c_fn, classifier_fn, vectorizer, threshold_classifier,
                  feature_names_full, max_features=30, class_names=['1', '0'],
-                 time_maximum=120):
+                 time_maximum=120, off_value=''):
 
         """ Init function
 
@@ -59,6 +59,7 @@ class LimeCounterfactual(object):
             expressed in minutes. Default is set to 2 minutes (120 seconds).
         """
 
+        self.off_value = off_value
         self.c_fn = c_fn
         self.classifier_fn = classifier_fn
         self.class_names = class_names
@@ -107,13 +108,7 @@ class LimeCounterfactual(object):
         """
 
         tic = time.time()  # start timer
-
-        instance_text = str(instance.values)
-        if isinstance(instance, pd.DataFrame):
-            instance_sparse = self.vectorizer.transform([instance_text])
-        else:
-            instance_sparse = self.vectorizer.transform([instance])
-        nb_active_features = np.size(instance_sparse)
+        nb_active_features = np.size(instance)
         score_predicted = self.classifier_fn(instance)[0]
         idx = np.argmax(score_predicted)
         explainer = Mojito(instance.columns,
@@ -166,7 +161,7 @@ class LimeCounterfactual(object):
                         number_perturbed += 1
                         if (len(index_feature) != 0):
                             index_feature = index_feature[0][0]
-                            perturbed_instance.iloc[:, index_feature] = 'nan'
+                            perturbed_instance.iloc[:, index_feature] = self.off_value
                             feature_names_full_index.append(index_feature)
                             feature_coefficient.append(feature[1])
                 score_new = self.classifier_fn(perturbed_instance)[0]
@@ -180,6 +175,7 @@ class LimeCounterfactual(object):
                 expl_lime = explanation_lime
                 explanation_set = feature_names_full_index[0:number_perturbed]
                 feature_coefficient_set = feature_coefficient[0:number_perturbed]
+                cf_example = perturbed_instance.copy()
 
             else:
                 minimum_size_explanation = np.nan
@@ -190,7 +186,7 @@ class LimeCounterfactual(object):
                 expl_lime = explanation_lime
                 explanation_set = []
                 feature_coefficient_set = []
-
+                cf_example = pd.DataFrame()
         else:
             minimum_size_explanation = np.nan
             minimum_size_explanation_rel = np.nan
@@ -200,12 +196,13 @@ class LimeCounterfactual(object):
             expl_lime = explanation_lime
             explanation_set = []
             feature_coefficient_set = []
+            cf_example = pd.DataFrame()
 
         return {'explanation_set': explanation_set, 'feature_coefficient_set': feature_coefficient_set,
                 'number_active_elements': number_active_elements, 'size explanation': minimum_size_explanation,
                 'relative size explanation': minimum_size_explanation_rel, 'time elapsed': time_elapsed,
                 'original score': score_predicted[0], 'new score': score_new[0], 'difference scores': difference_scores,
-                'explanation LIME': expl_lime}
+                'explanation LIME': expl_lime, 'cf_example': cf_example}
 
 """
 Function to preprocess numerical/binary big data to raw text format and to 
