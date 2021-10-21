@@ -20,7 +20,7 @@ root_datadir = 'datasets/'
 experiments_dir = 'cf/'
 
 
-def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], exp_dir: str = experiments_dir,
+def evaluate(model_type: str, samples: int = 50, filtered_datasets: list = [], exp_dir: str = experiments_dir,
              fast: bool = False, max_predict: int = -1):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
@@ -30,6 +30,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
             if dir not in filtered_datasets:
                 continue
             for robust in [False]:
+                model = from_type(model_type)
                 os.makedirs(exp_dir + dir, exist_ok=True)
                 model_name = model.name
                 if robust:
@@ -146,6 +147,6 @@ if __name__ == "__main__":
     filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
                          'fodo_zaga', #'beers', 'abt_buy', 
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar', 'dblp_acm']
-    model = from_type(mtype)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)
+                         'dblp_scholar', #'dblp_acm'
+                         ]
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)

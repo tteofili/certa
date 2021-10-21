@@ -12,9 +12,8 @@ def split_training_valid(pt_train, SPLIT_FACTOR=0.8):
 
 class ERModel:
 
-    def init(self):
+    def __init__(self):
         self.name = ''
-        pass
 
     def predict(self, x, **kwargs):
         pass
