@@ -142,9 +142,9 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'emt'
-    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'abt_buy', 'fodo_zaga', 'beers',
+    mtype = 'dm'
+    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         'fodo_zaga', #'beers', 'abt_buy', 
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar', 'dblp_acm']
     model = from_type(mtype)
