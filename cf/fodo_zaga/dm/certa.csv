@@ -1,0 +1,116 @@
+,label,latency,match,prediction,row,summary,type
+0,0.0,124.10512980199996,0.0,[0.90349408 0.09650592],6-230,"ltable_name/ltable_phone/ltable_class    0.433333
+dtype: float64",certa
+1,1.0,14.612100557000076,0.0,[0.82059355 0.17940645],22-240,"Series([], dtype: float64)",certa
+2,0.0,57.221471931999986,0.0,[0.95375401 0.04624599],501-214,"ltable_class       0.0
+ltable_res_type    0.0
+ltable_phone       0.0
+ltable_city        0.0
+ltable_addr        0.0
+ltable_name        0.0
+dtype: float64",certa
+3,1.0,208.89589514900013,1.0,[0.36446446 0.63553554],38-256,"ltable_name/ltable_class    0.59
+dtype: float64",certa
+4,0.0,16.176520440999866,0.0,[0.97463115 0.02536885],70-130,"Series([], dtype: float64)",certa
+5,0.0,66.70462734900002,0.0,[0.9445025 0.0554975],384-300,"rtable_class    0.962963
+dtype: float64",certa
+6,0.0,24.91830208500005,0.0,[0.96008407 0.03991593],76-26,"Series([], dtype: float64)",certa
+7,0.0,63.96048494100023,0.0,[0.95554505 0.04445495],147-23,"rtable_city/rtable_class    0.96
+rtable_name/rtable_class    0.96
+dtype: float64",certa
+8,1.0,266.7033181940001,1.0,[0.49607301 0.50392699],83-301,"ltable_addr     0.61
+ltable_class    0.61
+ltable_name     0.61
+dtype: float64",certa
+9,0.0,28.652943607999987,0.0,[0.93028991 0.06971009],90-148,"ltable_class       0.0
+ltable_res_type    0.0
+ltable_phone       0.0
+ltable_city        0.0
+ltable_addr        0.0
+ltable_name        0.0
+dtype: float64",certa
+10,0.0,122.63436810800022,0.0,[0.94685426 0.05314574],197-251,"rtable_class    0.603774
+dtype: float64",certa
+11,0.0,78.22134762899987,0.0,[0.64563668 0.35436332],119-82,"rtable_name/rtable_city/rtable_phone/rtable_class    0.564103
+rtable_name/rtable_addr/rtable_city/rtable_class     0.564103
+dtype: float64",certa
+12,0.0,18.03236370200011,0.0,[0.96828503 0.03171497],68-288,"Series([], dtype: float64)",certa
+13,0.0,156.59172951599976,0.0,[0.96785193 0.03214807],143-0,"rtable_class    0.493151
+dtype: float64",certa
+14,0.0,59.41068005800025,0.0,[0.96586777 0.03413223],437-130,"rtable_name/rtable_phone/rtable_class    0.96
+dtype: float64",certa
+15,0.0,159.88069611100036,0.0,[0.93110555 0.06889445],292-89,"rtable_phone/rtable_class    0.430769
+dtype: float64",certa
+16,0.0,32.283927764000055,0.0,[0.93064845 0.06935155],42-275,"Series([], dtype: float64)",certa
+17,0.0,100.16981714600024,0.0,[0.97629416 0.02370584],431-288,"rtable_name/rtable_addr/rtable_phone/rtable_class    0.971429
+dtype: float64",certa
+18,0.0,74.80623592799975,0.0,[0.96560933 0.03439067],131-233,"rtable_name/rtable_addr/rtable_city/rtable_phone/rtable_res_type/rtable_class    0.962963
+dtype: float64",certa
+19,0.0,59.82764280900028,0.0,[0.95238515 0.04761485],405-172,"rtable_name/rtable_class    0.689655
+dtype: float64",certa
+20,0.0,27.32927429199981,0.0,[0.96754368 0.03245632],92-308,"rtable_name/rtable_addr/rtable_phone/rtable_res_type/rtable_class    0.4
+dtype: float64",certa
+21,0.0,22.42291711300004,0.0,[0.97018235 0.02981765],448-125,"Series([], dtype: float64)",certa
+22,1.0,202.1009764659998,1.0,[0.29867607 0.70132393],84-302,"ltable_name/ltable_addr/ltable_city/ltable_phone/ltable_res_type/ltable_class    0.65
+dtype: float64",certa
+23,0.0,60.16210775599984,0.0,[0.92361062 0.07638938],50-242,"rtable_class    0.947368
+dtype: float64",certa
+24,1.0,15.17777748799972,0.0,[0.58564112 0.41435888],74-292,"Series([], dtype: float64)",certa
+25,0.0,121.87961167999993,0.0,[0.85773046 0.14226954],443-126,"rtable_class    0.470588
+dtype: float64",certa
+26,0.0,66.45364258099971,0.0,[0.95866458 0.04133542],50-278,"rtable_name/rtable_class                 0.947368
+rtable_addr/rtable_phone/rtable_class    0.947368
+dtype: float64",certa
+27,0.0,20.77696568500005,0.0,[0.96074274 0.03925726],72-288,"Series([], dtype: float64)",certa
+28,0.0,20.002516719999676,0.0,[0.9049105 0.0950895],429-285,"Series([], dtype: float64)",certa
+29,0.0,94.21510842899988,0.0,[0.98000473 0.01999527],431-128,"rtable_name/rtable_addr/rtable_phone/rtable_res_type/rtable_class    0.971429
+dtype: float64",certa
+30,0.0,84.66339873599918,0.0,[0.97057172 0.02942828],433-123,"rtable_class    0.969697
+dtype: float64",certa
+31,0.0,108.06690301699928,0.0,[0.96924298 0.03075702],442-289,"ltable_name/ltable_city/ltable_phone/ltable_class    0.380952
+dtype: float64",certa
+32,0.0,69.37399714499952,0.0,[0.94066527 0.05933473],410-295,"ltable_name/ltable_class    0.214286
+dtype: float64",certa
+33,0.0,60.99894467200011,0.0,[0.9729504 0.0270496],437-136,"rtable_name/rtable_phone/rtable_class                   0.96
+rtable_name/rtable_addr/rtable_res_type/rtable_class    0.96
+dtype: float64",certa
+34,0.0,167.6489333620002,0.0,[0.9131617 0.0868383],165-223,"rtable_class    0.338028
+dtype: float64",certa
+35,1.0,228.56838441200034,1.0,[0.37102914 0.62897086],37-255,"ltable_addr/ltable_city/ltable_class     0.68
+ltable_name/ltable_phone/ltable_class    0.68
+ltable_name/ltable_city/ltable_class     0.68
+ltable_name/ltable_addr/ltable_class     0.68
+dtype: float64",certa
+36,0.0,109.78645064900047,0.0,[0.91837493 0.08162507],148-238,"rtable_class    0.5
+dtype: float64",certa
+37,0.0,58.31239960400035,0.0,[0.96719625 0.03280375],406-65,"rtable_name/rtable_addr/rtable_city/rtable_phone/rtable_res_type/rtable_class    0.954545
+dtype: float64",certa
+38,0.0,15.689329236000049,0.0,[0.9366798 0.0633202],82-141,"Series([], dtype: float64)",certa
+39,0.0,59.01710028399975,0.0,[0.94560648 0.05439352],146-225,"rtable_class    0.947368
+dtype: float64",certa
+40,0.0,84.80126493200078,0.0,[0.96390839 0.03609161],494-193,"rtable_name/rtable_class    0.5
+dtype: float64",certa
+41,0.0,87.69363472499936,0.0,[0.94600305 0.05399695],429-131,"ltable_name/ltable_addr/ltable_city/ltable_phone/ltable_res_type/ltable_class    0.058824
+dtype: float64",certa
+42,0.0,93.09963885599973,0.0,[0.66219747 0.33780253],147-33,"rtable_class    0.55814
+dtype: float64",certa
+43,0.0,90.27508260200011,0.0,[0.96714053 0.03285947],121-52,"rtable_phone/rtable_class       0.972222
+rtable_res_type/rtable_class    0.972222
+rtable_name/rtable_class        0.972222
+rtable_city/rtable_class        0.972222
+dtype: float64",certa
+44,0.0,72.06040125599975,0.0,[0.90187258 0.09812742],170-224,"rtable_class    0.962963
+dtype: float64",certa
+45,0.0,24.13769451400003,0.0,[0.98681335 0.01318665],70-285,"Series([], dtype: float64)",certa
+46,0.0,96.30866586899992,0.0,[0.9682206 0.0317794],427-133,"ltable_class       0.0
+ltable_res_type    0.0
+ltable_phone       0.0
+ltable_city        0.0
+ltable_addr        0.0
+ltable_name        0.0
+dtype: float64",certa
+47,0.0,88.99293377100003,0.0,[0.95653186 0.04346814],326-278,"rtable_name/rtable_addr/rtable_phone/rtable_res_type/rtable_class    0.967742
+dtype: float64",certa
+48,0.0,14.165797908000059,0.0,[0.9768936 0.0231064],72-132,"Series([], dtype: float64)",certa
+49,0.0,77.81358832600017,0.0,[0.5894556 0.4105444],451-126,"rtable_name/rtable_phone    0.205882
+dtype: float64",certa
