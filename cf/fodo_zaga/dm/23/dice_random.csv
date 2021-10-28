@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,'55 e. 54th st. ',` new york ',50.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',7.0,aquavit,212-307-7311,scandinavian,1
+1,'55 e. 54th st. ',` los angeles ',162.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',20.0,aquavit,212-307-7311,scandinavian,1
+2,' 490 e. paces ferry rd. ',` new york ',50.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',7.0,aquavit,212-307-7311,scandinavian,1
+3,'55 e. 54th st. ',` new york ',84.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',22.0,aquavit,212-307-7311,scandinavian,1
+4,'55 e. 54th st. ',` new york ',50.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',7.0,` chin \ 's ',212-307-7311,scandinavian,1
+5,'55 e. 54th st. ',` new york ',162.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',20.0,aquavit,212-307-7311,scandinavian,1
+6,'55 e. 54th st. ',` new york ',50.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',pasadena,7.0,` san domenico ',212-307-7311,scandinavian,1
+7,'55 e. 54th st. ',` new york ',50.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',7.0,` palm the ( los angeles ) ',212-307-7311,vegetarian,1
+8,'55 e. 54th st. ',` new york ',22.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',20.0,aquavit,212-307-7311,scandinavian,1
+9,'55 e. 54th st. ',` new york ',50.0,oceana,212/759 -5941,seafood,'13 w. 54th st. ',` new york city ',7.0,` palm the ( los angeles ) ',212-307-7311,scandinavian,1

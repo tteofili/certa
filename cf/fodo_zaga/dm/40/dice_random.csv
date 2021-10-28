@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,' 3226 mission st. ',` san francisco ',74.0,` le colonial ',415/861 -6224,mexican,' 9001 santa monica blvd. ',` san francisco ',22.0,` dusit thai ',415-826-4639,thai,1
+1,' 3226 mission st. ',` san francisco ',74.0,manora,415/861 -6224,mexican,' 3221 mission st. ',` san francisco ',22.0,` dusit thai ',415-826-4639,thai,1
+2,' 595 piedmont ave. rio shopping mall ',` san francisco ',22.0,manora,415/861 -6224,asian,' 3221 mission st. ',` san francisco ',20.0,` dusit thai ',415-826-4639,thai,1
+3,' 3226 mission st. ',` san francisco ',74.0,manora,415/861 -6224,mexican,' 9001 santa monica blvd. ',` san francisco ',22.0,` dusit thai ',415-826-4639,thai,1
+4,' 595 piedmont ave. rio shopping mall ',` new york ',22.0,manora,415/861 -6224,asian,' 3221 mission st. ',` san francisco ',20.0,` dusit thai ',415-826-4639,` french ( classic ) ',1
+5,' 3226 mission st. ',` las vegas ',37.0,manora,415/861 -6224,asian,' 3300 las vegas blvd. s. ',` san francisco ',7.0,moongate,415-826-4639,thai,1
+6,' 3226 mission st. ',` san francisco ',37.0,manora,415/861 -6224,asian,' 3221 mission st. ',` san francisco ',7.0,` dusit thai ',415-826-4639,thai,1
+7,' 3226 mission st. ',` san francisco ',37.0,manora,415/861 -6224,asian,' 3221 mission st. ',` san francisco ',7.0,moongate,415-826-4639,thai,1
+8,' 160 e. 64th st. ',` los angeles ',22.0,manora,415/861 -6224,asian,' 3221 mission st. ',` san francisco ',616.0,` palace court ',415-826-4639,thai,1
+9,' 3226 mission st. ',` san francisco ',74.0,joss,415/861 -6224,asian,' 3221 mission st. ',` new york city ',22.0,` dusit thai ',415-826-4639,thai,1

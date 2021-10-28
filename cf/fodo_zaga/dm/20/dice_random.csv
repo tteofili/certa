@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,' b peachtree rd. ',atlanta,90.0,` bugsy \ 's diner ',404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',404-237-2700,` american ( new ) ',1
+1,' b peachtree rd. ',atlanta,90.0,toulouse,213/937 -5733,french,' 3434 peachtree rd. ne ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',404-237-2700,` american ( new ) ',1
+2,' b peachtree rd. ',atlanta,84.0,toulouse,404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` koo koo roo ',404-237-2700,` american ( new ) ',1
+3,' b peachtree rd. ',atlanta,84.0,toulouse,404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` jo jo ',404-237-2700,` american ( new ) ',1
+4,' b peachtree rd. ',atlanta,84.0,oritalia,404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',404-237-2700,` american ( new ) ',1
+5,' b peachtree rd. ',atlanta,90.0,toulouse,702/735 -4663,french,' 3434 peachtree rd. ne ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',415-826-4639,` american ( new ) ',1
+6,' b peachtree rd. ',atlanta,90.0,toulouse,404/351 -9533,french,' 3221 mission st. ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',702-369-6300,` american ( new ) ',1
+7,' b peachtree rd. ',atlanta,84.0,toulouse,404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',702-731-7110,` french ( classic ) ',1
+8,' b peachtree rd. ',atlanta,90.0,toulouse,404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` ritz-carlton dining room ( buckhead ) ',404-237-2700,` american ( new ) ',1
+9,' b peachtree rd. ',atlanta,84.0,toulouse,404/351 -9533,french,' 3434 peachtree rd. ne ',atlanta,90.0,` koo koo roo ',404-237-2700,italian,1

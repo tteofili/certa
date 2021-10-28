@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,' 1510 e. flamingo rd. ',` new york ',118.0,` le perigord ',212/755 -6244,french,' 3 e. 52nd st. ',` new york city ',20.0,` spago ( los angeles ) ',212-752-1495,` french ( classic ) ',1
+1,' 6182 w. flamingo rd. ',` new york ',501.0,` le perigord ',212/755 -6244,french,' 3 e. 52nd st. ',` new york city ',534.0,` jackson diner ',212-752-1495,` french ( classic ) ',1
+2,' 1397 n. highland ave. ',` las vegas ',22.0,` le perigord ',310/276 -1886,french,' 3 e. 52nd st. ',` new york city ',662.0,` la grenouille ',702-737-7111,` french ( classic ) ',1
+3,' 1397 n. highland ave. ',` las vegas ',22.0,` le perigord ',310/276 -1886,french,' 3 e. 52nd st. ',` new york city ',662.0,` la grenouille ',212-752-1495,` french ( classic ) ',1
+4,' 6182 w. flamingo rd. ',` new york ',501.0,` le perigord ',212/755 -6244,french,' 3 e. 52nd st. ',` new york city ',534.0,` jackson diner ',212-752-1495,chinese,1
+5,' 1510 e. flamingo rd. ',` new york ',118.0,` le perigord ',212/755 -6244,french,' 3700 w. flamingo rd. ',` new york city ',20.0,` spago ( los angeles ) ',212-752-1495,` french ( classic ) ',1
+6,' 405 e. 52nd st. ',` new york ',74.0,` tommy tang \ 's ',212/755 -6244,french,' 3 e. 52nd st. ',` new york city ',664.0,` la grenouille ',212-752-1495,italian,1
+7,' 405 e. 52nd st. ',` new york ',37.0,` le perigord ',212/755 -6244,buffets,'13 w. 54th st. ',` new york city ',7.0,` la grenouille ',212-752-1495,` french ( classic ) ',1
+8,' 2355 peachtree rd. . peachtree battle shopping center ',atlanta,501.0,` lillie langtry \ 's ',702/732 -6330,french,' 3 e. 52nd st. ',` new york city ',22.0,` la grenouille ',212-752-1495,` french ( classic ) ',1
+9,' 3570 las vegas blvd. s ',` new york ',74.0,` tommy tang \ 's ',212/755 -6244,french,' 3 e. 52nd st. ',` new york city ',664.0,` la grenouille ',212-752-1495,italian,1

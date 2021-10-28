@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,' 260 e. paces ferry road ',` san francisco ',84.0,` jo jo ',702/734 -0410,` coffee shops/diners ',' 8795 sunset blvd. ',` w. hollywood ',84.0,moongate,702-791-7352,chinese,1
+1,' 1915 fillmore st. ',` san francisco ',22.0,` indigo coastal grill ',702/734 -0410,` coffee shops/diners ',' 1397 n. highland ave. ',` las vegas ',84.0,` island spice ',702-791-7352,chinese,1
+2,' 2880 las vegas blvd. s ',` las vegas ',22.0,` steak house ',702/734 -0410,` coffee shops/diners ',' 1397 n. highland ave. ',` las vegas ',84.0,` island spice ',702-791-7352,chinese,1
+3,' 2880 las vegas blvd. s ',` san francisco ',22.0,` indigo coastal grill ',702/734 -0410,` coffee shops/diners ',' 1397 n. highland ave. ',` las vegas ',84.0,` island spice ',702-791-7352,chinese,1
+4,' 6182 w. flamingo rd. ',atlanta,84.0,` steak house ',702/734 -0410,italian,' 3400 las vegas blvd. s. ',` las vegas ',38.0,` heera of india ',702-791-7352,chinese,1
+5,' 6182 w. flamingo rd. ',` las vegas ',84.0,` steak house ',702/734 -0410,italian,' 3400 las vegas blvd. s. ',` las vegas ',38.0,` heera of india ',702-791-7352,chinese,1
+6,' 2880 las vegas blvd. s ',` san francisco ',162.0,` steak house ',212/765 -1737,` steak houses ',' 200 e. fremont st. ',pasadena,534.0,` yujean kang \ 's ',702-791-7352,` american ( new ) ',1
+7,' 2880 las vegas blvd. s ',` las vegas ',22.0,` indigo coastal grill ',702/734 -0410,` coffee shops/diners ',' 1397 n. highland ave. ',` las vegas ',84.0,` island spice ',702-791-7352,chinese,1
+8,' 260 e. paces ferry road ',` san francisco ',84.0,` jo jo ',702/734 -0410,` coffee shops/diners ',' 8795 sunset blvd. ',` las vegas ',84.0,moongate,702-791-7352,chinese,1
+9,' 260 e. paces ferry road ',` san francisco ',84.0,` steak house ',702/734 -0410,` coffee shops/diners ',' 8795 sunset blvd. ',` las vegas ',84.0,moongate,702-791-7352,chinese,1

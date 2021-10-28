@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,' 1915 fillmore st. ',atlanta,84.0,` mandarin court ',404/237 -2663,american,' 1023 abbot kinney blvd. ',venice,662.0,` joe \ 's ',404-237-2700,` american ( new ) ',1
+1,' 1915 fillmore st. ',` new york ',84.0,` mandarin court ',404/237 -2663,american,' 1023 abbot kinney blvd. ',venice,662.0,` joe \ 's ',404-237-2700,` american ( new ) ',1
+2,' 3130 piedmont road ',` new york ',118.0,` steak house ',404/237 -2663,american,' 37-03 74th st. ',venice,749.0,` joe \ 's ',213-655-9045,` american ( new ) ',1
+3,' 3130 piedmont road ',atlanta,6.0,` bone \ 's ',702/734 -0410,american,' 1023 abbot kinney blvd. ',` west la ',6.0,` joe \ 's ',310-399-5811,` american ( new ) ',1
+4,' 1915 fillmore st. ',` new york ',84.0,` mandarin court ',404/237 -2663,american,' 1023 abbot kinney blvd. ',` new york city ',662.0,` joe \ 's ',404-237-2700,` american ( new ) ',1
+5,' 3130 piedmont road ',` new york ',118.0,` steak house ',404/237 -2663,american,' 37-03 74th st. ',venice,749.0,` joe \ 's ',213-655-9045,chinese,1
+6,' 3130 piedmont road ',` new york ',6.0,` bone \ 's ',702/734 -0410,american,' 1023 abbot kinney blvd. ',` west la ',6.0,` joe \ 's ',310-399-5811,` american ( new ) ',1
+7,' 1915 fillmore st. ',` new york ',84.0,` mandarin court ',404/237 -2663,american,' 1023 abbot kinney blvd. ',` new york city ',662.0,` joe \ 's ',404-237-2700,southwestern,1
+8,' 3130 piedmont road ',` san francisco ',144.0,` bone \ 's ',404/237 -2663,american,' 1023 abbot kinney blvd. ',atlanta,664.0,` joe \ 's ',310-399-5811,asian,1
+9,' 3130 piedmont road ',` new york ',6.0,` bone \ 's ',702/734 -0410,american,' 402 w. 44th st. ',` west la ',6.0,` joe \ 's ',310-399-5811,` american ( new ) ',1

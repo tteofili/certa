@@ -1,0 +1,11 @@
+,ltable_addr,ltable_city,ltable_class,ltable_name,ltable_phone,ltable_res_type,rtable_addr,rtable_city,rtable_class,rtable_name,rtable_phone,rtable_res_type,outcome
+0,' 3555 las vegas blvd. s ',` las vegas ',84.0,` bugsy \ 's diner ',702/733 -3111,` coffee shops/diners ',' 3300 las vegas blvd. s. ',` las vegas ',74.0,` madame ching \ 's ',702-894-7111,` french bistro ',1
+1,' 3555 las vegas blvd. s ',` san francisco ',84.0,` bugsy \ 's diner ',702/733 -3111,` coffee shops/diners ',' 3300 las vegas blvd. s. ',` las vegas ',74.0,` madame ching \ 's ',702-894-7111,` french bistro ',1
+2,' 160 central park s ',` los angeles ',22.0,` bugsy \ 's diner ',702/733 -3111,` coffee shops/diners ',' 3300 las vegas blvd. s. ',` new york city ',662.0,` madame ching \ 's ',702-894-7111,` hot dogs ',1
+3,' 3555 las vegas blvd. s ',` san francisco ',84.0,` bugsy \ 's diner ',702/733 -3111,` coffee shops/diners ',' 243 e. 58th st. ',` las vegas ',74.0,` madame ching \ 's ',702-894-7111,` french bistro ',1
+4,'67 n. raymond ave. ',` san francisco ',84.0,` bugsy \ 's diner ',702/733 -3111,` coffee shops/diners ',' 243 e. 58th st. ',` las vegas ',74.0,` madame ching \ 's ',702-894-7111,` french bistro ',1
+5,' 3434 peachtree rd. ',` san francisco ',74.0,` bugsy \ 's diner ',212/223 -5656,` coffee shops/diners ',' 3300 las vegas blvd. s. ',` las vegas ',749.0,` madame ching \ 's ',702-894-7111,` hot dogs ',1
+6,' b peachtree rd. ',` los angeles ',84.0,` bertolini \ 's ',702/733 -3111,` coffee shops/diners ',' 1397 n. highland ave. ',queens,662.0,` madame ching \ 's ',702-894-7111,asian,1
+7,'67 n. raymond ave. ',` san francisco ',84.0,` bugsy \ 's diner ',702/733 -3111,` coffee shops/diners ',' 243 e. 58th st. ',` las vegas ',74.0,` san domenico ',702-894-7111,` french bistro ',1
+8,'67 n. raymond ave. ',` las vegas ',70.0,` bugsy \ 's diner ',702/734 -0410,mexican,' 1023 abbot kinney blvd. ',` las vegas ',70.0,` madame ching \ 's ',702-894-7111,asian,1
+9,' b peachtree rd. ',` los angeles ',84.0,` bertolini \ 's ',702/733 -3111,` coffee shops/diners ',' 1397 n. highland ave. ',queens,662.0,` madame ching \ 's ',702-894-7111,vegetarian,1

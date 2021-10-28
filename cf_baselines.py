@@ -190,7 +190,7 @@ warnings.filterwarnings("ignore")
 root_datadir = 'datasets/'
 experiments_dir = 'cf/'
 
-def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_dir,):
+def baselines_gen(model_type: str, samples, filtered_datasets, exp_dir: str = experiments_dir,):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
 
@@ -199,6 +199,7 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
             if dir not in filtered_datasets:
                 continue
             for robust in [False]:
+                model = from_type(model_type)
                 os.makedirs(exp_dir + dir, exist_ok=True)
                 model_name = model.name
                 if robust:
@@ -252,12 +253,14 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                     rand_row = test_df.iloc[idx]
 
                     basedir = exp_dir + dir + '/' + model_name + '/' + str(idx)
+                    if not os.path.exists(basedir):
+                        os.makedirs(basedir)
 
                     try:
                         instance = pd.DataFrame(rand_row).transpose().drop(['outcome', 'ltable_id', 'rtable_id'],
                                                                            axis=1).astype(str)
 
-                        if lime_c:
+                        if lime_c and not os.path.exists(basedir + '/limec.csv'):
                             print('lime-c')
                             try:
                                 limec_explainer = LimeCounterfactual(model, predict_fn, None, 0.5,
@@ -271,7 +274,7 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                                 print(f'skipped item {str(idx)}')
                                 pass
 
-                        if shap_c:
+                        if shap_c and not os.path.exists(basedir + '/shapc.csv'):
                             print('shap-c')
                             try:
                                 shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
@@ -286,7 +289,7 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
                                 print(f'skipped item {str(idx)}')
                                 pass
 
-                        if dice_r:
+                        if dice_r and not os.path.exists(basedir + '/dice_random.csv'):
                             print('dice_r')
                             try:
 
@@ -316,10 +319,10 @@ def baselines_gen(model, samples, filtered_datasets, exp_dir: str = experiments_
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'deeper'
+    mtype = 'dm'
     filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'abt_buy', 'fodo_zaga', 'beers',
+                          #'fodo_zaga', 'beers', 'abt_buy',
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar', 'dblp_acm']
-    model = from_type(mtype)
-    baselines_gen(model, samples=samples, filtered_datasets=filtered_datasets)
+                         #'dblp_scholar', 'dblp_acm'
+                         ]
+    baselines_gen(mtype, samples=samples, filtered_datasets=filtered_datasets)
