@@ -320,9 +320,9 @@ def baselines_gen(model_type: str, samples, filtered_datasets, exp_dir: str = ex
 if __name__ == "__main__":
     samples = 50
     mtype = 'dm'
-    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', #'dirty_dblp_acm', 'dirty_dblp_scholar'
                           #'fodo_zaga', 'beers', 'abt_buy',
-                         'amazon_google', 'itunes_amazon', 'walmart_amazon',
+                         #'walmart_amazon', 'amazon_google', 'itunes_amazon',
                          #'dblp_scholar', 'dblp_acm'
                          ]
     baselines_gen(mtype, samples=samples, filtered_datasets=filtered_datasets)
