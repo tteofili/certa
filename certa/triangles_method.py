@@ -303,9 +303,10 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, l
 
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
 
-    flippedPredictions_df, rankings = perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad,
+    flippedPredictions_df, rankings, all_predictions = perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad,
                                                       attr_length, predict_fn, sourcesMap, lprefix, rprefix, contrastive=contrastive)
 
+    all_predictions.to_csv('lattices.csv', mode='a')
     explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                     attr_length=attr_length)
 
@@ -434,7 +435,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
         flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
     except:
         flippedPredictions_df = pd.DataFrame(flippedPredictions)
-    return flippedPredictions_df, rankings
+    return flippedPredictions_df, rankings, pd.concat([perturbations_df, predictions[['nomatch_score', 'match_score']]], axis=1)
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1
