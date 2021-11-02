@@ -13,14 +13,13 @@ from baselines.landmark import Landmark
 from baselines.mojito import Mojito
 import shap
 
-from models.ermodel import ERModel
 from models.utils import from_type
 
 root_datadir = 'datasets/'
 experiments_dir = 'examples/'
 
 
-def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
+def evaluate(model: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
              fast: bool = False, max_predict: int = -1):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
@@ -29,9 +28,10 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
         for dir in dirs:
             if dir not in filtered_datasets:
                 continue
+            model = from_type(mtype)
 
             os.makedirs(exp_dir + dir, exist_ok=True)
-            model_name = model.name
+            model_name = mtype
             os.makedirs(exp_dir + dir + '/' + model_name, exist_ok=True)
             if dir == 'temporary':
                 continue
@@ -146,7 +146,7 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                                 mojito_exp.pop('id', None)
 
                         mojito_exp['type'] = 'mojito'
-                        check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, mojito_exp, k, prediction[1])
+                        check, effect_eval = check_saliency(model, l_tuple, r_tuple, predict_fn, mojito_exp, k, prediction[1])
                         if check:
                             continue
                         mojito_row = {'explanation': mojito_exp, 'type': 'mojito-d', 'latency': latency_m,
@@ -168,7 +168,7 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
 
 
                         land_exp['type'] = 'landmark'
-                        check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, land_exp, k, prediction[1])
+                        check, effect_eval = check_saliency(model, l_tuple, r_tuple, predict_fn, land_exp, k, prediction[1])
                         if check:
                             continue
                         land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
@@ -193,7 +193,7 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
 
 
                         shap_saliency['type'] = 'shap'
-                        check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, shap_saliency, k, prediction[1])
+                        check, effect_eval = check_saliency(model, l_tuple, r_tuple, predict_fn, shap_saliency, k, prediction[1])
                         if check:
                             continue
                         shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
@@ -222,7 +222,7 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
                         certa_saliency = saliency_df.transpose().to_dict()[0]
 
                         certa_saliency['type'] = 'certa'
-                        check, effect_eval = check_saliency(l_tuple, r_tuple, predict_fn, certa_saliency, k,
+                        check, effect_eval = check_saliency(model, l_tuple, r_tuple, predict_fn, certa_saliency, k,
                                                             prediction[1])
                         if check:
                             continue
@@ -258,7 +258,7 @@ def evaluate(model: ERModel, samples: int = -1, filtered_datasets: list = [], ex
             cf.to_csv(exp_dir + dir + '/' + model_name + '/cf.csv')
 
 
-def check_saliency(l_tuple, r_tuple, predict_fn, saliency, k, score):
+def check_saliency(model, l_tuple, r_tuple, predict_fn, saliency, k, score):
     check = False
     lprefix = 'ltable_'
     rprefix = 'rtable_'
@@ -332,10 +332,7 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 100
-    type = 'dm'
-    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'abt_buy', 'fodo_zaga', 'beers',
-                         'amazon_google', 'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar', 'dblp_acm']
-    model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=3000, fast=True)
+    mtype = 'dm'
+    filtered_datasets = ['abt_buy',
+                         'itunes_amazon', ]
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=200, fast=True)
