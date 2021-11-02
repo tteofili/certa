@@ -1,0 +1,2 @@
+,explanation,label,latency,match,prediction,row,score_copy,score_drop,type
+0,"{'ltable_Album_Name': -0.012959456632149079, 'ltable_CopyRight': -0.019586162411274533, 'ltable_Song_Name': -0.025076951466062977, 'ltable_Time': -0.010888304408773444, 'rtable_CopyRight': 0.01583273353588572, 'rtable_Price': 0.021083842910614832, 'rtable_Released': 0.0216687350727394, 'rtable_Song_Name': -0.014323116539583798, 'rtable_Time': -0.038932070813516226}",0.0,6.840915925975423,1.0,[0.17958653 0.82041347],6306-42359,0.8104977011680603,0.6294298768043518,mojito-d

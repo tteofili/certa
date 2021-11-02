@@ -1,0 +1,5 @@
+,explanation,label,latency,match,prediction,row,score_copy,score_drop,type
+0,"{'ltable_name': 0.325, 'ltable_description': 0.325, 'ltable_price': 0.325, 'rtable_name': 0.725, 'rtable_description': 0.725, 'rtable_price': 0.725}",1.0,8.571141685999464,0.0,[0.9911343  0.00886572],942-949,0.007937964051961899,0.012402507476508617,certa
+1,"{'rtable_name': 0.325, 'rtable_description': 0.375, 'rtable_price': 0.375, 'ltable_name': 0.525, 'ltable_description': 0.575, 'ltable_price': 0.575}",1.0,7.515029540998512,0.0,[0.9937476  0.00625243],599-545,0.004745794460177422,0.010569530539214611,certa
+2,"{'rtable_name': 0.625, 'rtable_description': 0.625, 'rtable_price': 0.625, 'ltable_name': 0.425, 'ltable_description': 0.425, 'ltable_price': 0.425}",1.0,6.023875512000814,0.0,[0.98937047 0.01062956],710-746,0.00669446773827076,0.007665663957595825,certa
+3,"{'rtable_name': 0.825, 'rtable_description': 0.875, 'rtable_price': 0.875, 'ltable_name': 0.125, 'ltable_description': 0.125, 'ltable_price': 0.125}",1.0,4.224376899997878,0.0,[0.9861254  0.01387456],244-328,0.014758176170289516,0.011695721186697483,certa
