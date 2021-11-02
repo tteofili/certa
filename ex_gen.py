@@ -333,6 +333,9 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     samples = 100
     mtype = 'dm'
-    filtered_datasets = ['abt_buy',
-                         'itunes_amazon', ]
-    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=200, fast=True)
+    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         'fodo_zaga', 'beers', 'abt_buy',
+                         'amazon_google', 'itunes_amazon', 'walmart_amazon',
+                         'dblp_scholar', 'dblp_acm'
+                         ]
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)

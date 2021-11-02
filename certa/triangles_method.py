@@ -1,3 +1,5 @@
+import logging
+
 from collections import defaultdict
 from functools import partialmethod
 from itertools import combinations
@@ -129,7 +131,7 @@ def __getRecords(sourcesMap, triangleIds, lprefix, rprefix):
 def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
                                     rprefix, use_tokens: bool = False):
     # generate power set of attributes
-    allAttributesSubsets = list(_powerset(attributes, 1, maxLenAttributeSet))
+    allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
     perturbations = []
     perturbedAttributes = []
@@ -298,15 +300,17 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, l
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
 
-    attributes = [col for col in list(sources[0]) if col not in [lprefix+'id']]
-    attributes += [col for col in list(sources[1]) if col not in [rprefix+'id']]
+    attributes = [col for col in list(sources[0]) if col not in [lprefix + 'id']]
+    attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
 
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
 
-    flippedPredictions_df, rankings, all_predictions = perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad,
-                                                      attr_length, predict_fn, sourcesMap, lprefix, rprefix, contrastive=contrastive)
+    flippedPredictions_df, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
+                                                                       class_to_explain, discard_bad,
+                                                                       attr_length, predict_fn, sourcesMap, lprefix,
+                                                                       rprefix, contrastive=contrastive)
 
-    all_predictions.to_csv('lattices.csv', mode='a')
+    # all_predictions.to_csv('lattices.csv', mode='a')
     explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                     attr_length=attr_length)
 
@@ -401,41 +405,60 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
     flippedPredictions = []
     t_i = 0
     transitivity = True
-    perturbations = []
-    for triangle in tqdm(allTriangles):
-        try:
-            if check:
-                identity, symmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn)
-                allTriangles[t_i] = allTriangles[t_i] + (identity, symmetry, transitivity,)
-            if check and discard_bad and not transitivity:
-                continue
-            currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, attr_length,
-                                                                   class_to_explain, lprefix, rprefix)
-            perturbations.append(currentPerturbations)
-        except:
-            allTriangles[t_i] = allTriangles[t_i] + (False, False, False,)
-            pass
-        t_i += 1
+    # lattice stratified predictions
+    all_good = False
+    for a in range(1, attr_length):
+        perturbations = []
+        for triangle in tqdm(allTriangles):
+            try:
+                if check:
+                    identity, symmetry, transitivity = check_properties(triangle, sourcesMap, predict_fn)
+                    allTriangles[t_i] = allTriangles[t_i] + (identity, symmetry, transitivity,)
+                if check and discard_bad and not transitivity:
+                    continue
+                currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, a,
+                                                                       class_to_explain, lprefix, rprefix)
+                perturbations.append(currentPerturbations)
+            except:
+                allTriangles[t_i] = allTriangles[t_i] + (False, False, False,)
+                pass
+            t_i += 1
 
-    try:
-        perturbations_df = pd.concat(perturbations, ignore_index=True)
-    except:
-        perturbations_df = pd.DataFrame(perturbations)
-    currPerturbedAttr = perturbations_df.alteredAttributes.values
-    predictions = predict_fn(perturbations_df)
-    #predictions = predictions.drop(columns=['alteredAttributes'])
-    proba = predictions[['nomatch_score', 'match_score']].values
-    if contrastive:
-        class_to_explain = abs(1 - class_to_explain)
-    curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
-    flippedPredictions.append(curr_flippedPredictions)
-    ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
-    rankings.append(ranking)
+        try:
+            perturbations_df = pd.concat(perturbations, ignore_index=True)
+        except:
+            perturbations_df = pd.DataFrame(perturbations)
+
+        currPerturbedAttr = perturbations_df.alteredAttributes.values
+        if a != attr_length and not all_good:
+            predictions = predict_fn(perturbations_df)
+            # predictions = predictions.drop(columns=['alteredAttributes'])
+            proba = predictions[['nomatch_score', 'match_score']].values
+
+            if contrastive:
+                class_to_explain = abs(1 - class_to_explain)
+            curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
+        else:
+            proba = pd.DataFrame(columns=['nomatch_score', 'match_score'])
+            proba[class_to_explain] = 0
+            proba[abs(1 - class_to_explain)] = 1
+            curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1, ignore_index=True)
+
+        flippedPredictions.append(curr_flippedPredictions)
+        ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
+        rankings.append(ranking)
+
+        if len(curr_flippedPredictions) == len(perturbations_df):
+            logging.info(f'skipped predictions at depth {a}')
+            all_good = True
+        else:
+            logging.debug(f'predicted depth {a}')
+
     try:
         flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
     except:
         flippedPredictions_df = pd.DataFrame(flippedPredictions)
-    return flippedPredictions_df, rankings, pd.concat([perturbations_df, predictions[['nomatch_score', 'match_score']]], axis=1)
+    return flippedPredictions_df, rankings, []  # pd.concat([perturbations_df, predictions[['nomatch_score', 'match_score']]], axis=1)
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1

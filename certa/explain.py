@@ -21,7 +21,7 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                      max_predict=max_predict)
 
     if attr_length <= 0:
-        attr_length = len(l_tuple) - 1 + len(r_tuple) - 1
+        attr_length = min(len(l_tuple) - 1, len(r_tuple) - 1)
     if len(local_samples) > 0:
         explanations, counterfactual_examples, triangles = triangles_method.explainSamples(local_samples, [
             pd.concat([lsource, gright_df]),

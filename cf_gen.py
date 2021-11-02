@@ -32,7 +32,7 @@ def evaluate(model_type: str, samples: int = 50, filtered_datasets: list = [], e
             for robust in [False]:
                 model = from_type(model_type)
                 os.makedirs(exp_dir + dir, exist_ok=True)
-                model_name = model.name
+                model_name = model_type
                 if robust:
                     model_name = model_name + '_robust'
                 os.makedirs(exp_dir + dir + '/' + model_name, exist_ok=True)
@@ -143,10 +143,10 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'dm'
+    mtype = 'deeper'
     filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
                          'fodo_zaga', 'beers', 'abt_buy',
                          'amazon_google', 'itunes_amazon', 'walmart_amazon',
                          'dblp_scholar', 'dblp_acm'
                          ]
-    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=2000, fast=True)
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)

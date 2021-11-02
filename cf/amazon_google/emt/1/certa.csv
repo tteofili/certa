@@ -1,0 +1,6 @@
+,label,ltable_title,ltable_manufacturer,ltable_price,rtable_title,rtable_manufacturer,rtable_price,alteredAttributes,droppedValues,copiedValues,classes,labels,nomatch_score,match_score,attr_count
+0,,adobe dreamweaver cs3 [ mac ],adobe,399.0,adobe dreamweaver cs3,,1659.99,"('rtable_title', 'rtable_manufacturer')","['adobe cs3 web premium', nan]","['adobe dreamweaver cs3', nan]",1,0,0.040237024,0.959763,2
+1,,adobe dreamweaver cs3 [ mac ],adobe,399.0,adobe dreamweaver cs3,,415.99,"('rtable_title', 'rtable_price')","['adobe cs3 web premium', 1659.99]","['adobe dreamweaver cs3', 415.99]",1,0,0.015602583,0.9843975,2
+2,,adobe dreamweaver cs3 [ mac ],adobe,399.0,adobe dreamweaver cs3,,1659.99,"('rtable_title', 'rtable_manufacturer')","['adobe cs3 web premium', nan]","['adobe dreamweaver cs3', nan]",1,0,0.040237024,0.959763,2
+3,,adobe dreamweaver cs3 [ mac ],adobe,399.0,adobe dreamweaver cs3,,415.99,"('rtable_title', 'rtable_price')","['adobe cs3 web premium', 1659.99]","['adobe dreamweaver cs3', 415.99]",1,0,0.015602583,0.9843975,2
+4,,adobe dreamweaver cs3 [ mac ],adobe,399.0,got game entertainment atlantis quest,,17.27,"('rtable_title', 'rtable_price')","['adobe cs3 web premium', 1659.99]","['got game entertainment atlantis quest', 17.27]",1,0,0.090156496,0.9098435,2
