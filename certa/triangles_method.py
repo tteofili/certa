@@ -400,7 +400,7 @@ def cf_summary(explanation):
 
 
 def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
-                    sourcesMap, lprefix, rprefix, contrastive: bool = False):
+                    sourcesMap, lprefix, rprefix, contrastive: bool = False, monotonicity=True):
     rankings = []
     flippedPredictions = []
     t_i = 0
@@ -430,19 +430,26 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
             perturbations_df = pd.DataFrame(perturbations)
 
         currPerturbedAttr = perturbations_df.alteredAttributes.values
-        if a != attr_length and not all_good:
+        if monotonicity:
+            if a != attr_length and not all_good:
+                predictions = predict_fn(perturbations_df)
+                proba = predictions[['nomatch_score', 'match_score']].values
+
+                if contrastive:
+                    class_to_explain = abs(1 - class_to_explain)
+                curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
+            else:
+                proba = pd.DataFrame(columns=['nomatch_score', 'match_score'])
+                proba[class_to_explain] = 0
+                proba[abs(1 - class_to_explain)] = 1
+                curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1, ignore_index=True)
+        else:
             predictions = predict_fn(perturbations_df)
-            # predictions = predictions.drop(columns=['alteredAttributes'])
             proba = predictions[['nomatch_score', 'match_score']].values
 
             if contrastive:
                 class_to_explain = abs(1 - class_to_explain)
             curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
-        else:
-            proba = pd.DataFrame(columns=['nomatch_score', 'match_score'])
-            proba[class_to_explain] = 0
-            proba[abs(1 - class_to_explain)] = 1
-            curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1, ignore_index=True)
 
         flippedPredictions.append(curr_flippedPredictions)
         ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
@@ -465,7 +472,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
 def getAttributeRanking(proba: np.ndarray, alteredAttributes: list, originalClass: int):
     attributeRanking = {k: 0 for k in alteredAttributes}
     for i, prob in enumerate(proba):
-        if prob[originalClass] < 0.5:
+        if float(prob[originalClass]) < 0.5:
             attributeRanking[alteredAttributes[i]] += 1
     return attributeRanking
 
