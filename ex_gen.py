@@ -48,7 +48,7 @@ def evaluate(model: str, samples: int = -1, filtered_datasets: list = [], exp_di
             test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])[:samples]
             train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 
-            k = len(lsource.columns) - 1
+            k = 3
 
             mojito = Mojito(test_df.columns,
                             attr_to_copy='left',
@@ -204,7 +204,7 @@ def evaluate(model: str, samples: int = -1, filtered_datasets: list = [], exp_di
 
                         # CERTA
                         print('certa')
-                        num_triangles = 10
+                        num_triangles = 100
 
                         t0 = time.perf_counter()
 
@@ -212,7 +212,7 @@ def evaluate(model: str, samples: int = -1, filtered_datasets: list = [], exp_di
                                                                                               rsource, predict_fn, datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast, max_predict=max_predict,
-                                                                                              token_parts=True, attr_length=k)
+                                                                                              token_parts=True)
 
                         latency_c = time.perf_counter() - t0
 
@@ -258,7 +258,7 @@ def evaluate(model: str, samples: int = -1, filtered_datasets: list = [], exp_di
             cf.to_csv(exp_dir + dir + '/' + model_name + '/cf.csv')
 
 
-def check_saliency(model, l_tuple, r_tuple, predict_fn, saliency, k, score):
+def check_saliency(model, l_tuple, r_tuple, predict_fn, saliency, top_k, score):
     check = False
     lprefix = 'ltable_'
     rprefix = 'rtable_'
@@ -270,60 +270,63 @@ def check_saliency(model, l_tuple, r_tuple, predict_fn, saliency, k, score):
     # eval saliencies
     print(saliency)
     # get top k important attributes
-    exp_type = saliency['type']
-    print(saliency.pop('type'))
-    if exp_type == 'certa':
-        explanation_attributes = sorted(saliency, key=saliency.get, reverse=True)[:k]
-    elif score < 0.5:
-        saliency = {k: v for k, v in saliency.items() if v < 0}
-        explanation_attributes = sorted(saliency, key=saliency.get)[:k]
-    else:
-        saliency = {k: v for k, v in saliency.items() if v > 0}
-        explanation_attributes = sorted(saliency, key=saliency.get, reverse=True)[:k]
+    score_drops = []
+    class_drops = []
+    score_copies = []
+    class_copies = []
+    for k in range(1, top_k):
+        saliency_c = saliency.copy()
+        exp_type = saliency_c['type']
+        print(saliency_c.pop('type'))
+        if exp_type == 'certa':
+            explanation_attributes = sorted(saliency_c, key=saliency_c.get, reverse=True)[:k]
+        elif score < 0.5:
+            saliency_c = {k: v for k, v in saliency_c.items() if v < 0}
+            explanation_attributes = sorted(saliency_c, key=saliency_c.get)[:k]
+        else:
+            saliency_c = {k: v for k, v in saliency_c.items() if v > 0}
+            explanation_attributes = sorted(saliency_c, key=saliency_c.get, reverse=True)[:k]
 
-    # change those attributes
-    try:
-        lt = l_tuple.copy()
-        rt = r_tuple.copy()
-        modified_row = get_row(lt, rt)
-        for e in explanation_attributes:
-            modified_row[e] = ''
-        modified_tuple_prediction = \
-            predict_fn(modified_row)[['nomatch_score', 'match_score']].values[0]
-        # print(modified_tuple_prediction)
-        # print(modified_row)
-        score_drop = modified_tuple_prediction[1]
-        class_drop = np.argmax(modified_tuple_prediction)
-        eval_series['top_' + exp_type + '_' + model.name] = explanation_attributes
-        eval_series['score_drop'] = score_drop
-        eval_series['class_drop'] = class_drop
-        if class_drop != orig_class:
-            check = True
-    except Exception as e:
-        print(traceback.format_exc())
-    try:
-        lt = l_tuple.copy()
-        rt = r_tuple.copy()
-        modified_row = get_row(lt, rt)
-        for e in explanation_attributes:
-            if e.startswith(lprefix):
-                new_e = e.replace(lprefix, rprefix)
-            else:
-                new_e = e.replace(rprefix, lprefix)
-            modified_row[e] = modified_row[new_e]
-        # print(modified_row)
-        modified_tuple_prediction = \
-            predict_fn(modified_row)[['nomatch_score', 'match_score']].values[0]
-        # print(modified_tuple_prediction)
-        score_copy = modified_tuple_prediction[1]
-        class_copy = np.argmax(modified_tuple_prediction)
-        eval_series['score_copy'] = score_copy
-        eval_series['class_copy'] = class_copy
-        if not check and class_copy != orig_class:
-            check = True
-    except Exception as e:
-        print(traceback.format_exc())
-
+        # change those attributes
+        try:
+            lt = l_tuple.copy()
+            rt = r_tuple.copy()
+            modified_row = get_row(lt, rt)
+            for e in explanation_attributes:
+                modified_row[e] = ''
+            modified_tuple_prediction = predict_fn(modified_row)[['nomatch_score', 'match_score']].values[0]
+            score_drop = modified_tuple_prediction[1]
+            class_drop = np.argmax(modified_tuple_prediction)
+            eval_series['top_' + exp_type + '_' + model.name] = explanation_attributes
+            score_drops.append(score_drop)
+            class_drops.append(class_drop)
+            if class_drop != orig_class:
+                check = True
+        except Exception as e:
+            print(traceback.format_exc())
+        try:
+            lt = l_tuple.copy()
+            rt = r_tuple.copy()
+            modified_row = get_row(lt, rt)
+            for e in explanation_attributes:
+                if e.startswith(lprefix):
+                    new_e = e.replace(lprefix, rprefix)
+                else:
+                    new_e = e.replace(rprefix, lprefix)
+                modified_row[e] = modified_row[new_e]
+            modified_tuple_prediction = predict_fn(modified_row)[['nomatch_score', 'match_score']].values[0]
+            score_copy = modified_tuple_prediction[1]
+            class_copy = np.argmax(modified_tuple_prediction)
+            score_copies.append(score_copy)
+            class_copies.append(class_copy)
+            if not check and class_copy != orig_class:
+                check = True
+        except Exception as e:
+            print(traceback.format_exc())
+    eval_series['score_drop'] = score_drops
+    eval_series['class_drop'] = class_drops
+    eval_series['score_copy'] = score_copies
+    eval_series['class_copy'] = class_copies
     return check, eval_series
 
 
@@ -331,11 +334,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    samples = 100
+    samples = 200
     mtype = 'dm'
-    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'fodo_zaga', 'beers', 'abt_buy',
-                         'amazon_google', 'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar', 'dblp_acm'
-                         ]
+    filtered_datasets = ['abt_buy']
     evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)
