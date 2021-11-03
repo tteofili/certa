@@ -1,2 +1,0 @@
-,explanation,type,latency,match,label,row,prediction,score_drop,score_copy
-0,"{'ltable_description': 0.10925800007620576, 'ltable_name': 0.11691464544392738, 'rtable_name': 0.01469894506509406}",mojito-d,21.066739156999986,1.0,0.0,231-185,[4.1185795e-05 9.9995875e-01],0.7064940929412842,0.9999833106994629

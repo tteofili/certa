@@ -1,2 +1,0 @@
-,explanation,type,latency,match,label,row,prediction,score_drop,score_copy
-0,"{'ltable_price': 0.2, 'rtable_description': 0.15, 'rtable_price': 0.15}",certa,55.259792253,1.0,0.0,231-185,[4.1185795e-05 9.9995875e-01],0.9999587535858154,0.999984860420227

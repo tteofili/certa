@@ -1,2 +1,0 @@
-,explanation,type,latency,match,label,row,prediction,score_drop,score_copy
-0,"{'ltable_description': 0.16411094249214508, 'ltable_name': 0.23416945891245267, 'ltable_price': 0.0, 'rtable_description': 0.1705100460742251, 'rtable_name': 0.0, 'rtable_price': 0.3578598781349138}",shap,104.96086021499997,1.0,0.0,231-185,[4.1185795e-05 9.9995875e-01],0.9997618794441223,0.9999867677688599
