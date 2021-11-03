@@ -224,7 +224,7 @@ def evaluate(model: str, samples: int = -1, filtered_datasets: list = [], exp_di
                         certa_saliency['type'] = 'certa'
                         check, effect_eval = check_saliency(model, l_tuple, r_tuple, predict_fn, certa_saliency, k,
                                                             prediction[1])
-                        
+
                         certa_row = {'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
                                      'match': class_to_explain,
                                      'label': label, 'row': row_id, 'prediction': prediction,
@@ -334,6 +334,6 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 500
-    mtype = 'emt'
+    mtype = 'dm'
     filtered_datasets = ['abt_buy']
     evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=300, fast=True)
