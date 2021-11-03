@@ -9,11 +9,6 @@ from certa.explain import explain
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
 
-from baselines.landmark import Landmark
-from baselines.mojito import Mojito
-import shap
-
-from models.ermodel import ERModel
 from models.utils import from_type
 
 root_datadir = 'datasets/'
@@ -98,6 +93,12 @@ def evaluate(model_type: str, samples: int = 50, filtered_datasets: list = [], e
                     item = get_row(l_tuple, r_tuple)
 
                     try:
+                        cf_dir = exp_dir + dir + '/' + model_name + '/' + str(i)
+                        os.makedirs(cf_dir, exist_ok=True)
+                        dest_file = cf_dir + '/certa.csv'
+                        if os.path.exists(dest_file):
+                            continue
+
                         # CERTA
                         print('certa')
                         num_triangles = 100
@@ -119,9 +120,8 @@ def evaluate(model_type: str, samples: int = 50, filtered_datasets: list = [], e
                                      'label': label, 'row': row_id, 'prediction': prediction}
 
                         certas = certas.append(certa_row, ignore_index=True)
-                        cf_dir = exp_dir + dir + '/' + model_name + '/' + str(i)
-                        os.makedirs(cf_dir, exist_ok=True)
-                        counterfactual_examples.to_csv(cf_dir + '/certa.csv')
+
+                        counterfactual_examples.to_csv(dest_file)
 
                         item['match'] = prediction[1]
                         item['label'] = label
@@ -143,10 +143,6 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'deeper'
-    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'fodo_zaga', 'beers', 'abt_buy',
-                         'amazon_google', 'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar', 'dblp_acm'
-                         ]
-    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)
+    mtype = 'dm'
+    filtered_datasets = ['abt_buy']
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=1000, fast=True)
