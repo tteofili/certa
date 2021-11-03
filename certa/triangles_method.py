@@ -440,9 +440,16 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                 curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
             else:
                 proba = pd.DataFrame(columns=['nomatch_score', 'match_score'])
-                proba[class_to_explain] = 0
-                proba[abs(1 - class_to_explain)] = 1
-                curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1, ignore_index=True)
+
+                if class_to_explain == 0:
+                    proba.loc[:,'nomatch_score'] = np.zeros([len(perturbations_df)])
+                    proba.loc[:,'match_score'] = np.ones([len(perturbations_df)])
+                else:
+                    proba.loc[:, 'match_score'] = np.zeros([len(perturbations_df)])
+                    proba.loc[:, 'nomatch_score'] = np.ones([len(perturbations_df)])
+
+                curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1)
+                proba = proba.values
         else:
             predictions = predict_fn(perturbations_df)
             proba = predictions[['nomatch_score', 'match_score']].values
