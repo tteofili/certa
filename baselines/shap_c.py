@@ -138,6 +138,10 @@ class ShapCounterfactual(object):
         features_explanation_shap_abs = np.array(features_explanation_shap)[inds]
         explanation_shap_sorted = np.array(explanation_shap)[inds]
 
+        number_perturbed = 0
+        coefficients_features_explanations_shap_abs_found = []
+        feature_names_full_index = []
+        perturbed_instance = instance.copy()
         length = 0
         iteration = 0
         score = self.classifier_fn(instance)[0]

@@ -201,7 +201,7 @@ def baselines_gen(model_type: str, samples, filtered_datasets, exp_dir: str = ex
             for robust in [False]:
                 model = from_type(model_type)
                 os.makedirs(exp_dir + dir, exist_ok=True)
-                model_name = model.name
+                model_name = model_type
                 if robust:
                     model_name = model_name + '_robust'
                 os.makedirs(exp_dir + dir + '/' + model_name, exist_ok=True)
@@ -319,9 +319,9 @@ def baselines_gen(model_type: str, samples, filtered_datasets, exp_dir: str = ex
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'dm'
+    mtype = 'emt'
     filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', #'dirty_dblp_acm', 'dirty_dblp_scholar'
-                          'fodo_zaga', 'beers', 'abt_buy',
+                          'fodo_zaga', 'abt_buy',
                          'walmart_amazon', 'amazon_google', 'itunes_amazon',
                          'dblp_scholar', 'dblp_acm'
                          ]
