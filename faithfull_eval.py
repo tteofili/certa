@@ -7,7 +7,7 @@ from certa.utils import merge_sources
 from metrics.faithfulness import get_faithfullness
 from models.utils import from_type
 
-model_type = 'dm'
+model_type = 'emt'
 experiments_dir = 'quantitative/'
 root_datadir = 'datasets/'
 base_dir = ''

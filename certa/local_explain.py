@@ -41,7 +41,8 @@ def text_to_vector(text):
     return Counter(words)
 
 
-def find_candidates(record, source, similarity_threshold, find_positives, lj=True, lprefix='ltable_', rprefix='rtable_'):
+def find_candidates(record, source, similarity_threshold, find_positives, lj=True, lprefix='ltable_',
+                    rprefix='rtable_'):
     record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
     source_without_id = source.copy()
     source_without_id = source_without_id.drop(['id'], axis=1)
@@ -64,7 +65,7 @@ def find_candidates(record, source, similarity_threshold, find_positives, lj=Tru
                     candidates.append((record['id'], source_ids[idx]))
                 else:
                     candidates.append((source_ids[idx], record['id']))
-    return pd.DataFrame(candidates, columns=[lprefix+'id', rprefix+'id'])
+    return pd.DataFrame(candidates, columns=[lprefix + 'id', rprefix + 'id'])
 
 
 def get_original_prediction(r1, r2, predict_fn):
@@ -72,7 +73,7 @@ def get_original_prediction(r1, r2, predict_fn):
     return predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
 
 
-def get_row(r1, r2, lprefix = 'ltable_', rprefix = 'rtable_'):
+def get_row(r1, r2, lprefix='ltable_', rprefix='rtable_'):
     r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
     r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
     r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
@@ -176,7 +177,8 @@ def copy_EDIT_match(tupla, d):
 
 
 def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
-                  rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100, class_to_explain: int = None,
+                  rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100,
+                  class_to_explain: int = None,
                   use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
                   use_w: bool = True, use_y: bool = True, datadir='', theta_min: float = 0.5,
                   theta_max: float = 0.5, token_parts: bool = False):

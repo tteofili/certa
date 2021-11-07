@@ -333,7 +333,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
-    samples = 500
+    samples = 100
     mtype = 'deeper'
     filtered_datasets = ['abt_buy']
-    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=300, fast=True)
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=-1, fast=True)

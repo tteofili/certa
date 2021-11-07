@@ -20,7 +20,7 @@ root_datadir = 'datasets/'
 experiments_dir = 'quantitative/'
 
 
-def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], exp_dir: str = experiments_dir,
+def evaluate(mtype: str, samples: int = 50, filtered_datasets: list = [], exp_dir: str = experiments_dir,
              fast: bool = False, max_predict: int = -1, compare=True):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
@@ -31,7 +31,8 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                 continue
             for robust in [False]:
                 os.makedirs(exp_dir + dir, exist_ok=True)
-                model_name = model.name
+                model = from_type(mtype)
+                model_name = mtype
                 if robust:
                     model_name = model_name + '_robust'
                 os.makedirs(exp_dir + dir + '/' + model_name, exist_ok=True)
@@ -117,7 +118,7 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                     try:
                         # CERTA
                         print('certa')
-                        num_triangles = 10
+                        num_triangles = 100
 
                         t0 = time.perf_counter()
 
@@ -125,7 +126,17 @@ def evaluate(model: ERModel, samples: int = 50, filtered_datasets: list = [], ex
                                                                                               rsource, predict_fn, datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast, max_predict=max_predict,
-                                                                                              token_parts=False, attr_length=4)
+                                                                                              token_parts=True, attr_length=len(lsource) - 1)
+                        if len(saliency_df) == 0:
+                            saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple,
+                                                                                                  lsource,
+                                                                                                  rsource, predict_fn,
+                                                                                                  datadir,
+                                                                                                  num_triangles=num_triangles,
+                                                                                                  fast=False,
+                                                                                                  max_predict=-1,
+                                                                                                  token_parts=True,
+                                                                                                  attr_length=len(lsource) - 1)
 
                         latency_c = time.perf_counter() - t0
 
@@ -236,9 +247,9 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    type = 'emt'
-    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon',
-                          'itunes_amazon', 'walmart_amazon',
-                         'dblp_acm']
-    model = from_type(type)
-    evaluate(model, samples=samples, filtered_datasets=filtered_datasets, max_predict=500, fast=True, compare=False)
+    mtype = 'emt'
+    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         'fodo_zaga',
+                         'itunes_amazon', 'walmart_amazon',
+                         'dblp_scholar', 'dblp_acm']
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=500, fast=True, compare=False)

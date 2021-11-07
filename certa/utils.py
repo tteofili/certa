@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table,
                   robust: bool = False):
     dataset = pd.DataFrame(columns={col: table[col].dtype for col in copy_from_table})
@@ -68,7 +69,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
 def diff(a: str, b: str):
     d = set(a.split(' ')).difference(b.split(' '))
     if len(d) == 0:
-        d = '+'+str(set(b.split(' ')).difference(a.split(' ')))
+        d = '+' + str(set(b.split(' ')).difference(a.split(' ')))
     else:
-        d = '-'+str(d)
+        d = '-' + str(d)
     return d

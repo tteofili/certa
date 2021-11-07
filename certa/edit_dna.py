@@ -7,8 +7,11 @@ Created on Sat Feb  8 12:27:43 2020
 
 import random
 import string
-dna=set(string.printable)
-#dna = set(["A", "C", "G", "T"])
+
+dna = set(string.printable)
+
+
+# dna = set(["A", "C", "G", "T"])
 
 class Sequence(str):
 
@@ -25,7 +28,6 @@ class Sequence(str):
                 elif mutant_type == "s":
                     mutants.add(self.substitute(k))
         return list(mutants)
-
 
     def deletion(self, n):
         if n >= len(self):

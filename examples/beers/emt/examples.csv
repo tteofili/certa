@@ -1,0 +1,3 @@
+,ltable_id,ltable_Beer_Name,ltable_Brew_Factory_Name,ltable_Style,ltable_ABV,rtable_id,rtable_Beer_Name,rtable_Brew_Factory_Name,rtable_Style,rtable_ABV,match,label,cf_summary
+0,76,Green Lakes Organic Ale,Deschutes Brewery,American Amber / Red Ale,5.20 %,2831,Deschutes Green Lakes Non-Organic Ale,Deschutes Brewery,Amber Ale,6.40 %,0.94334894,0,{'ltable_Style': 0.6}
+1,4027,Lower De Boom Barleywine,21st Amendment Brewery,American Barleywine,11.50 %,2510,21st Amendment Bourbon Barrel Lower da Boom Barleywine,21st Amendment Brewery,Barley Wine,9.50 %,0.95647293,0,{'ltable_Beer_Name/ltable_Brew_Factory_Name/ltable_Style': 0.7}

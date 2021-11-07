@@ -321,7 +321,7 @@ if __name__ == "__main__":
     samples = 50
     mtype = 'emt'
     filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', #'dirty_dblp_acm', 'dirty_dblp_scholar'
-                          'fodo_zaga', 'abt_buy',
+                          'fodo_zaga',
                          'walmart_amazon', 'amazon_google', 'itunes_amazon',
                          'dblp_scholar', 'dblp_acm'
                          ]

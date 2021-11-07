@@ -1,8 +1,8 @@
 import logging
+import re
 
 import numpy as np
 import pandas as pd
-import re
 
 from certa import local_explain, triangles_method
 
@@ -42,17 +42,12 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
             alt_attrs = counterfactual_examples['alteredAttributes']
             for index, value in alt_attrs.items():
                 attrs = re.sub("[\(\)',]", '', str(value)).split()
-                # if attrs[0].startswith('rprefix'):
-                #     attr_length = len(r_tuple) - 1
-                # else:
-                #     attr_length = len(l_tuple) - 1
-
                 for attr in attrs:
-                    nec_score = 1 #/ (pow(2, attr_length - 1))
+                    nec_score = 1  # / (pow(2, attr_length - 1))
                     if attr in sal:
                         ns = sal[attr] + nec_score
                     else:
-                        ns = 2 * nec_score # adding a count for P(A)
+                        ns = 2 * nec_score  # adding a count for P(A)
                     sal[attr] = ns
 
             for k, v in sal.items():
@@ -61,7 +56,7 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
             saliency_df = pd.DataFrame(data=[sal.values()], columns=sal.keys())
 
         if len(counterfactual_examples) > 0:
-            counterfactual_examples['attr_count'] = counterfactual_examples.alteredAttributes.astype(str)\
+            counterfactual_examples['attr_count'] = counterfactual_examples.alteredAttributes.astype(str) \
                 .str.split(',').str.len()
             counterfactual_examples = counterfactual_examples.sort_values(by=['attr_count'])
 

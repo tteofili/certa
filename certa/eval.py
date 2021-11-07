@@ -140,7 +140,6 @@ def eval_drop(prediction, explanation_attributes, l_record, r_record, predict_fn
     return drop, impact
 
 
-
 def eval_sample(prediction, explanation_attributes, lsource, l_record, rsource, r_record, predict_fn):
     class_to_explain = np.argmax(prediction)
     drop = 0
