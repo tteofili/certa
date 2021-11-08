@@ -239,7 +239,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         if len(neighborhood) > num_triangles:
             neighborhood = neighborhood.sample(n=num_triangles)
         else:
-            logging.debug('could find {} neighbors of the {} requested', len(neighborhood), num_triangles)
+            logging.warning(f'could find {str(len(neighborhood))} triangles of the {str(num_triangles)} requested')
 
         neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
                                          neighborhood.match_score.values))

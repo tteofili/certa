@@ -118,15 +118,15 @@ def evaluate(mtype: str, samples: int = 50, filtered_datasets: list = [], exp_di
                     try:
                         # CERTA
                         print('certa')
-                        num_triangles = 100
-
+                        num_triangles = 10
+                        token_parts = False
                         t0 = time.perf_counter()
 
                         saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource,
                                                                                               rsource, predict_fn, datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast, max_predict=max_predict,
-                                                                                              token_parts=True, attr_length=len(lsource) - 1)
+                                                                                              token_parts=token_parts, attr_length=len(lsource) - 1)
                         if len(saliency_df) == 0:
                             saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple,
                                                                                                   lsource,
@@ -134,8 +134,8 @@ def evaluate(mtype: str, samples: int = 50, filtered_datasets: list = [], exp_di
                                                                                                   datadir,
                                                                                                   num_triangles=num_triangles,
                                                                                                   fast=False,
-                                                                                                  max_predict=-1,
-                                                                                                  token_parts=True,
+                                                                                                  max_predict=max_predict,
+                                                                                                  token_parts=token_parts,
                                                                                                   attr_length=len(lsource) - 1)
 
                         latency_c = time.perf_counter() - t0
@@ -248,8 +248,9 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
     samples = 50
     mtype = 'emt'
-    filtered_datasets = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'fodo_zaga',
+    filtered_datasets = [#'dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
+                         #'fodo_zaga',
                          'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar', 'dblp_acm']
-    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=500, fast=True, compare=False)
+                         #'dblp_scholar', 'dblp_acm'
+    ]
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=100, fast=True, compare=True)

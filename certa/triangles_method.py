@@ -430,7 +430,8 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
             perturbations_df = pd.concat(perturbations, ignore_index=True)
         except:
             perturbations_df = pd.DataFrame(perturbations)
-
+        if len(perturbations_df) == 0 or 'alteredAttributes' not in perturbations_df.columns:
+            continue
         currPerturbedAttr = perturbations_df.alteredAttributes.values
         if monotonicity:
             if a != attr_length and not all_good:
