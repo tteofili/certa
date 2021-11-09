@@ -9,7 +9,7 @@ from certa import local_explain, triangles_method
 
 def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: bool = False, left=True, right=True,
             attr_length=-1, mode: str = 'open', num_triangles: int = 100, token_parts: bool = True,
-            saliency: bool = True, lprefix='ltable_', rprefix='rtable_', max_predict: int = -1):
+            saliency: bool = True, lprefix='ltable_', rprefix='rtable_', max_predict: int = -1, generate_perturb=True):
     predicted_class = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
     local_samples, gleft_df, gright_df = local_explain.dataset_local(l_tuple, r_tuple, lsource, rsource,
                                                                      predict_fn, lprefix, rprefix,
@@ -18,7 +18,8 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, fast: b
                                                                      use_w=right, use_y=left,
                                                                      num_triangles=num_triangles,
                                                                      token_parts=token_parts,
-                                                                     max_predict=max_predict)
+                                                                     max_predict=max_predict,
+                                                                     generate_perturb=generate_perturb)
 
     if attr_length <= 0:
         attr_length = min(len(l_tuple) - 1, len(r_tuple) - 1)

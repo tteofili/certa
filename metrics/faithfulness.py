@@ -20,15 +20,24 @@ def get_faithfullness(model: ERModel, base_dir: str, test_set_df: pd.DataFrame):
     aucs = dict()
     for saliency in saliency_names:
         model_scores = []
-
+        reverse = True
         saliency_df = pd.read_csv(os.path.join(base_dir, saliency + '.csv'))
+        if saliency == 'certa':
+            preds = saliency_df['match']
+
         for threshold in thresholds:
             top_k = int(threshold * attr_len)
             test_set_df_c = test_set_df.copy().astype(str)
             for i in range(len(saliency_df)):
+                if int(preds[i]) == 0:
+                    reverse = False
                 explanation = saliency_df.iloc[i]['explanation']
                 attributes_dict = json.loads(explanation.replace("'", "\""))
-                sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1))
+                if saliency == 'certa':
+                    sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1),
+                                                    reverse=True)
+                else:
+                    sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1), reverse=reverse)
                 top_k_attributes = sorted_attributes_dict[:top_k]
                 for t in top_k_attributes:
                     test_set_df_c.at[i, t[0]] = ''
