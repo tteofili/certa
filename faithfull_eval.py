@@ -12,10 +12,7 @@ experiments_dir = 'quantitative/'
 root_datadir = 'datasets/'
 base_dir = ''
 samples = 50
-whitelist = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'beers',' abt_buy', 'fodo_zaga',
-                         'amazon_google',  'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar',  'dblp_acm']
+whitelist = ['fodo_zaga']
 
 faithfulness_dict = dict()
 for subdir, dirs, files in os.walk(experiments_dir):

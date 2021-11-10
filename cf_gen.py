@@ -101,7 +101,7 @@ def evaluate(model_type: str, samples: int = 50, filtered_datasets: list = [], e
 
                         # CERTA
                         print('certa')
-                        num_triangles = 100
+                        num_triangles = 10
 
                         t0 = time.perf_counter()
 
@@ -110,7 +110,9 @@ def evaluate(model_type: str, samples: int = 50, filtered_datasets: list = [], e
                                                                                               datadir,
                                                                                               num_triangles=num_triangles,
                                                                                               fast=fast,
+                                                                                              attr_length=2,
                                                                                               max_predict=max_predict,
+                                                                                              token_parts=False,
                                                                                               saliency=False)
 
                         latency_c = time.perf_counter() - t0
@@ -143,6 +145,6 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     samples = 50
-    mtype = 'dm'
-    filtered_datasets = ['abt_buy']
-    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=1000, fast=True)
+    mtype = 'emt'
+    filtered_datasets = ['itunes_amazon', 'walmart_amazon']
+    evaluate(mtype, samples=samples, filtered_datasets=filtered_datasets, max_predict=100, fast=True)

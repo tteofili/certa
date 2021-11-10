@@ -1,24 +1,10 @@
 import math
 import os
 import traceback
-
+import logging
 import pandas as pd
 
-from certa.utils import merge_sources
 from models.utils import from_type
-
-model_type = 'deeper'
-experiments_dir = 'cf/'
-root_datadir = 'datasets/'
-base_dir = ''
-samples = 50
-whitelist = ['dirty_dblp_scholar', 'dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm',
-                         'beers',' abt_buy', 'fodo_zaga',
-                         'amazon_google',  'itunes_amazon', 'walmart_amazon',
-                         'dblp_scholar',  'dblp_acm'
-             ]
-
-cf_dict = dict()
 
 
 def get_validity(model, rows_df, predicted_class):
@@ -84,67 +70,79 @@ def get_sparsity(expl_df, instance):
     return 1 - get_proximity(expl_df, instance) / (len(expl_df.columns) / 2)
 
 
-for subdir, dirs, files in os.walk(experiments_dir):
-    for dataset in dirs:
-        if dataset not in whitelist:
-            continue
-        datadir = os.path.join(root_datadir, dataset)
-        test = pd.read_csv(datadir + '/test.csv')
+def cf_eval(model_type: str, samples=50, whitelist=[]):
+    experiments_dir = 'cf/'
+    base_dir = ''
 
-        lsource = pd.read_csv(datadir + '/tableA.csv')
-        rsource = pd.read_csv(datadir + '/tableB.csv')
-        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])[:samples]
+    cf_dict = dict()
+    for subdir, dirs, files in os.walk(experiments_dir):
+        for dataset in dirs:
+            if dataset not in whitelist:
+                continue
 
-        model = from_type('%s' % model_type)
-        try:
-            model.load('%smodels/%s/%s' % (base_dir, model_type, dataset))
+            model = from_type('%s' % model_type)
+            try:
+                logging.info('loading model')
+                model.load('%smodels/%s/%s' % (base_dir, model_type, dataset))
 
-            base_cf_exp_dir = experiments_dir + dataset + '/' + model_type
-            examples_df = pd.read_csv(base_cf_exp_dir + '/examples.csv')
+                base_cf_exp_dir = experiments_dir + dataset + '/' + model_type
+                logging.info('loading cfs')
+                examples_df = pd.read_csv(base_cf_exp_dir + '/examples.csv')
 
-            cf_eval = dict()
-            saliency_names = ['certa', 'dice_random', 'shapc', 'limec']
-            for saliency in saliency_names:
-                validity = 0
-                proximity = 0
-                sparsity = 0
-                diversity = 0
-                count = 0
-                for i in range(samples):
-                    try:
-                        # get cfs
-                        expl_df = pd.read_csv(base_cf_exp_dir + '/' + str(i) + '/' + saliency + '.csv')
+                cf_eval = dict()
+                saliency_names = ['certa', 'dice_random', 'shapc', 'limec']
+                for saliency in saliency_names:
+                    logging.info(f'processing {saliency}')
+                    validity = 0
+                    proximity = 0
+                    sparsity = 0
+                    diversity = 0
+                    count = 0
+                    for i in range(samples):
+                        try:
+                            # get cfs
+                            expl_df = pd.read_csv(base_cf_exp_dir + '/' + str(i) + '/' + saliency + '.csv')
 
-                        example_row = examples_df.iloc[i]
-                        instance = example_row.drop(['ltable_id', 'rtable_id', 'match', 'label'])
-                        label = example_row['label']
-                        score = example_row['match']
-                        predicted_class = int(float(score) > 0.5)
+                            example_row = examples_df.iloc[i]
+                            instance = example_row.drop(['ltable_id', 'rtable_id', 'match', 'label'])
+                            score = example_row['match']
+                            predicted_class = int(float(score) > 0.5)
 
-                        # validity
-                        validity += get_validity(model, expl_df, predicted_class)
+                            # validity
+                            validity += get_validity(model, expl_df, predicted_class)
 
-                        # proximity
-                        proximity += get_proximity(expl_df, instance)
+                            # proximity
+                            proximity += get_proximity(expl_df, instance)
 
-                        # sparsity
-                        sparsity += get_sparsity(expl_df, instance)
+                            # sparsity
+                            sparsity += get_sparsity(expl_df, instance)
 
-                        # diversity
-                        diversity += get_diversity(expl_df)
-                        count += 1
-                    except:
-                        pass
-                row = {'validity': validity / count, 'proximity': proximity / count,
-                          'sparsity': sparsity / count, 'diversity': diversity / count}
-                print(row)
-                cf_eval[saliency] = row
+                            # diversity
+                            diversity += get_diversity(expl_df)
+                            count += 1
+                        except:
+                            pass
+                    row = {'validity': validity / count, 'proximity': proximity / count,
+                           'sparsity': sparsity / count, 'diversity': diversity / count}
+                    logging.info(f'{saliency}:{row}')
+                    cf_eval[saliency] = row
 
-            print(f'{model_type}: cf-eval for {dataset}: {cf_eval}')
-            cf_dict[dataset] = cf_eval
-        except:
-            print(traceback.format_exc())
-            print(f'skipped {dataset}')
-            pass
+                print(f'{model_type}: cf-eval for {dataset}: {cf_eval}')
+                cf_dict[dataset] = cf_eval
+            except:
+                print(traceback.format_exc())
+                print(f'skipped {dataset}')
+                pass
+        return cf_dict
 
-print(cf_dict)
+
+if __name__ == "__main__":
+    samples = 50
+    mtype = 'emt'
+    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm', 'dirty_dblp_scholar'
+                                                                                          'fodo_zaga',
+                         'walmart_amazon', 'amazon_google', 'itunes_amazon',
+                         'dblp_scholar', 'dblp_acm'
+                         ]
+    cf_dict = cf_eval(mtype, samples=samples, whitelist=filtered_datasets)
+    print(cf_dict)
