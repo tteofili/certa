@@ -1,0 +1,50 @@
+,label,latency,match,prediction,row,summary,type
+0,0.0,49.98669661200256,0.0,[0.82949977 0.17050023],3505-30346,"rtable_Time    0.9
+dtype: float64",certa
+1,0.0,51.679517784999916,0.0,[0.74597329 0.25402671],5343-47894,"rtable_Time    0.8
+dtype: float64",certa
+2,1.0,36.80033045401797,1.0,[0.02325809 0.97674191],3354-17643,"rtable_Time    0.2
+dtype: float64",certa
+3,0.0,50.807699717988726,0.0,[0.92675129 0.07324871],1268-34910,"ltable_Released       0.0
+ltable_Time           0.0
+ltable_CopyRight      0.0
+ltable_Price          0.0
+ltable_Genre          0.0
+ltable_Album_Name     0.0
+ltable_Artist_Name    0.0
+ltable_Song_Name      0.0
+rtable_Released       0.0
+rtable_Time           0.0
+rtable_CopyRight      0.0
+rtable_Price          0.0
+rtable_Genre          0.0
+rtable_Album_Name     0.0
+rtable_Artist_Name    0.0
+rtable_Song_Name      0.0
+dtype: float64",certa
+4,0.0,37.677574053028366,0.0,[0.93546219 0.06453781],1176-34919,"ltable_Time    0.1
+dtype: float64",certa
+5,0.0,46.08569599798648,0.0,[0.92395424 0.07604576],1156-28014,"rtable_Released       0.0
+rtable_Time           0.0
+rtable_CopyRight      0.0
+rtable_Price          0.0
+rtable_Genre          0.0
+rtable_Album_Name     0.0
+rtable_Artist_Name    0.0
+rtable_Song_Name      0.0
+dtype: float64",certa
+6,0.0,49.87693962000776,0.0,[0.94772848 0.05227152],2718-17189,"ltable_Time    0.2
+dtype: float64",certa
+7,0.0,37.598164561000885,0.0,[0.96297396 0.03702604],1164-28001,"ltable_Released       0.0
+ltable_Time           0.0
+ltable_CopyRight      0.0
+ltable_Price          0.0
+ltable_Genre          0.0
+ltable_Album_Name     0.0
+ltable_Artist_Name    0.0
+ltable_Song_Name      0.0
+dtype: float64",certa
+8,0.0,32.721884248021524,0.0,[0.94659323 0.05340677],271-53030,"ltable_Time    0.6
+dtype: float64",certa
+9,0.0,40.52493890799815,0.0,[0.9155477 0.0844523],796-33113,"rtable_Time    0.9
+dtype: float64",certa

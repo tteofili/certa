@@ -1,0 +1,51 @@
+,label,latency,match,prediction,row,summary,type
+0,0.0,16.37126441000146,0.0,[0.9481997 0.0518003],1496-1225,"rtable_title    0.6
+dtype: float64",certa
+1,0.0,15.812031970010139,1.0,[0.22337353 0.77662647],574-749,"ltable_authors    0.6
+ltable_title      0.6
+dtype: float64",certa
+2,0.0,22.539602649980225,0.0,[0.94794738 0.05205262],561-1957,"rtable_title    0.6
+dtype: float64",certa
+3,0.0,16.806935355009045,0.0,[0.95048149 0.04951851],1799-1307,"rtable_year       0.0
+rtable_venue      0.0
+rtable_authors    0.0
+rtable_title      0.0
+ltable_year       0.0
+ltable_venue      0.0
+ltable_authors    0.0
+ltable_title      0.0
+dtype: float64",certa
+4,0.0,24.319270568026695,0.0,[0.94720077 0.05279923],1116-1205,"ltable_title    0.9
+dtype: float64",certa
+5,0.0,23.249717839004006,0.0,[0.94883773 0.05116227],2009-679,"ltable_year       0.0
+ltable_venue      0.0
+ltable_authors    0.0
+ltable_title      0.0
+rtable_year       0.0
+rtable_venue      0.0
+rtable_authors    0.0
+rtable_title      0.0
+dtype: float64",certa
+6,0.0,21.900741694989847,0.0,[0.94922495 0.05077505],1496-991,"rtable_year       0.0
+rtable_venue      0.0
+rtable_authors    0.0
+rtable_title      0.0
+ltable_year       0.0
+ltable_venue      0.0
+ltable_authors    0.0
+ltable_title      0.0
+dtype: float64",certa
+7,0.0,20.307666334992973,0.0,[0.94809344 0.05190656],69-591,"ltable_title    0.7
+dtype: float64",certa
+8,0.0,19.78058415700798,0.0,[0.95028174 0.04971826],729-2227,"ltable_title    0.4
+rtable_title    0.4
+dtype: float64",certa
+9,0.0,21.85674366701278,0.0,[0.94913977 0.05086023],35-590,"rtable_year       0.0
+rtable_venue      0.0
+rtable_authors    0.0
+rtable_title      0.0
+ltable_year       0.0
+ltable_venue      0.0
+ltable_authors    0.0
+ltable_title      0.0
+dtype: float64",certa
