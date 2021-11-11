@@ -73,6 +73,7 @@ def get_sparsity(expl_df, instance):
 def cf_eval(model_type: str, samples=50, whitelist=[]):
     experiments_dir = 'cf/'
     base_dir = ''
+    t = 10
 
     cf_dict = dict()
     for subdir, dirs, files in os.walk(experiments_dir):
@@ -97,6 +98,7 @@ def cf_eval(model_type: str, samples=50, whitelist=[]):
                     proximity = 0
                     sparsity = 0
                     diversity = 0
+                    length = 0
                     count = 0
                     for i in range(samples):
                         try:
@@ -109,21 +111,24 @@ def cf_eval(model_type: str, samples=50, whitelist=[]):
                             predicted_class = int(float(score) > 0.5)
 
                             # validity
-                            validity += get_validity(model, expl_df, predicted_class)
+                            validity += get_validity(model, expl_df[:t], predicted_class)
 
                             # proximity
-                            proximity += get_proximity(expl_df, instance)
+                            proximity += get_proximity(expl_df[:t], instance)
 
                             # sparsity
-                            sparsity += get_sparsity(expl_df, instance)
+                            sparsity += get_sparsity(expl_df[:t], instance)
 
                             # diversity
-                            diversity += get_diversity(expl_df)
+                            diversity += get_diversity(expl_df[:t])
+
+                            length += len(expl_df)
                             count += 1
                         except:
                             pass
                     row = {'validity': validity / count, 'proximity': proximity / count,
-                           'sparsity': sparsity / count, 'diversity': diversity / count}
+                           'sparsity': sparsity / count, 'diversity': diversity / count,
+                           'length': length / count}
                     logging.info(f'{saliency}:{row}')
                     cf_eval[saliency] = row
 
@@ -137,11 +142,11 @@ def cf_eval(model_type: str, samples=50, whitelist=[]):
 
 
 if __name__ == "__main__":
-    samples = 50
-    mtype = 'emt'
-    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm', 'dirty_dblp_scholar'
-                                                                                          'fodo_zaga',
-                         'walmart_amazon', 'amazon_google', 'itunes_amazon',
+    samples = 20
+    mtype = 'deeper'
+    filtered_datasets = ['dirty_amazon_itunes', 'dirty_walmart_amazon', 'dirty_dblp_acm', 'dirty_dblp_scholar',
+                         'fodo_zaga', 'beers', 'abt_buy',
+                         'walmart_amazon', 'itunes_amazon', 'amazon_google',
                          'dblp_scholar', 'dblp_acm'
                          ]
     cf_dict = cf_eval(mtype, samples=samples, whitelist=filtered_datasets)
