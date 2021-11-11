@@ -99,7 +99,7 @@ def cf_eval(model_type: str, samples=50, whitelist=[]):
                     sparsity = 0
                     diversity = 0
                     length = 0
-                    count = 0
+                    count = 1e-10
                     for i in range(samples):
                         try:
                             # get cfs
