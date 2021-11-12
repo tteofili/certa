@@ -182,6 +182,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                   use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
                   use_w: bool = True, use_y: bool = True, datadir='', theta_min: float = 0.5,
                   theta_max: float = 0.5, token_parts: bool = False):
+    # TODO: ensure balanced triangles set
     if not use_predict:
         theta_max = 0.1
         theta_min = 0.7
