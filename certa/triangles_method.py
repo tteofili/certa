@@ -304,11 +304,12 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
 
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     if len(allTriangles) > 0:
+        print('finding flips')
         flippedPredictions_df, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
                                                                            class_to_explain, discard_bad,
                                                                            attr_length, predict_fn, sourcesMap, lprefix,
                                                                            rprefix)
-
+        print('calculating scores')
         if persist_predictions:
             all_predictions.to_csv('predictions.csv', mode='a')
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),

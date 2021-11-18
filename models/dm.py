@@ -1,15 +1,14 @@
+import contextlib
 import logging
+import os
+import random
 import re
+import string
 from collections import defaultdict
 
 import deepmatcher as dm
 import numpy as np
-import contextlib
 import pandas as pd
-import random
-import os
-import string
-
 from scipy.sparse import csr_matrix
 
 from models.ermodel import ERModel
@@ -256,18 +255,21 @@ class DMERModel(ERModel):
         label_valid.to_csv(valid_file, index=False)
 
         # read dataset
-        trainLab, validationLab = dm.data.process(cache=dataset_name + '.pth', path='', train=train_file,
+        trainLab, validationLab = dm.data.process(cache='models/saved/dm/' + dataset_name + '.pth', path='',
+                                                  train=train_file,
                                                   validation=valid_file, left_prefix='ltable_',
                                                   right_prefix='rtable_')
         self.initialize_models(trainLab)
 
         logging.debug("TRAINING with {} samples", len(trainLab))
         # train default model with standard dataset
-        self.model.run_train(trainLab, validationLab, best_save_path=dataset_name + '_best_default_model.pth',
+        self.model.run_train(trainLab, validationLab,
+                             best_save_path='models/saved/dm/' + dataset_name + '_best_default_model.pth',
                              epochs=15)
 
         stats = self.model.run_eval(validationLab)
-
+        os.remove(train_file)
+        os.remove(valid_file)
         return stats
 
     def predict(self, x, mojito=False, expand_dim=False, **kwargs):
@@ -296,6 +298,7 @@ class DMERModel(ERModel):
                                   right_prefix='rtable_', cache=None)
 
         f1 = self.model.run_eval(testLab)
+        os.remove(test_file)
         return 0, 0, f1
 
     def load(self, path):

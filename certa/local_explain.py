@@ -23,8 +23,8 @@ def get_row(r1, r2, lprefix='ltable_', rprefix='rtable_'):
     return r1r2
 
 
-def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, num_candidates, lj=True, max=-1,
-                            lprefix='ltable_', rprefix='rtable_'):
+def find_candidates_predict(record, source, similarity_threshold, find_positives, predict_fn, num_candidates, lj=True,
+                            max=-1, lprefix='ltable_', rprefix='rtable_'):
     out = pd.DataFrame()
     if lj:
         records = pd.DataFrame()
@@ -43,11 +43,10 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
         records.columns = list(map(lambda col: rprefix + col, records.columns))
         samples = pd.concat([copy, records], axis=1)
 
-    if max > 0:
-        samples = samples.sample(frac=1)[:max]
-    result = pd.DataFrame()
 
-    batch = 1000
+    samples = samples.sample(frac=1)[:max]
+    result = pd.DataFrame()
+    batch = int(len(samples) / 5)
     i = 0
     while len(out) < num_candidates:
         batch_samples = samples[batch * i:batch * (i + 1)]

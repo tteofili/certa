@@ -10,6 +10,7 @@ def explain(l_tuple, r_tuple, lsource, rsource, predict_fn, dataset_dir, left=Tr
             num_triangles: int = 100, token_parts: bool = True, lprefix='ltable_', rprefix='rtable_',
             max_predict: int = -1, generate_perturb=True):
     pc = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
+    print('local samples')
     local_samples, gleft_df, gright_df = local_explain.dataset_local(l_tuple, r_tuple, lsource, rsource,
                                                                      predict_fn, lprefix, rprefix,
                                                                      class_to_explain=pc,

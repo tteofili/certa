@@ -1,5 +1,5 @@
 import logging
-
+import os
 import pandas as pd
 
 from certa.utils import merge_sources
@@ -22,6 +22,8 @@ def from_type(type: str):
 
 def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
     model = from_type(mtype)
+
+    os.makedirs(modeldir, exist_ok=True)
 
     print(f'working on {modelname}')
     logging.info(f'reading data from {datadir}')
