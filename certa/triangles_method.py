@@ -292,10 +292,10 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
         return matches == 3 or non_matches == 3 or (matches == 1 and non_matches == 2)
 
 
-def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
-                   class_to_explain: int, attr_length: int, check: bool = False,
-                   discard_bad: bool = False, return_top: bool = False,
-                   persist_predictions: bool = False):
+def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
+                    class_to_explain: int, attr_length: int, check: bool = False,
+                    discard_bad: bool = False, return_top: bool = False,
+                    persist_predictions: bool = False):
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
 
@@ -310,9 +310,19 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, l
                                                                            rprefix)
 
         if persist_predictions:
-            all_predictions.to_csv('lattices.csv', mode='a')
+            all_predictions.to_csv('predictions.csv', mode='a')
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                         attr_length=attr_length)
+
+        flips = len(flippedPredictions_df)
+        saliency = dict()
+        for ranking in rankings:
+            for k, v in ranking.items():
+                for a in k:
+                    if a in saliency.keys():
+                        saliency[a] += v / flips
+                    else:
+                        saliency[a] = 2 / flips # count full A set
 
         if len(explanation) > 0:
             if return_top:
@@ -321,12 +331,12 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, l
             else:
                 filtered_exp = explanation
 
-            return filtered_exp, flippedPredictions_df, allTriangles
+            return saliency, filtered_exp, flippedPredictions_df, allTriangles
         else:
-            return [], pd.DataFrame(), []
+            return dict(), [], pd.DataFrame(), []
     else:
         logging.warning(f'empty triangles !?')
-        return [], pd.DataFrame(), []
+        return dict(), [], pd.DataFrame(), []
 
 
 def cf_summary(explanation):

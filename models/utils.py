@@ -47,3 +47,4 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
         text_file.write('p:' + str(precision) + ', r:' + str(recall) + ', f1:' + str(fmeasure))
         text_file.close()
         model.save(modeldir)
+    return model
