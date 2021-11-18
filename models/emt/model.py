@@ -2,7 +2,6 @@ import os
 
 from transformers import DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer
 
-
 def save_model(model, experiment_name, model_output_dir, epoch=None, tokenizer=None):
     if epoch:
         output_sub_dir = os.path.join(model_output_dir, experiment_name, "epoch_{}".format(epoch))

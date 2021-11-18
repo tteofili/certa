@@ -196,7 +196,7 @@ def train_model_ER(data, valid, model, embeddings_model, tokenizer, pretraining=
     # Early stopping (arresta l'apprendimento se non ci sono miglioramenti)
     es = EarlyStopping(monitor=metric, min_delta=0, verbose=1, patience=7)
     # Model checkpointing (salva il miglior modello fin'ora)
-    mc = ModelCheckpoint(f'models/deeper/{model_name}_best_model_{end}.h5', monitor=metric, verbose=1,
+    mc = ModelCheckpoint(f'models/saved/deeper/{model_name}_best_model_{end}.h5', monitor=metric, verbose=1,
                          save_best_only=True)
 
     # Addestramento modello

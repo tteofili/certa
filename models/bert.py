@@ -6,15 +6,15 @@ import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
 
-import bert.model
-import bert.config
-import bert.data_representation
-import bert.data_loader
-import bert.optimizer
-import bert.evaluation
-import bert.torch_initializer
-import bert.training
-import bert.prediction
+import models.emt.model
+import models.emt.config
+import models.emt.data_representation
+import models.emt.data_loader
+import models.emt.optimizer
+import models.emt.evaluation
+import models.emt.torch_initializer
+import models.emt.training
+import models.emt.prediction
 from models.ermodel import ERModel
 
 BATCH_SIZE = 8

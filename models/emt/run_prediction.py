@@ -3,13 +3,13 @@ import os
 
 from transformers import BertTokenizer
 
-from config import read_arguments_prediction
-from data_representation import DeepMatcherProcessor, QqpProcessor
-from logging_customized import setup_logging
-from data_loader import load_data, DataType
-from model import load_model
-from prediction import predict
-from torch_initializer import initialize_gpu_seed
+from models.emt.config import read_arguments_prediction
+from models.emt.data_representation import DeepMatcherProcessor, QqpProcessor
+from models.emt.logging_customized import setup_logging
+from models.emt.data_loader import load_data, DataType
+from models.emt.model import load_model
+from models.emt.prediction import predict
+from models.emt.torch_initializer import initialize_gpu_seed
 
 setup_logging()
 

@@ -4,8 +4,8 @@ import os
 import torch
 from tqdm import tqdm, trange
 
-from logging_customized import setup_logging
-from model import save_model
+from models.emt.logging_customized import setup_logging
+from models.emt.model import save_model
 from tensorboardX import SummaryWriter
 
 setup_logging()

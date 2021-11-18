@@ -1,7 +1,7 @@
 import logging
 
-from logging_customized import setup_logging
-from data_representation import InputFeatures
+from models.emt.logging_customized import setup_logging
+from models.emt.data_representation import InputFeatures
 
 setup_logging()
 

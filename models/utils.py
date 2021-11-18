@@ -43,8 +43,6 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
         model.train(train_df, valid_df, modelname)
 
         precision, recall, fmeasure = model.evaluation(test_df)
-        if not modeldir.endswith('/'):
-            modeldir = modeldir + '/'
         text_file = open(modeldir + 'report.txt', "a")
         text_file.write('p:' + str(precision) + ', r:' + str(recall) + ', f1:' + str(fmeasure))
         text_file.close()
