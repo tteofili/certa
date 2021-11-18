@@ -6,7 +6,6 @@ from baselines.mojito import Mojito
 """
 Import libraries 
 """
-from lime.lime_text import LimeTextExplainer
 import time
 import pandas as pd
 

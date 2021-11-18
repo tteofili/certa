@@ -1,71 +1,12 @@
 import logging
-import math
 import os
 import random
-import re
 import string
-from collections import Counter
 
 import numpy as np
 import pandas as pd
 
-from certa.edit_dna import Sequence
 from certa.utils import diff
-
-'''
-N.B. For now this script can only work using deepmatcher
-'''
-
-WORD = re.compile(r'\w+')
-
-
-# calculate similarity between two text vectors
-def get_cosine(text1, text2):
-    vec1 = text_to_vector(text1)
-    vec2 = text_to_vector(text2)
-    intersection = set(vec1.keys()) & set(vec2.keys())
-    numerator = sum([vec1[x] * vec2[x] for x in intersection])
-
-    sum1 = sum([vec1[x] ** 2 for x in vec1.keys()])
-    sum2 = sum([vec2[x] ** 2 for x in vec2.keys()])
-    denominator = math.sqrt(sum1) * math.sqrt(sum2)
-
-    if not denominator:
-        return 0.0
-    else:
-        return float(numerator) / denominator
-
-
-def text_to_vector(text):
-    words = WORD.findall(text)
-    return Counter(words)
-
-
-def find_candidates(record, source, similarity_threshold, find_positives, lj=True, lprefix='ltable_',
-                    rprefix='rtable_'):
-    record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
-    source_without_id = source.copy()
-    source_without_id = source_without_id.drop(['id'], axis=1)
-    source_ids = source.id.values
-    # for a faster iteration
-    source_without_id = source_without_id.values
-    candidates = []
-    for idx, row in enumerate(source_without_id):
-        currentRecord = " ".join(row.astype(str))
-        currentSimilarity = get_cosine(record2text, currentRecord)
-        if find_positives:
-            if currentSimilarity >= similarity_threshold:
-                if lj:
-                    candidates.append((record['id'], source_ids[idx]))
-                else:
-                    candidates.append((source_ids[idx], record['id']))
-        else:
-            if currentSimilarity < similarity_threshold:
-                if lj:
-                    candidates.append((record['id'], source_ids[idx]))
-                else:
-                    candidates.append((source_ids[idx], record['id']))
-    return pd.DataFrame(candidates, columns=[lprefix + 'id', rprefix + 'id'])
 
 
 def get_original_prediction(r1, r2, predict_fn):
@@ -135,57 +76,12 @@ def __generate_unlabeled(dataset_dir, unlabeled_filename, lprefix='ltable_', rpr
     return unlabeled_df.drop_duplicates()
 
 
-def copy_EDIT(series, n, d):
-    copy = series.copy()
-    if n == -1:
-        l_idx = random.randint(0, int(len(series) / 2))
-        r_idx = l_idx + int(len(series) / 2)
-        o_l_val = str(copy.get(l_idx))
-        l_val = o_l_val
-        while l_val == o_l_val:
-            l_val = copy_EDIT_match([o_l_val], d)[0]
-        o_r_val = str(copy.get(r_idx))
-        r_val = o_r_val
-        while o_r_val == r_val:
-            r_val = copy_EDIT_match([o_r_val], d)[0]
-        copy.update(pd.Series([l_val, r_val], index=[l_idx, r_idx]))
-    else:
-        o_r_val = str(copy.get(n))
-        r_val = o_r_val
-        while o_r_val == r_val:
-            changed = copy_EDIT_match([o_r_val], d)
-            r_val = changed[0]
-        copy[n] = r_val
-    return copy
-
-
-def copy_EDIT_match(tupla, d):
-    copy_tup = []
-
-    for i in range(len(tupla)):
-        attr = Sequence(tupla[i])
-        if len(tupla[i]) > 1:
-            n = 3  # number of strings in result
-            mutates = attr.mutate(d, n)
-            copy_tup.append(str(mutates[1]))
-        else:
-            copy_tup.append(tupla[i])
-
-    if copy_tup == tupla:
-        copy_tup = copy_EDIT_match(tupla, d)
-    return copy_tup
-
-
 def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                   rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100,
                   class_to_explain: int = None,
-                  use_predict: bool = True, generate_perturb: bool = True, max_predict: int = -1,
+                  generate_perturb: bool = True, max_predict: int = -1,
                   use_w: bool = True, use_y: bool = True, datadir='', theta_min: float = 0.5,
                   theta_max: float = 0.5, token_parts: bool = False):
-    # TODO: ensure balanced triangles set
-    if not use_predict:
-        theta_max = 0.1
-        theta_min = 0.7
     r1r2 = get_row(r1, r2)
     originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
 
@@ -196,7 +92,8 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
     findPositives, neighborhood = get_default_neighborhood(class_to_explain, datadir, lsource, max_predict,
                                                            originalPrediction, predict_fn, r1, r2, rsource, theta_max,
-                                                           theta_min, use_predict, use_w, use_y, lprefix, rprefix)
+                                                           theta_min, use_w, use_y, lprefix, rprefix,
+                                                           num_triangles)
 
     if token_parts and len(neighborhood) < num_triangles:
         new_records_left_df = pd.DataFrame()
@@ -223,7 +120,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                                     originalPrediction, predict_fn, r1, r2,
                                                     pd.concat([rsource, generated_records_right_df]),
                                                     theta_max,
-                                                    theta_min, use_predict, use_w, use_y, lprefix, rprefix)
+                                                    theta_min, use_w, use_y, lprefix, rprefix, num_triangles)
         neighborhood = pd.concat([neighborhood, neighborhood2])
 
     if generate_perturb and len(neighborhood) < num_triangles:
@@ -257,7 +154,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
 
 def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, originalPrediction, predict_fn, r1, r2,
-                             rsource, theta_max, theta_min, use_predict, use_w, use_y, lprefix, rprefix):
+                             rsource, theta_max, theta_min, use_w, use_y, lprefix, rprefix, num_triangles):
     candidates4r1 = pd.DataFrame()
     candidates4r2 = pd.DataFrame()
     if class_to_explain == None:
@@ -265,35 +162,22 @@ def get_default_neighborhood(class_to_explain, datadir, lsource, max_predict, or
     else:
         findPositives = bool(0 == int(class_to_explain))
     if findPositives:
-        if use_predict:
-            if use_y:
-                candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True,
-                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
-            if use_w:
-                candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False,
-                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
-        else:
-            if use_y:
-                candidates4r1 = find_candidates(r1, rsource, theta_max, find_positives=findPositives, lj=True,
-                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
-            if use_w:
-                candidates4r2 = find_candidates(r2, lsource, theta_max, find_positives=findPositives, lj=False,
-                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
+        if use_y:
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_max, findPositives, predict_fn, lj=True,
+                                                    max=max_predict, lprefix=lprefix, rprefix=rprefix)
+        if use_w:
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_max, findPositives, predict_fn, lj=False,
+                                                    max=max_predict, lprefix=lprefix, rprefix=rprefix)
+
     else:
-        if use_predict:
-            if use_y:
-                candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True,
-                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
-            if use_w:
-                candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False,
-                                                        max=max_predict, lprefix=lprefix, rprefix=rprefix)
-        else:
-            if use_y:
-                candidates4r1 = find_candidates(r1, rsource, theta_min, find_positives=findPositives, lj=True,
-                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
-            if use_w:
-                candidates4r2 = find_candidates(r2, lsource, theta_min, find_positives=findPositives, lj=False,
-                                                lprefix=lprefix, rprefix=rprefix)[:max_predict]
+        if use_y:
+            candidates4r1 = find_candidates_predict(r1, rsource, theta_min, findPositives, predict_fn, lj=True,
+                                                    max=max_predict, lprefix=lprefix, rprefix=rprefix)
+        if use_w:
+            candidates4r2 = find_candidates_predict(r2, lsource, theta_min, findPositives, predict_fn, lj=False,
+                                                    max=max_predict, lprefix=lprefix, rprefix=rprefix)
+    candidates4r1 = candidates4r1[:int(num_triangles/2)]
+    candidates4r2 = candidates4r2[:int(num_triangles/2)]
     id4explanation = pd.concat([candidates4r1, candidates4r2], ignore_index=True)
     if len(id4explanation) > 0:
         tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
@@ -415,27 +299,3 @@ def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False, lprefi
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
     return neighborhood
 
-
-def find_thresholds(test_df: pd.DataFrame, m: float, lprefix='ltable_', rprefix='rtable_'):
-    ignore_columns = ['id']
-
-    l_columns = [col for col in list(test_df) if (col.startswith(lprefix)) and (col not in ignore_columns)]
-    r_columns = [col for col in list(test_df) if col.startswith(rprefix) and (col not in ignore_columns)]
-
-    l_string_test_df = test_df[l_columns].astype('str').agg(' '.join, axis=1)
-    r_string_test_df = test_df[r_columns].astype('str').agg(' '.join, axis=1)
-    label_df = test_df['label']
-
-    merged_string = pd.concat([l_string_test_df, r_string_test_df, label_df], ignore_index=True, axis=1)
-
-    sim_df = merged_string.apply(lambda x: get_cosine(x[0], x[1]), axis=1)
-
-    tuples_ls_df = pd.concat([merged_string, sim_df], ignore_index=True, axis=1)
-
-    lpos_df = tuples_ls_df[tuples_ls_df[2] == 1]
-    lneg_df = tuples_ls_df[tuples_ls_df[2] == 0]
-
-    theta_max = lpos_df[3].mean() + m * lpos_df[3].std()
-    theta_min = lneg_df[3].mean() - m * lneg_df[3].std()
-
-    return theta_min, theta_max

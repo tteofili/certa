@@ -1,18 +1,20 @@
-"""Evaluate confidence measure."""
 import json
+import operator
 import os
 
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import auc
 from sklearn.metrics import max_error, mean_absolute_error
 from sklearn.model_selection import ShuffleSplit
 from sklearn.preprocessing import MinMaxScaler
 
+from models.ermodel import ERModel
 
-def get_confidence(base_dir: str):
+
+def get_confidence(saliency_names: list, base_dir: str):
     np.random.seed(1)
-    saliency_names = ['certa', 'landmark', 'mojito_c', 'mojito_d', 'shap']
     all_y = []
     ci = dict()
     for saliency in saliency_names:
@@ -106,7 +108,6 @@ def get_confidence(base_dir: str):
             X_train, y_train, X_test, y_test = features[train_index], y[
                 train_index], features[test_index], y[test_index]
             reg = LinearRegression().fit(X_train, y_train)
-            pred = reg.predict(X_train)
             test_pred = reg.predict(X_test)
 
             all_metrics = []
@@ -134,6 +135,40 @@ def get_confidence(base_dir: str):
     return ci
 
 
-if __name__ == "__main__":
-    ci = get_confidence('/home/tteofili/dev/certa/quantitative/fodo_zaga/emt')
-    print(ci)
+def get_faithfullness(model: ERModel, base_dir: str, test_set_df: pd.DataFrame):
+    np.random.seed(0)
+    saliency_names = ['certa', 'landmark', 'mojito_c', 'mojito_d', 'shap']
+
+    thresholds = [0.1, 0.2, 0.33, 0.5, 0.7, 0.9]
+
+    attr_len = len(test_set_df.columns) - 2
+    aucs = dict()
+    for saliency in saliency_names:
+        model_scores = []
+        reverse = True
+        saliency_df = pd.read_csv(os.path.join(base_dir, saliency + '.csv'))
+        if saliency == 'certa':
+            preds = saliency_df['match']
+
+        for threshold in thresholds:
+            top_k = int(threshold * attr_len)
+            test_set_df_c = test_set_df.copy().astype(str)
+            for i in range(len(saliency_df)):
+                if int(preds[i]) == 0:
+                    reverse = False
+                explanation = saliency_df.iloc[i]['explanation']
+                attributes_dict = json.loads(explanation.replace("'", "\""))
+                if saliency == 'certa':
+                    sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1),
+                                                    reverse=True)
+                else:
+                    sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1),
+                                                    reverse=reverse)
+                top_k_attributes = sorted_attributes_dict[:top_k]
+                for t in top_k_attributes:
+                    test_set_df_c.at[i, t[0]] = ''
+            evaluation = model.evaluation(test_set_df_c)
+            model_scores.append(evaluation[2])
+        auc_sal = auc(thresholds, model_scores)
+        aucs[saliency] = auc_sal
+    return aucs

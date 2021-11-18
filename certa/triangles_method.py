@@ -293,9 +293,9 @@ def check_transitivity_text(model, predict_fn, u, v, v1, w, strict: bool = False
 
 
 def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
-                   class_to_explain: int, attr_length: int, check: bool = False, tokens: bool = False,
-                   discard_bad: bool = False, attribute_combine: bool = False, return_top: bool = False,
-                   contrastive: bool = False):
+                   class_to_explain: int, attr_length: int, check: bool = False,
+                   discard_bad: bool = False, return_top: bool = False,
+                   persist_predictions: bool = False):
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
 
@@ -307,9 +307,10 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, l
         flippedPredictions_df, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
                                                                            class_to_explain, discard_bad,
                                                                            attr_length, predict_fn, sourcesMap, lprefix,
-                                                                           rprefix, contrastive=contrastive)
+                                                                           rprefix)
 
-        # all_predictions.to_csv('lattices.csv', mode='a')
+        if persist_predictions:
+            all_predictions.to_csv('lattices.csv', mode='a')
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                         attr_length=attr_length)
 
@@ -319,66 +320,6 @@ def explainSamples(dataset: pd.DataFrame, sources: list, predict_fn: callable, l
                 filtered_exp = series
             else:
                 filtered_exp = explanation
-
-            if attribute_combine:
-                filtered_exp = {}
-                for index, value in explanation.items():
-                    attributes_involved = str(index).split('/')
-                    if len(attributes_involved) > 1:
-                        filtered_exp[index] = value
-                    for ai in attributes_involved:
-                        ai_score = value / len(attributes_involved)
-                        if ai in filtered_exp:
-                            filtered_exp[ai] += ai_score
-                        else:
-                            filtered_exp[ai] = ai_score
-                # normalize
-                sum1 = sum(abs(filtered_exp[item]) for item in filtered_exp)
-                for k in filtered_exp.keys():
-                    filtered_exp[k] = filtered_exp[k] / sum1
-
-            if tokens:
-                # todo: to be finished (weight by score, properly aggregate token rankings, better explanation (not string)
-                token_filtered_exp = defaultdict(int)
-                token_rankings = []
-                token_flippedPredictions = []
-                token_flippedPredictions_df = pd.DataFrame()
-                for exp in filtered_exp:
-                    e_attrs = exp.split('/')
-                    e_score = explanation[exp]
-
-                    for triangle in tqdm(allTriangles):
-                        currentTokenPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, e_attrs,
-                                                                                         attr_length,
-                                                                                         class_to_explain)
-                        currPerturbedAttr = currentTokenPerturbations[['alteredAttributes', 'alteredTokens']].apply(
-                            lambda x: ':'.join(x.dropna().astype(str)), axis=1).values
-                        predictions = predict_fn(currentTokenPerturbations)
-                        predictions = predictions.drop(columns=['alteredAttributes', 'alteredTokens'])
-                        proba = predictions[['nomatch_score', 'match_score']].values
-                        curr_flippedPredictions = currentTokenPerturbations[proba[:, class_to_explain] < 0.5]
-                        token_flippedPredictions.append(curr_flippedPredictions)
-                        token_ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
-                        token_rankings.append(token_ranking)
-
-                    try:
-                        token_flippedPredictions_df = pd.concat(token_flippedPredictions, ignore_index=True)
-                    except:
-                        token_flippedPredictions_df = pd.DataFrame(token_flippedPredictions)
-
-                    token_explanation = aggregateRankings(token_rankings, lenTriangles=len(allTriangles),
-                                                          attr_length=1000)
-
-                    if len(token_explanation) > 0:
-                        token_sorted_attr_pairs = token_explanation.sort_values(ascending=False)
-                        token_explanations = token_sorted_attr_pairs.loc[
-                            token_sorted_attr_pairs.values == token_sorted_attr_pairs.values.max()]
-                        token_filtered = [i for i in token_explanations.keys() if
-                                          not any(all(c in i for c in b) and len(b) < len(i) for b in explanations.keys())]
-                        for te in token_filtered:
-                            token_filtered_exp[te] = token_explanations[te]
-
-                return token_filtered_exp, token_flippedPredictions_df, allTriangles
 
             return filtered_exp, flippedPredictions_df, allTriangles
         else:
@@ -401,11 +342,11 @@ def cf_summary(explanation):
 
 
 def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
-                    sourcesMap, lprefix, rprefix, contrastive: bool = False, monotonicity=True):
-    rankings = []
-    flippedPredictions = []
-    transitivity = True
+                    sourcesMap, lprefix, rprefix, monotonicity=True):
     if monotonicity:
+        rankings = []
+        transitivity = True
+        flippedPredictions = []
         # lattice stratified predictions
         all_good = False
         for a in range(1, attr_length):
@@ -433,13 +374,10 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
             if len(perturbations_df) == 0 or 'alteredAttributes' not in perturbations_df.columns:
                 continue
             currPerturbedAttr = perturbations_df.alteredAttributes.values
-            # if monotonicity:
             if a != attr_length and not all_good:
                 predictions = predict_fn(perturbations_df)
                 proba = predictions[['nomatch_score', 'match_score']].values
 
-                if contrastive:
-                    class_to_explain = abs(1 - class_to_explain)
                 curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
             else:
                 proba = pd.DataFrame(columns=['nomatch_score', 'match_score'])
@@ -463,7 +401,15 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                 all_good = True
             else:
                 logging.debug(f'predicted depth {a}')
+        try:
+            flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
+        except:
+            flippedPredictions_df = pd.DataFrame(flippedPredictions)
+        return flippedPredictions_df, rankings, []
     else:
+        rankings = []
+        transitivity = True
+        flippedPredictions = []
         t_i = 0
         perturbations = []
         for triangle in tqdm(allTriangles):
@@ -489,8 +435,6 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
         predictions = predict_fn(perturbations_df)
         predictions = predictions.drop(columns=['alteredAttributes'])
         proba = predictions[['nomatch_score', 'match_score']].values
-        if contrastive:
-            class_to_explain = abs(1 - class_to_explain)
         curr_flippedPredictions = perturbations_df[proba[:, class_to_explain] < 0.5]
         flippedPredictions.append(curr_flippedPredictions)
         ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
@@ -500,12 +444,6 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
         except:
             flippedPredictions_df = pd.DataFrame(flippedPredictions)
         return flippedPredictions_df, rankings
-
-    try:
-        flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
-    except:
-        flippedPredictions_df = pd.DataFrame(flippedPredictions)
-    return flippedPredictions_df, rankings, []  # pd.concat([perturbations_df, predictions[['nomatch_score', 'match_score']]], axis=1)
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1
