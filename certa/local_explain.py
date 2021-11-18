@@ -1,7 +1,10 @@
 import logging
+import math
 import os
 import random
+import re
 import string
+from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -43,10 +46,15 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
         records.columns = list(map(lambda col: rprefix + col, records.columns))
         samples = pd.concat([copy, records], axis=1)
 
+    if max > 0:
+        samples = samples.sample(frac=1)[:max]
 
-    samples = samples.sample(frac=1)[:max]
+    record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
+    samples['score'] = samples.T.apply(lambda row: get_cosine(record2text, " ".join(row.astype(str))))
+    samples = samples.sort_values(by='score', ascending=False)
+    samples = samples.drop(['score'], axis=1)
     result = pd.DataFrame()
-    batch = int(len(samples) / 5)
+    batch = 300 #int(len(samples) / 5)
     i = 0
     while len(out) < num_candidates:
         batch_samples = samples[batch * i:batch * (i + 1)]
@@ -99,6 +107,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                                            originalPrediction, predict_fn, r1, r2, rsource, theta_max,
                                                            theta_min, use_w, use_y, lprefix, rprefix,
                                                            num_triangles)
+    print(f'first neighborhood {len(neighborhood)}')
 
     if token_parts and len(neighborhood) < num_triangles:
         generated_records_left_df, generated_records_right_df = generate_subsequences(generated_records_left_df,
@@ -309,3 +318,25 @@ def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False, lprefi
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
     return neighborhood
 
+WORD = re.compile(r'\w+')
+
+# calculate similarity between two text vectors
+def get_cosine(text1, text2):
+    vec1 = text_to_vector(text1)
+    vec2 = text_to_vector(text2)
+    intersection = set(vec1.keys()) & set(vec2.keys())
+    numerator = sum([vec1[x] * vec2[x] for x in intersection])
+
+    sum1 = sum([vec1[x] ** 2 for x in vec1.keys()])
+    sum2 = sum([vec2[x] ** 2 for x in vec2.keys()])
+    denominator = math.sqrt(sum1) * math.sqrt(sum2)
+
+    if not denominator:
+        return 0.0
+    else:
+        return float(numerator) / denominator
+
+
+def text_to_vector(text):
+    words = WORD.findall(text)
+    return Counter(words)
