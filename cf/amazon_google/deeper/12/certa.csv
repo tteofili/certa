@@ -1,5 +1,0 @@
-,ltable_title,ltable_manufacturer,ltable_price,rtable_title,rtable_manufacturer,rtable_price,alteredAttributes,droppedValues,copiedValues,nomatch_score,match_score,attr_count
-0,quicken 2007 basic,intuit,29.95,intuit quicken 2007 macintosh,,69.99,"('rtable_title',)",['quicken ( r ) for mac 2007'],['intuit quicken 2007 macintosh'],0.2435296,0.75647044,2
-1,quicken 2007 basic,intuit,29.95,intuit quicken 2007 macintosh,,69.99,"('rtable_title', 'rtable_manufacturer')","['quicken ( r ) for mac 2007', nan]","['intuit quicken 2007 macintosh', nan]",0.24352989,0.7564701,2
-2,quicken 2007 basic,intuit,29.95,intuit quicken 2007 macintosh,,69.99,"('rtable_title', 'rtable_price')","['quicken ( r ) for mac 2007', 69.99]","['intuit quicken 2007 macintosh', 69.99]",0.2435296,0.75647044,2
-3,quicken 2007 basic,intuit,29.95,intuit quicken 2007 macintosh,,69.99,"('rtable_title', 'rtable_manufacturer', 'rtable_price')","['quicken ( r ) for mac 2007', nan, 69.99]","['intuit quicken 2007 macintosh', nan, 69.99]",0.2435296,0.75647044,3

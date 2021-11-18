@@ -1,3 +1,0 @@
-,explanation,label,latency,match,prediction,row,score_copy,score_drop,type
-0,"{'ltable_Style': 0.4375, 'ltable_Beer_Name': 0.3125, 'rtable_Style': 0.1625, 'ltable_ABV': 0.2125, 'ltable_Brew_Factory_Name': 0.2125, 'rtable_Beer_Name': 0.1125, 'rtable_Brew_Factory_Name': 0.125, 'rtable_ABV': 0.075}",0.0,1109.6103843519813,1.0,[0.056651   0.94334894],76-2831,0.9558348059654236,0.9160196781158447,certa
-1,"{'rtable_Beer_Name': 0.1, 'ltable_Beer_Name': 0.2125, 'ltable_Style': 0.2125, 'rtable_Brew_Factory_Name': 0.05, 'rtable_Style': 0.05, 'rtable_ABV': 0.05, 'ltable_Brew_Factory_Name': 0.1, 'ltable_ABV': 0.0625}",0.0,1220.6420996800007,1.0,[0.04352708 0.95647293],4027-2510,0.9565383791923523,0.8757424354553223,certa

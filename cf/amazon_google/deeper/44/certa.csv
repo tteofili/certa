@@ -1,7 +1,0 @@
-,ltable_title,ltable_manufacturer,ltable_price,rtable_title,rtable_manufacturer,rtable_price,alteredAttributes,droppedValues,copiedValues,nomatch_score,match_score,attr_count
-0,learning quickbooks 2007,intuit,39.95,intuit quicken 2007 macintosh,,178.99,"('rtable_title',)",['quickbooks ( r )'],['intuit quicken 2007 macintosh'],0.28376645,0.7162336,2
-1,learning quickbooks 2007,intuit,39.95,intuit quicken 2007 macintosh,,178.99,"('rtable_title', 'rtable_manufacturer')","['quickbooks ( r )', nan]","['intuit quicken 2007 macintosh', nan]",0.28376645,0.7162336,2
-2,learning quickbooks 2007,intuit,39.95,intuit quicken 2007 macintosh,,69.99,"('rtable_title', 'rtable_price')","['quickbooks ( r )', 178.99]","['intuit quicken 2007 macintosh', 69.99]",0.17551635,0.82448363,2
-4,learning quickbooks 2007,punch ! software,39.95,quickbooks ( r ),,178.99,"('ltable_manufacturer',)",['intuit'],['punch ! software'],0.44451195,0.55548805,2
-5,learning quickbooks 2007,punch ! software,129.99,quickbooks ( r ),,178.99,"('ltable_manufacturer', 'ltable_price')","['intuit', 39.95]","['punch ! software', 129.99]",0.48336208,0.5166379,2
-3,learning quickbooks 2007,intuit,39.95,intuit quicken 2007 macintosh,,69.99,"('rtable_title', 'rtable_manufacturer', 'rtable_price')","['quickbooks ( r )', nan, 178.99]","['intuit quicken 2007 macintosh', nan, 69.99]",0.17551635,0.82448363,3

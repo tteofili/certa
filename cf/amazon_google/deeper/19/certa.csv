@@ -1,3 +1,0 @@
-,ltable_title,ltable_manufacturer,ltable_price,rtable_title,rtable_manufacturer,rtable_price,alteredAttributes,droppedValues,copiedValues,nomatch_score,match_score,attr_count
-0,microsoft powerpoint 2004 ( mac ),microsoft,229.99,microsoft ov l/sa prj ext conn ul 3yr/acqyr1 t76-01189,,89.99,"('rtable_title',)",['microsoft money 2007 home and business ( pc )'],['microsoft ov l/sa prj ext conn ul 3yr/acqyr1 t76-01189'],0.44984457,0.55015546,2
-1,microsoft powerpoint 2004 ( mac ),microsoft,229.99,microsoft ov l/sa prj ext conn ul 3yr/acqyr1 t76-01189,,89.99,"('rtable_title', 'rtable_manufacturer')","['microsoft money 2007 home and business ( pc )', nan]","['microsoft ov l/sa prj ext conn ul 3yr/acqyr1 t76-01189', nan]",0.44984457,0.55015546,2
