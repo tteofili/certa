@@ -315,15 +315,16 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                         attr_length=attr_length)
 
-        flips = len(flippedPredictions_df)
+        flips = len(flippedPredictions_df) + len(allTriangles)
         saliency = dict()
+        for a in dataset.columns:
+            if (a.startswith(lprefix) or a.startswith(rprefix)) and not (a == lprefix + 'id' or a == rprefix + 'id'):
+                saliency[a] = len(allTriangles) / flips # all attributes have a flip for the entire attribute set A
+
         for ranking in rankings:
             for k, v in ranking.items():
                 for a in k:
-                    if a in saliency.keys():
-                        saliency[a] += v / flips
-                    else:
-                        saliency[a] = 2 / flips # count full A set
+                    saliency[a] += v / flips
 
         if len(explanation) > 0:
             if return_top:

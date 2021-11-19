@@ -265,7 +265,7 @@ class DMERModel(ERModel):
         # train default model with standard dataset
         self.model.run_train(trainLab, validationLab,
                              best_save_path='models/saved/dm/' + dataset_name + '_best_default_model.pth',
-                             epochs=15)
+                             epochs=30)
 
         stats = self.model.run_eval(validationLab)
         os.remove(train_file)

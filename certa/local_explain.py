@@ -51,10 +51,10 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
 
     record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
     samples['score'] = samples.T.apply(lambda row: get_cosine(record2text, " ".join(row.astype(str))))
-    samples = samples.sort_values(by='score', ascending=False)
+    samples = samples.sort_values(by='score', ascending=not find_positives)
     samples = samples.drop(['score'], axis=1)
     result = pd.DataFrame()
-    batch = 300 #int(len(samples) / 5)
+    batch = int(len(samples) / 3)
     i = 0
     while len(out) < num_candidates:
         batch_samples = samples[batch * i:batch * (i + 1)]
@@ -67,6 +67,7 @@ def find_candidates_predict(record, source, similarity_threshold, find_positives
             out = predicted[predicted["match_score"] < similarity_threshold]
         if len(out) > 0:
             result = pd.concat([result, out[[lprefix + 'id', rprefix + 'id']]], axis=0)
+        i += 1
     return result
 
 
@@ -121,6 +122,7 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                                     theta_max,
                                                     theta_min, use_w, use_y, lprefix, rprefix, num_triangles)
         neighborhood = pd.concat([neighborhood, neighborhood2])
+        print(f'second neighborhood {len(neighborhood2)}')
 
     if generate_perturb and len(neighborhood) < num_triangles:
         generated_df, generated_copies_left_df, generated_copies_right_df = generate_neighbors(lprefix, lsource, r1,
@@ -128,9 +130,10 @@ def dataset_local(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         generated_records_left_df = pd.concat([generated_records_left_df, generated_copies_left_df])
         generated_records_right_df = pd.concat([generated_records_right_df, generated_copies_right_df])
 
-        neighborhood = pd.concat([neighborhood, get_neighbors(findPositives, predict_fn, generated_df[:max_predict],
-                                                              report=False)], axis=0)
+        neighborhood3 = get_neighbors(findPositives, predict_fn, generated_df[:max_predict], report=False)
+        neighborhood = pd.concat([neighborhood, neighborhood3], axis=0)
         logging.debug('perturbed neighborhood', len(neighborhood))
+        print(f'third neighborhood {len(neighborhood3)}')
 
     if len(neighborhood) > 0:
         if len(neighborhood) > num_triangles:
@@ -298,7 +301,7 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
     return generated_df, generated_records_left_df, generated_records_right_df
 
 
-def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False, lprefix='ltable_', rprefix='rtable_'):
+def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False):
     original = r1r2c.copy()
     try:
         r1r2c = r1r2c.drop(columns=['diff', 'attr_name', 'attr_pos'])

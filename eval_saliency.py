@@ -12,7 +12,7 @@ from baselines.landmark import Landmark
 from baselines.mojito import Mojito
 import shap
 
-from metrics.saliency import get_faithfullness
+from metrics.saliency import get_faithfullness, get_confidence
 from models.utils import get_model
 
 experiments_dir = 'experiments/'
@@ -58,8 +58,8 @@ def evaluate(mtype: str, samples: int = 5, filtered_datasets: list = [], exp_dir
         certas = pd.DataFrame()
         landmarks = pd.DataFrame()
         shaps = pd.DataFrame()
-        mojitos_c = pd.DataFrame()
-        mojitos_d = pd.DataFrame()
+        mojitos = pd.DataFrame()
+
         for i in range(len(test_df)):
             rand_row = test_df.iloc[i]
             l_id = int(rand_row['ltable_id'])
@@ -96,39 +96,32 @@ def evaluate(mtype: str, samples: int = 5, filtered_datasets: list = [], exp_dir
                 if compare:
                     # Mojito
                     print('mojito')
-                    t0 = time.perf_counter()
-                    mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
-                                                  num_features=15,
-                                                  num_perturbation=100)
+                    if class_to_explain == 1:
+                        t0 = time.perf_counter()
+                        mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
+                                                      num_features=15,
+                                                      num_perturbation=100)
 
-                    latency_m = time.perf_counter() - t0
+                        latency_m = time.perf_counter() - t0
 
-                    mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
+                        mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
+                    else:
+                        t0 = time.perf_counter()
+                        mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
+                                                      num_features=15,
+                                                      num_perturbation=100)
 
-                    if 'id' in mojito_exp:
-                        mojito_exp.pop('id', None)
+                        latency_m = time.perf_counter() - t0
 
-                    mojito_row = {'explanation': mojito_exp, 'type': 'mojito-c', 'latency': latency_m,
-                                  'match': class_to_explain,
-                                  'label': label, 'row': row_id, 'prediction': prediction}
-                    mojitos_c = mojitos_c.append(mojito_row, ignore_index=True)
-
-                    t0 = time.perf_counter()
-                    mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
-                                                  num_features=15,
-                                                  num_perturbation=100)
-
-                    latency_m = time.perf_counter() - t0
-
-                    mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
+                        mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
 
                     if 'id' in mojito_exp:
                         mojito_exp.pop('id', None)
 
-                    mojito_row = {'explanation': mojito_exp, 'type': 'mojito-d', 'latency': latency_m,
+                    mojito_row = {'explanation': mojito_exp, 'type': 'mojito', 'latency': latency_m,
                                   'match': class_to_explain,
                                   'label': label, 'row': row_id, 'prediction': prediction}
-                    mojitos_d = mojitos_d.append(mojito_row, ignore_index=True)
+                    mojitos = mojitos.append(mojito_row, ignore_index=True)
 
                     # landmark
                     print('landmark')
@@ -177,16 +170,19 @@ def evaluate(mtype: str, samples: int = 5, filtered_datasets: list = [], exp_dir
                 print(f'skipped item {str(i)}')
                 item.head()
 
+        os.makedirs(exp_dir + dataset + '/' + model_name, exist_ok=True)
         if compare:
-            mojitos_d.to_csv(exp_dir + dataset + '/' + model_name + '/mojito_d.csv')
-            mojitos_c.to_csv(exp_dir + dataset + '/' + model_name + '/mojito_c.csv')
+            mojitos.to_csv(exp_dir + dataset + '/' + model_name + '/mojito.csv')
             landmarks.to_csv(exp_dir + dataset + '/' + model_name + '/landmark.csv')
             shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
-            examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
+        examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
         certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
         faithfulness = get_faithfullness(model, '%s%s%s/%s' % ('', experiments_dir, dataset, mtype),
                                          test_df)
         print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
+
+        ci = get_confidence(['certa', 'mojito', 'landmark', 'shap'], experiments_dir + dataset + '/' + mtype)
+        print(f'{mtype}: confidence indication for {dataset}: {ci}')
 
 
 import warnings
@@ -194,5 +190,5 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     mtype = 'dm'
-    filtered_datasets = ['fodo_zaga']
+    filtered_datasets = ['beers']
     evaluate(mtype, filtered_datasets=filtered_datasets)

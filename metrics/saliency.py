@@ -137,7 +137,7 @@ def get_confidence(saliency_names: list, base_dir: str):
 
 def get_faithfullness(model: ERModel, base_dir: str, test_set_df: pd.DataFrame):
     np.random.seed(0)
-    saliency_names = ['certa', 'landmark', 'mojito_c', 'mojito_d', 'shap']
+    saliency_names = ['certa', 'landmark', 'mojito', 'shap']
 
     thresholds = [0.1, 0.2, 0.33, 0.5, 0.7, 0.9]
 
