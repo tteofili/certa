@@ -1,1 +1,1 @@
-from certa.explain import explain
+from certa.explain import CertaExplainer

@@ -41,9 +41,9 @@ def getMixedTriangles(dataset, sources):
     # the id is so composed: lsourcenumber@id#rsourcenumber@id
     for i in range(len(sources)):
         sourcesmap[i] = sources[i]
-    # if not 'ltable_id' in dataset_c.columns:
+    #if not 'ltable_id' in dataset_c.columns:
     dataset_c['ltable_id'] = list(map(lambda lrid: str(lrid).split("#")[0], dataset_c.id.values))
-    # if not 'rtable_id' in dataset_c.columns:
+    #if not 'rtable_id' in dataset_c.columns:
     dataset_c['rtable_id'] = list(map(lambda lrid: str(lrid).split("#")[1], dataset_c.id.values))
     positives = dataset_c[dataset_c.label == 1].astype('str')  # match classified samples
     negatives = dataset_c[dataset_c.label == 0].astype('str')  # no-match classified samples
@@ -304,18 +304,16 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
 
     allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
     if len(allTriangles) > 0:
-        print('finding flips')
-        flippedPredictions_df, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
+        flipped_predictions, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
                                                                            class_to_explain, discard_bad,
                                                                            attr_length, predict_fn, sourcesMap, lprefix,
                                                                            rprefix)
-        print('calculating scores')
         if persist_predictions:
             all_predictions.to_csv('predictions.csv', mode='a')
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
                                         attr_length=attr_length)
 
-        flips = len(flippedPredictions_df) + len(allTriangles)
+        flips = len(flipped_predictions) + len(allTriangles)
         saliency = dict()
         for a in dataset.columns:
             if (a.startswith(lprefix) or a.startswith(rprefix)) and not (a == lprefix + 'id' or a == rprefix + 'id'):
@@ -327,13 +325,17 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                     saliency[a] += v / flips
 
         if len(explanation) > 0:
+            if len(flipped_predictions) > 0:
+                flipped_predictions['attr_count'] = flipped_predictions.alteredAttributes.astype(str) \
+                    .str.split(',').str.len()
+                flipped_predictions = flipped_predictions.sort_values(by=['attr_count'])
             if return_top:
                 series = cf_summary(explanation)
                 filtered_exp = series
             else:
                 filtered_exp = explanation
 
-            return saliency, filtered_exp, flippedPredictions_df, allTriangles
+            return saliency, filtered_exp, flipped_predictions, allTriangles
         else:
             return dict(), [], pd.DataFrame(), []
     else:

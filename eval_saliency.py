@@ -4,7 +4,7 @@ import traceback
 
 import numpy as np
 import pandas as pd
-from certa.explain import explain
+from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
 
@@ -18,7 +18,7 @@ from models.utils import get_model
 experiments_dir = 'experiments/'
 base_datadir = 'datasets/'
 
-def evaluate(mtype: str, samples: int = 5, filtered_datasets: list = [], exp_dir: str = experiments_dir,
+def evaluate(mtype: str, samples: int = 15, filtered_datasets: list = [], exp_dir: str = experiments_dir,
              compare=True):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
@@ -54,6 +54,8 @@ def evaluate(mtype: str, samples: int = 5, filtered_datasets: list = [], exp_dir
         shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
                                               train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
 
+        certa_explainer = CertaExplainer(lsource, rsource)
+
         examples = pd.DataFrame()
         certas = pd.DataFrame()
         landmarks = pd.DataFrame()
@@ -77,12 +79,11 @@ def evaluate(mtype: str, samples: int = 5, filtered_datasets: list = [], exp_dir
             try:
                 # CERTA
                 print('certa')
-                num_triangles = 100
+                num_triangles = 10
                 t0 = time.perf_counter()
 
-                saliency_df, cf_summary, counterfactual_examples, triangles = explain(l_tuple, r_tuple, lsource,
-                                                                                      rsource, predict_fn, datadir,
-                                                                                      num_triangles=num_triangles)
+                saliency_df, cf_summary, cf_ex, triangles = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
+                                                                                    num_triangles=num_triangles)
 
                 latency_c = time.perf_counter() - t0
 
