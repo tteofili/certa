@@ -62,7 +62,7 @@ _CERTA_ returns:
 * the saliency explanation within the _saliency_ pd.DataFrame 
 * a _summary_ containing the set of attributes that has the highest probability of sufficiency of flipping the original prediction
 * the generated counterfactual explanations within the _cfs_ pd.DataFrame 
-* the list of triangles (in form of tuples of ids) used to generate the explanations
+* the list of open _triangles_ (in form of tuples of record ids) used to generate the explanations
 
 # Examples
 
