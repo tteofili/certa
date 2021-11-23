@@ -1,4 +1,70 @@
 CERTA
 =======
 
-Computing ER explanations with TriAngles
+Code for _CERTA_ (Computing ER explanations with TriAngles), an algorithm for computing saliency and counterfactual explanations for Entity Resolution models.
+
+# Installation
+
+To install _CERTA_ locally run :
+```shell
+pip install .
+```
+
+# Usage
+
+Wrap the model whose predictions need to be explained using the _ERModel_ interface.
+The _get_model_ utility method will load an existing model, if available, or train a new one using the data in the provided dataset.
+E.g. for a _DeepMatcher_ model use:
+
+```python
+from models.utils import get_model
+
+model = get_model('dm', '/path/where/to/save', '/path/to/dataset', 'modelname')
+```
+
+Define a prediction function wrapping the _model.predict()_ method.
+
+```python
+def predict_fn(x, **kwargs):
+    return model.predict(x, **kwargs)
+```
+
+Create a _CertaExplainer_. 
+_CERTA_ needs access to the data sources _lsource_ and _rsource_. 
+
+```python
+import pandas as pd
+from certa.explain import CertaExplainer
+
+lsource = pd.read_csv('/path/to/dataset/tableA.csv')
+rsource = pd.read_csv('/path/to/dataset/tableB.csv')
+certa_explainer = CertaExplainer(lsource, rsource)
+```
+
+To generate the prediction for the first two records in the data sources, do the following:
+
+```python
+import numpy as np
+from certa.local_explain import get_original_prediction
+
+l_tuple = lsource.iloc[0]
+r_tuple = rsource.iloc[0]
+prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
+class_to_explain = np.argmax(prediction)
+```
+
+To explain the prediction using _CERTA_ :
+
+```python
+saliency, summary, cfs, triangles = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
+```
+_CERTA_ returns:
+* the saliency explanation within the _saliency_ pd.DataFrame 
+* a _summary_ containing the set of attributes that has the highest probability of sufficiency of flipping the original prediction
+* the generated counterfactual explanations within the _cfs_ pd.DataFrame 
+* the list of triangles (in form of tuples of ids) used to generate the explanations
+
+# Examples
+
+Examples of using _CERTA_ can be found in the following notebooks:
+* [sample.ipynb](notebooks/sample.ipynb)
