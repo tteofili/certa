@@ -29,7 +29,7 @@ def predict_fn(x, **kwargs):
     return model.predict(x, **kwargs)
 ```
 
-Create a _CertaExplainer_. 
+Create a [CertaExplainer](certa/explain.py). 
 _CERTA_ needs access to the data sources _lsource_ and _rsource_. 
 
 ```python
