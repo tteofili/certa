@@ -46,19 +46,15 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         opposite prediction by the ER model
     '''
     r1r2 = get_row(r1, r2)
-    originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
+    original_prediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
 
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
 
-    generated_df, generated_copies_left_df, generated_copies_right_df = generate_neighbors(lprefix, lsource, r1,
-                                                                                           r2, rprefix, rsource)
+    copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
 
-    findPositives, support = get_support(class_to_explain,
-                                              pd.concat([lsource, generated_copies_left_df]), max_predict,
-                                              originalPrediction, predict_fn, r1, r2,
-                                              pd.concat([rsource, generated_copies_right_df]), use_w,
-                                              use_q,
-                                              lprefix, rprefix, num_triangles)
+    find_positives, support = get_support(class_to_explain, pd.concat([lsource, copies_left]), max_predict,
+                                         original_prediction, predict_fn, r1, r2, pd.concat([rsource, copies_right]),
+                                         use_w, use_q, lprefix, rprefix, num_triangles)
 
     if len(support) > 0:
         if len(support) > num_triangles:
@@ -70,11 +66,11 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                          support.match_score.values))
         support = support.drop(['match_score', 'nomatch_score'], axis=1)
         if class_to_explain == None:
-            r1r2['label'] = np.argmax(originalPrediction)
+            r1r2['label'] = np.argmax(original_prediction)
         else:
             r1r2['label'] = class_to_explain
         support_pairs = pd.concat([r1r2, support], ignore_index=True)
-        return support_pairs, generated_copies_left_df, generated_copies_right_df
+        return support_pairs, copies_left, copies_right
     else:
         logging.warning('no triangles found')
         return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
@@ -208,7 +204,7 @@ def cs(text1, text2):
         return float(numerator) / denominator
 
 
-def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
+def expand_copies(lprefix, lsource, r1, r2, rprefix, rsource):
     generated_df = pd.DataFrame()
     new_copies_left = []
     new_copies_right = []
@@ -276,7 +272,7 @@ def generate_neighbors(lprefix, lsource, r1, r2, rprefix, rsource):
     return generated_df, generated_records_left_df, generated_records_right_df
 
 
-def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False):
+def get_neighbors(find_positives, predict_fn, r1r2c, report: bool = False):
     original = r1r2c.copy()
     try:
         r1r2c = r1r2c.drop(columns=['diff', 'attr_name', 'attr_pos'])
@@ -290,7 +286,7 @@ def get_neighbors(findPositives, predict_fn, r1r2c, report: bool = False):
             report.to_csv('experiments/diffs.csv', mode='a')
         except:
             pass
-    if findPositives:
+    if find_positives:
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score >= 0.5].copy()
     else:
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
