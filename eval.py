@@ -251,11 +251,9 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
         try:
             # CERTA
             print('certa')
-            num_triangles = 10
             t0 = time.perf_counter()
 
-            saliency_df, cf_summary, cf_ex, triangles = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
-                                                                                num_triangles=num_triangles)
+            saliency_df, cf_summary, cf_ex, triangles = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
 
             latency_c = time.perf_counter() - t0
 
