@@ -1,16 +1,7 @@
-BATCH_SIZE = 8
-
-MAX_SEQ_LENGTH = 128
-
-def split_training_valid(pt_train, SPLIT_FACTOR=0.8):
-    bound = int(len(pt_train) * SPLIT_FACTOR)
-    train = pt_train[:bound]
-    valid = pt_train[bound:]
-
-    return train, valid
-
-
 class ERModel:
+    '''
+    Interface for Entity Resolution models to be explained
+    '''
 
     def __init__(self):
         self.name = ''

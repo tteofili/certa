@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="CERTA",
-    version="0.0.3",
+    version="0.0.1",
     author="Tommaso Teofili",
     author_email="tommaso.teofili@gmail.com",
     description="Computing ER explanations with TriAngles",

@@ -23,6 +23,63 @@ def get_row(r1, r2, lprefix='ltable_', rprefix='rtable_'):
     return r1r2
 
 
+def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
+                        rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100,
+                        class_to_explain: int = None, max_predict: int = -1,
+                        use_w: bool = True, use_q: bool = True):
+    '''
+    generate a pd.DataFrame of support predictions to be used to generate open triangles.
+    :param r1: the "left" record
+    :param r2: the "right" record
+    :param lsource: the "left" data source
+    :param rsource: the "right" data source
+    :param predict_fn: the ER model prediction function
+    :param lprefix: the prefix of attributes from the "left" table
+    :param rprefix: the prefix of attributes from the "right" table
+    :param num_triangles: number of open triangles to be used to generate the explanation
+    :param class_to_explain: the class to be explained
+    :param max_predict: the maximum number of predictions to be performed by the ER model to generate the requested
+        number of open triangles
+    :param use_w: whether to use left open triangles
+    :param use_q: whether to use right open triangles
+    :return: a pd.DataFrame of record pairs with one record from the original prediction and one record yielding an
+        opposite prediction by the ER model
+    '''
+    r1r2 = get_row(r1, r2)
+    originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
+
+    r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
+
+    generated_df, generated_copies_left_df, generated_copies_right_df = generate_neighbors(lprefix, lsource, r1,
+                                                                                           r2, rprefix, rsource)
+
+    findPositives, support = get_support(class_to_explain,
+                                              pd.concat([lsource, generated_copies_left_df]), max_predict,
+                                              originalPrediction, predict_fn, r1, r2,
+                                              pd.concat([rsource, generated_copies_right_df]), use_w,
+                                              use_q,
+                                              lprefix, rprefix, num_triangles)
+
+    if len(support) > 0:
+        if len(support) > num_triangles:
+            support = support.sample(n=num_triangles)
+        else:
+            logging.warning(f'could find {str(len(support))} triangles of the {str(num_triangles)} requested')
+
+        support['label'] = list(map(lambda predictions: int(round(predictions)),
+                                         support.match_score.values))
+        support = support.drop(['match_score', 'nomatch_score'], axis=1)
+        if class_to_explain == None:
+            r1r2['label'] = np.argmax(originalPrediction)
+        else:
+            r1r2['label'] = class_to_explain
+        support_pairs = pd.concat([r1r2, support], ignore_index=True)
+        return support_pairs, generated_copies_left_df, generated_copies_right_df
+    else:
+        logging.warning('no triangles found')
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
+
 def find_candidates_predict(record, source, find_positives, predict_fn, num_candidates, lj=True,
                             max=-1, lprefix='ltable_', rprefix='rtable_'):
     if lj:
@@ -67,45 +124,6 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
     return result
 
 
-def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
-                        rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100,
-                        class_to_explain: int = None, max_predict: int = -1,
-                        use_w: bool = True, use_q: bool = True):
-    r1r2 = get_row(r1, r2)
-    originalPrediction = predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
-
-    r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
-
-    generated_df, generated_copies_left_df, generated_copies_right_df = generate_neighbors(lprefix, lsource, r1,
-                                                                                           r2, rprefix, rsource)
-
-    findPositives, neighborhood = get_default_neighborhood(class_to_explain,
-                                                           pd.concat([lsource, generated_copies_left_df]), max_predict,
-                                                           originalPrediction, predict_fn, r1, r2,
-                                                           pd.concat([rsource, generated_copies_right_df]), use_w,
-                                                           use_q,
-                                                           lprefix, rprefix, num_triangles)
-
-    if len(neighborhood) > 0:
-        if len(neighborhood) > num_triangles:
-            neighborhood = neighborhood.sample(n=num_triangles)
-        else:
-            logging.warning(f'could find {str(len(neighborhood))} triangles of the {str(num_triangles)} requested')
-
-        neighborhood['label'] = list(map(lambda predictions: int(round(predictions)),
-                                         neighborhood.match_score.values))
-        neighborhood = neighborhood.drop(['match_score', 'nomatch_score'], axis=1)
-        if class_to_explain == None:
-            r1r2['label'] = np.argmax(originalPrediction)
-        else:
-            r1r2['label'] = class_to_explain
-        dataset4explanation = pd.concat([r1r2, neighborhood], ignore_index=True)
-        return dataset4explanation, generated_copies_left_df, generated_copies_right_df
-    else:
-        logging.warning('no triangles found')
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
-
-
 def generate_subsequences(lsource, rsource, max=-1):
     new_records_left_df = pd.DataFrame()
     for i in np.arange(len(lsource[:max])):
@@ -124,8 +142,8 @@ def generate_subsequences(lsource, rsource, max=-1):
     return new_records_left_df, new_records_right_df
 
 
-def get_default_neighborhood(class_to_explain, lsource, max_predict, original_prediction, predict_fn, r1, r2,
-                             rsource, use_w, use_q, lprefix, rprefix, num_triangles):
+def get_support(class_to_explain, lsource, max_predict, original_prediction, predict_fn, r1, r2,
+                rsource, use_w, use_q, lprefix, rprefix, num_triangles):
     candidates4r1 = pd.DataFrame()
     candidates4r2 = pd.DataFrame()
     num_candidates = int(num_triangles / 2)

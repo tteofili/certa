@@ -12,7 +12,7 @@ pip install .
 
 # Usage
 
-Wrap the model whose predictions need to be explained using the _ERModel_ interface.
+Wrap the model whose predictions need to be explained using the [ERModel](models/ermodel.py) interface.
 The _get_model_ utility method will load an existing model, if available, or train a new one using the data in the provided dataset.
 E.g. for a _DeepMatcher_ model use:
 
@@ -29,7 +29,7 @@ def predict_fn(x, **kwargs):
     return model.predict(x, **kwargs)
 ```
 
-Create a _CertaExplainer_. 
+Create a [CertaExplainer](certa/explain.py). 
 _CERTA_ needs access to the data sources _lsource_ and _rsource_. 
 
 ```python
