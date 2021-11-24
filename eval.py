@@ -361,17 +361,17 @@ warnings.filterwarnings("ignore")
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Run saliency experiments.')
-    parser.add_argument('--base_dir', metavar='-b', type=str, help='the datasets base directory',
+    parser.add_argument('--base_dir', metavar='b', type=str, help='the datasets base directory',
                         required=True)
-    parser.add_argument('--model_type', metavar='-m', type=str, help='the ER model type to evaluate',
+    parser.add_argument('--model_type', metavar='m', type=str, help='the ER model type to evaluate',
                         choices=['dm', 'deeper', 'ditto'], required=True)
-    parser.add_argument('--datasets', metavar='-d', type=str, nargs='+', required=True,
+    parser.add_argument('--datasets', metavar='d', type=str, nargs='+', required=True,
                         help='the datasets to be used for the evaluation')
-    parser.add_argument('--exp_type', metavar='-e', type=str, choices=['saliency', 'counterfactual'],
+    parser.add_argument('--exp_type', metavar='e', type=str, choices=['saliency', 'counterfactual'],
                         help='the type of explanations to evaluate', required=True)
-    parser.add_argument('--samples', metavar='-s', type=int, default=-1,
+    parser.add_argument('--samples', metavar='s', type=int, default=-1,
                         help='no. of samples from the test set used for the evaluation')
-    parser.add_argument('--compare', metavar='-c', type=bool, default=False,
+    parser.add_argument('--compare', metavar='c', type=bool, default=False,
                         help='whether comparing CERTA with baselines')
     args = parser.parse_args()
     base_datadir = args.base_dir
