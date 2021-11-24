@@ -1,22 +1,20 @@
+import argparse
 import os
 import time
 import traceback
-import argparse
 
 import dice_ml
 import numpy as np
 import pandas as pd
+import shap
 
+from baselines.landmark import Landmark
 from baselines.lime_c import LimeCounterfactual
+from baselines.mojito import Mojito
 from baselines.shap_c import ShapCounterfactual
 from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
-
-from baselines.landmark import Landmark
-from baselines.mojito import Mojito
-import shap
-
 from metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
 from metrics.saliency import get_faithfullness, get_confidence
 from models.utils import get_model
@@ -24,8 +22,9 @@ from models.utils import get_model
 experiments_dir = 'experiments/'
 base_datadir = 'datasets/'
 
+
 def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
-             compare=True):
+             compare=False):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
     exp_dir = exp_dir + exp_type + '/'
@@ -36,6 +35,7 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
         model_name = mtype
         datadir = base_datadir + dataset
         model = get_model(mtype, modeldir, datadir, dataset)
+
         def predict_fn(x, **kwargs):
             return model.predict(x, **kwargs)
 
@@ -355,6 +355,7 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
 
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
@@ -370,6 +371,8 @@ if __name__ == "__main__":
                         help='the type of explanations to evaluate', required=True)
     parser.add_argument('--samples', metavar='-s', type=int, default=-1,
                         help='no. of samples from the test set used for the evaluation')
+    parser.add_argument('--compare', metavar='-c', type=bool, default=False,
+                        help='whether comparing CERTA with baselines')
     args = parser.parse_args()
     base_datadir = args.base_dir
     if not base_datadir.endswith('/'):
@@ -378,5 +381,6 @@ if __name__ == "__main__":
     mtype = args.model_type
     exp_type = args.exp_type
     samples = args.samples
+    compare = args.compare
 
-    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples)
+    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare)
