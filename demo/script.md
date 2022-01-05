@@ -23,7 +23,7 @@ DEMO SCRIPT
       7. compare sparsity, diversity, proximity
 3. **COUNTERINTUITIVE PREDICTIONS**<br/> for each dataset:
    1. take _n_ pairs from the test set that are wrongly classified as _matching_ by at least one model
-   2. take _n_ pairs from the test set that are wronglu classified as _non-matching_ by at least one models
+   2. take _n_ pairs from the test set that are wrongly classified as _non-matching_ by at least one models
    3. generate explanations with _CERTA_, _DiCE_ and _Mojito_ for all predictions
    4. show how different models pay attention to different attributes
       1. show different saliencies highlighting differences between explanations for correct and wrong predictions
