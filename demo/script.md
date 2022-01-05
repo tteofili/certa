@@ -3,7 +3,7 @@ DEMO SCRIPT
 
 # Explaining ER predictions with CERTA 
 0. Explanation visualization
-   1. visualize how a given open triangle issues a flip by altering different portions of different attributes
+   1. visualize how a given open triangle issues a flip by altering different attributes
 1. Train DeepER, DeepMatcher and Ditto on the following dataset kinds:
    1. Dataset with few attributes
    2. Dataset with many attributes
