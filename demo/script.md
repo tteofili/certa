@@ -3,7 +3,7 @@ DEMO SCRIPT
 
 # Explaining ER predictions with CERTA 
 0. Explanation visualization
-   1. visualize how a given open triangle issues a flip by altering different portions of different attributes
+   1. visualize how a given open triangle issues a flip by altering different attributes
 1. Train DeepER, DeepMatcher and Ditto on the following dataset kinds:
    1. Dataset with few attributes
    2. Dataset with many attributes
@@ -16,7 +16,7 @@ DEMO SCRIPT
    4. show how different models pay attention to different attributes
       1. show different CERTA saliencies for each model and same prediction 
       2. show Mojito saliencies 
-      3. compare fidelity and confidence indication
+      3. compare faithfulness and confidence indication
       4. alter attributes (based on human intuition) identified by explanation and see how the model score is affected
       5. show different CERTA counterfactuals for each model and same prediction
       6. show DiCE counterfactuals for each model and same prediction
@@ -27,7 +27,7 @@ DEMO SCRIPT
    3. generate explanations with _CERTA_, _DiCE_ and _Mojito_ for all predictions
    4. show how different models pay attention to different attributes
       1. show different saliencies highlighting differences between explanations for correct and wrong predictions
-      2. compare fidelity and confidence indication for saliencies
+      2. compare faithfulness and confidence indication for saliencies
       3. alter attributes (based on human intuition) identified by explanation and see how the model score is affected
       4. show CERTA counterfactuals for wrong predictions
       5. show DiCE counterfactuals for wrong predictions
