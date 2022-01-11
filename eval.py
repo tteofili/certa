@@ -347,10 +347,10 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
         shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
     examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
     certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    faithfulness = get_faithfullness(model, '%s%s%s/%s' % ('', experiments_dir, dataset, mtype),
+    faithfulness = get_faithfullness(model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype),
                                      test_df)
     print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
-    ci = get_confidence(['certa', 'mojito', 'landmark', 'shap'], experiments_dir + dataset + '/' + mtype)
+    ci = get_confidence(['certa', 'mojito', 'landmark', 'shap'], exp_dir + dataset + '/' + mtype)
     print(f'{mtype}: confidence indication for {dataset}: {ci}')
 
 
