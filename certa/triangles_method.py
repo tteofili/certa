@@ -219,8 +219,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                                                                            rprefix)
         if persist_predictions:
             all_predictions.to_csv('predictions.csv', mode='a')
-        explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
-                                        attr_length=attr_length)
+        explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
 
         flips = len(flipped_predictions) + len(allTriangles)
         saliency = dict()
@@ -284,6 +283,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                         continue
                     currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, a,
                                                                            class_to_explain, lprefix, rprefix)
+                    currentPerturbations['triangle'] = ' '.join(triangle)
                     perturbations.append(currentPerturbations)
                 except:
                     allTriangles[t_i] = allTriangles[t_i] + (False, False, False,)
@@ -298,7 +298,8 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                 continue
             currPerturbedAttr = perturbations_df.alteredAttributes.values
             if a != attr_length and not all_good:
-                predictions = predict_fn(perturbations_df)
+                predictions = predict_fn(perturbations_df.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
+                predictions = pd.concat([predictions, perturbations_df[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]], axis=1)
                 proba = predictions[['nomatch_score', 'match_score']].values
 
                 curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
