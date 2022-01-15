@@ -70,10 +70,13 @@ def __getRecords(sourcesMap, triangleIds, lprefix, rprefix):
 
 
 def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
-                                    rprefix):
+                                    rprefix, token=False):
     # generate power set of attributes
-    allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
+    if token:
+        allAttributesSubsets = []
+    else:
+        allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
     perturbations = []
     perturbedAttributes = []
     droppedValues = []
@@ -204,7 +207,7 @@ def check_properties(triangle, sourcesMap, predict_fn):
 def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
                     class_to_explain: int, attr_length: int, check: bool = False,
                     discard_bad: bool = False, return_top: bool = False,
-                    persist_predictions: bool = False):
+                    persist_predictions: bool = False, token: bool = False):
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
 
@@ -216,7 +219,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
         flipped_predictions, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
                                                                            class_to_explain, discard_bad,
                                                                            attr_length, predict_fn, sourcesMap, lprefix,
-                                                                           rprefix)
+                                                                           rprefix, token=token)
         if persist_predictions:
             all_predictions.to_csv('predictions.csv', mode='a')
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles),
@@ -265,7 +268,7 @@ def cf_summary(explanation):
 
 
 def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
-                    sourcesMap, lprefix, rprefix, monotonicity=True):
+                    sourcesMap, lprefix, rprefix, monotonicity=True, token=False):
     if monotonicity:
         rankings = []
         transitivity = True
