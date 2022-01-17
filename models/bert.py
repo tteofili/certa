@@ -203,7 +203,7 @@ class EMTERModel(ERModel):
 
     def load(self, path):
         self.model, self.tokenizer = models.emt.model.load_model(path, True)
-        return self
+        return self.model
 
     def save(self, path):
         models.emt.model.save_model(self.model, path, path, tokenizer=self.tokenizer)
