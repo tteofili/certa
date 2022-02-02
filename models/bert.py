@@ -42,13 +42,16 @@ class EMTERModel(ERModel):
         self.tokenizer = tokenizer_class.from_pretrained('distilbert-base-uncased', do_lower_case=True)
         self.model = model_class.from_pretrained('distilbert-base-uncased', config=config)
 
-    def train(self, label_train, label_valid, dataset_name):
-        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
-
-        self.model = self.model.to(device)
+    def train(self, label_train, label_valid, dataset_name, epochs=7):
+        try:
+            device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
+            self.model = self.model.to(device)
+        except:
+            pass
 
         exp_dir = 'saved/bert/' + dataset_name
         if len(label_train) > 0:
+            print('training is about to start')
             # balanced datasets
             # g_train = label_train.groupby('label')
             # label_train = pandas.DataFrame(g_train.apply(lambda x: x.sample(g_train.size().min()).reset_index(drop=True)))
@@ -66,8 +69,7 @@ class EMTERModel(ERModel):
                                                              MAX_SEQ_LENGTH,
                                                              BATCH_SIZE,
                                                              models.emt.data_loader.DataType.TRAINING, self.model_type)
-
-            num_epochs = 7
+            num_epochs = epochs
             num_train_steps = len(training_data_loader) * num_epochs
 
             learning_rate = 2e-5
@@ -80,7 +82,6 @@ class EMTERModel(ERModel):
                                                                  adam_eps,
                                                                  warmup_steps,
                                                                  weight_decay)
-
             eval_examples = processor.get_test_examples_file(validF)
             evaluation_data_loader = models.emt.data_loader.load_data(eval_examples,
                                                                label_list,
@@ -88,7 +89,6 @@ class EMTERModel(ERModel):
                                                                MAX_SEQ_LENGTH,
                                                                BATCH_SIZE,
                                                                models.emt.data_loader.DataType.EVALUATION, self.model_type)
-
 
             evaluation = models.emt.evaluation.Evaluation(evaluation_data_loader, '', exp_dir, len(label_list), self.model_type)
 

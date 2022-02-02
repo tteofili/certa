@@ -45,7 +45,7 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
             train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
             test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
             valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
-            print('training model')
+            print(f'training model with {len(train_df)} samples ({len(valid_df)} validation, {len(test_df)} test)')
             model.train(train_df, valid_df, modelname)
             print('evaluating model')
             precision, recall, fmeasure = model.evaluation(test_df)
