@@ -9,15 +9,19 @@ from certa.local_explain import generate_subsequences
 
 class CertaExplainer(object):
 
-    def __init__(self, lsource, rsource):
+    def __init__(self, lsource, rsource, data_augmentation: bool = True):
         '''
         Create the CERTA explainer
         :param lsource: the data source for "left" records
         :param rsource: the data source for "right" records
         '''
-        gen_left, gen_right = generate_subsequences(lsource, rsource)
-        self.lsource = pd.concat([lsource, gen_left])
-        self.rsource = pd.concat([rsource, gen_right])
+        if data_augmentation:
+            gen_left, gen_right = generate_subsequences(lsource, rsource)
+            self.lsource = pd.concat([lsource, gen_left])
+            self.rsource = pd.concat([rsource, gen_right])
+        else:
+            self.lsource = lsource
+            self.rsource = rsource
 
     def explain(self, l_tuple, r_tuple, predict_fn, left=True, right=True, attr_length=-1,
                 num_triangles: int = 100, lprefix='ltable_', rprefix='rtable_',
