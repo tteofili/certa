@@ -373,6 +373,9 @@ if __name__ == "__main__":
                         help='no. of samples from the test set used for the evaluation')
     parser.add_argument('--compare', metavar='c', type=bool, default=False,
                         help='whether comparing CERTA with baselines')
+    parser.add_argument('--da', metavar='da', type=bool, default=True,
+                        help='whether enabling CERTA data-augmentation feature')
+
     args = parser.parse_args()
     base_datadir = args.base_dir
     if not base_datadir.endswith('/'):

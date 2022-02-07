@@ -37,10 +37,12 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
     print(f'data loaded')
 
     try:
-        print(f'loading model from {modeldir}')
-        ret_model = model.load(modeldir)
-        if ret_model is None:
-            print(f'no model found, now training')
+        try:
+            print(f'loading model from {modeldir}')
+            model.load(modeldir)
+        except:
+            print(model)
+            print(f'no valid model found at {modeldir}, now training')
             print('merging sources')
             train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
             test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
