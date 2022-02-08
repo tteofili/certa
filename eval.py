@@ -24,7 +24,7 @@ base_datadir = 'datasets/'
 
 
 def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
-             compare=False):
+             compare=False, da=None):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
     exp_dir = exp_dir + exp_type + '/'
@@ -51,20 +51,20 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
 
         if 'saliency' == exp_type:
             eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
-                          rsource, test_df, train_df)
+                          rsource, test_df, train_df, da)
         elif 'counterfactual' == exp_type:
             eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-                    train_df)
+                    train_df, da)
 
 
 def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-            train_df):
+            train_df, da):
     examples_df = pd.DataFrame()
     certas = pd.DataFrame()
     train_noids = train_df.copy().astype(str)
     if 'ltable_id' in train_noids.columns and 'rtable_id' in train_noids.columns:
         train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1)
-    certa_explainer = CertaExplainer(lsource, rsource)
+    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
     t = 10
     for i in range(len(test_df)):
         rand_row = test_df.iloc[i]
@@ -216,8 +216,8 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
 
 
 def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
-                  test_df, train_df):
-    certa_explainer = CertaExplainer(lsource, rsource)
+                  test_df, train_df, da):
+    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
     if compare:
         mojito = Mojito(test_df.columns,
                         attr_to_copy='left',
@@ -375,7 +375,7 @@ if __name__ == "__main__":
                         help='no. of samples from the test set used for the evaluation')
     parser.add_argument('--compare', metavar='c', type=bool, default=False,
                         help='whether comparing CERTA with baselines')
-    parser.add_argument('--da', metavar='da', type=bool, default=True,
+    parser.add_argument('--da', metavar='da', type=str, default='on_demand',
                         help='whether enabling CERTA data-augmentation feature')
 
     args = parser.parse_args()
@@ -387,5 +387,6 @@ if __name__ == "__main__":
     exp_type = args.exp_type
     samples = args.samples
     compare = args.compare
+    da = args.da
 
-    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare)
+    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare, da=da)
