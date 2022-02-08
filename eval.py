@@ -16,7 +16,7 @@ from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
 from metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
-from metrics.saliency import get_faithfullness, get_confidence
+from metrics.saliency import get_faithfulness, get_confidence
 from models.utils import get_model
 
 experiments_dir = 'experiments/'
@@ -218,22 +218,24 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
 def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
                   test_df, train_df):
     certa_explainer = CertaExplainer(lsource, rsource)
-    mojito = Mojito(test_df.columns,
-                    attr_to_copy='left',
-                    split_expression=" ",
-                    class_names=['no_match', 'match'],
-                    lprefix='', rprefix='',
-                    feature_selection='lasso_path')
-    landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
-                                  exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
-                                  split_expression=r' ')
-    shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
-                                          train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
+    if compare:
+        mojito = Mojito(test_df.columns,
+                        attr_to_copy='left',
+                        split_expression=" ",
+                        class_names=['no_match', 'match'],
+                        lprefix='', rprefix='',
+                        feature_selection='lasso_path')
+        landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
+                                      exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
+                                      split_expression=r' ')
+        shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
+                                              train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
+        landmarks = pd.DataFrame()
+        shaps = pd.DataFrame()
+        mojitos = pd.DataFrame()
+
     examples = pd.DataFrame()
     certas = pd.DataFrame()
-    landmarks = pd.DataFrame()
-    shaps = pd.DataFrame()
-    mojitos = pd.DataFrame()
     for i in range(len(test_df)):
         rand_row = test_df.iloc[i]
         l_id = int(rand_row['ltable_id'])
@@ -347,8 +349,8 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
         shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
     examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
     certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    faithfulness = get_faithfullness(model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype),
-                                     test_df)
+    faithfulness = get_faithfulness(model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype),
+                                    test_df)
     print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
     ci = get_confidence(['certa', 'mojito', 'landmark', 'shap'], exp_dir + dataset + '/' + mtype)
     print(f'{mtype}: confidence indication for {dataset}: {ci}')
