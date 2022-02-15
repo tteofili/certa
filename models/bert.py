@@ -206,7 +206,7 @@ class EMTERModel(ERModel):
         return self.model
 
     def save(self, path):
-        models.emt.model.save_model(self.model, path, path, tokenizer=self.tokenizer)
+        models.emt.model.save_model(self.model, '', path, tokenizer=self.tokenizer)
 
     def predict_proba(self, x, **kwargs):
         return self.predict(x, mojito=True, expand_dim=True)
