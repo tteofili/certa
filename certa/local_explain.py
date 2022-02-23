@@ -26,7 +26,7 @@ def get_row(r1, r2, lprefix='ltable_', rprefix='rtable_'):
 def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                         rsource: pd.DataFrame, predict_fn, lprefix, rprefix, num_triangles: int = 100,
                         class_to_explain: int = None, max_predict: int = -1,
-                        use_w: bool = True, use_q: bool = True):
+                        use_w: bool = True, use_q: bool = True, use_all: bool = False):
     '''
     generate a pd.DataFrame of support predictions to be used to generate open triangles.
     :param r1: the "left" record
@@ -42,6 +42,8 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         number of open triangles
     :param use_w: whether to use left open triangles
     :param use_q: whether to use right open triangles
+    :param use_all: whether to use all possible records in the existing data sources to create support records, not
+        stopping when _num_triangles_ records have been found
     :return: a pd.DataFrame of record pairs with one record from the original prediction and one record yielding an
         opposite prediction by the ER model
     '''
@@ -77,7 +79,7 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
 
 def find_candidates_predict(record, source, find_positives, predict_fn, num_candidates, lj=True,
-                            max=-1, lprefix='ltable_', rprefix='rtable_'):
+                            max=-1, lprefix='ltable_', rprefix='rtable_', batched: bool = True):
     if lj:
         records = pd.DataFrame()
         records = records.append([record] * len(source), ignore_index=True)
@@ -106,17 +108,26 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
     batch = num_candidates * 4
     splits = min(10, int(len(samples) / batch))
     i = 0
-    while len(result) < num_candidates and i < splits:
-        batch_samples = samples[batch * i:batch * (i + 1)]
-        predicted = predict_fn(batch_samples)
+    if batched:
+        while len(result) < num_candidates and i < splits:
+            batch_samples = samples[batch * i:batch * (i + 1)]
+            predicted = predict_fn(batch_samples)
+            if find_positives:
+                out = predicted[predicted["match_score"] > 0.5]
+            else:
+                out = predicted[predicted["match_score"] < 0.5]
+            if len(out) > 0:
+                result = pd.concat([result, out], axis=0)
+            logging.info(f'{i}:{len(out)},{len(result)}')
+            i += 1
+    else:
+        predicted = predict_fn(samples)
         if find_positives:
             out = predicted[predicted["match_score"] > 0.5]
         else:
             out = predicted[predicted["match_score"] < 0.5]
         if len(out) > 0:
             result = pd.concat([result, out], axis=0)
-        logging.info(f'{i}:{len(out)},{len(result)}')
-        i += 1
     return result
 
 
@@ -139,7 +150,7 @@ def generate_subsequences(lsource, rsource, max=-1):
 
 
 def get_support(class_to_explain, lsource, max_predict, original_prediction, predict_fn, r1, r2,
-                rsource, use_w, use_q, lprefix, rprefix, num_triangles):
+                rsource, use_w, use_q, lprefix, rprefix, num_triangles, use_all: bool = False):
     candidates4r1 = pd.DataFrame()
     candidates4r2 = pd.DataFrame()
     num_candidates = int(num_triangles / 2)
@@ -148,7 +159,7 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
     else:
         findPositives = bool(0 == int(class_to_explain))
     if use_q:
-        candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates,
+        candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates, batched=not use_all,
                                                 lj=True, max=max_predict, lprefix=lprefix, rprefix=rprefix)
     if use_w:
         candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates,

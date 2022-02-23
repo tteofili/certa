@@ -9,15 +9,26 @@ from certa.local_explain import generate_subsequences
 
 class CertaExplainer(object):
 
-    def __init__(self, lsource, rsource):
+    def __init__(self, lsource, rsource, data_augmentation: str = 'on_demand'):
         '''
         Create the CERTA explainer
         :param lsource: the data source for "left" records
         :param rsource: the data source for "right" records
+        :param data_augmentation: 'no' to avoid usage of DA at all, 'on_demand' to use it only when needed, 'always'
+            to always use DA generated records even when the no. of found support records is sufficient.
         '''
-        gen_left, gen_right = generate_subsequences(lsource, rsource)
-        self.lsource = pd.concat([lsource, gen_left])
-        self.rsource = pd.concat([rsource, gen_right])
+        if data_augmentation in ['always', 'on_demand']:
+            gen_left, gen_right = generate_subsequences(lsource, rsource)
+            self.lsource = pd.concat([lsource, gen_left])
+            self.rsource = pd.concat([rsource, gen_right])
+            if data_augmentation == 'always':
+                self.use_all = True
+            else:
+                self.use_all = False
+        else:
+            self.lsource = lsource
+            self.rsource = rsource
+            self.use_all = False
 
     def explain(self, l_tuple, r_tuple, predict_fn, left=True, right=True, attr_length=-1,
                 num_triangles: int = 100, lprefix='ltable_', rprefix='rtable_',
@@ -36,6 +47,7 @@ class CertaExplainer(object):
         :param rprefix: the prefix of attributes from the "right" table
         :param max_predict: the maximum number of predictions to be performed by the ER model to generate the requested
         number of open triangles
+        :param use_all: whether to run the ER system on all available records
         :return: saliency explanation, cf explanation summary, all the generated cf explanations, the open triangles
         '''
         pc = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
@@ -43,7 +55,7 @@ class CertaExplainer(object):
                                                                                  self.rsource,
                                                                                  predict_fn, lprefix, rprefix,
                                                                                  class_to_explain=pc, use_w=left,
-                                                                                 use_q=right,
+                                                                                 use_q=right, use_all=self.use_all,
                                                                                  num_triangles=num_triangles,
                                                                                  max_predict=max_predict)
 

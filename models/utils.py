@@ -26,7 +26,7 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
     os.makedirs(modeldir, exist_ok=True)
 
     print(f'working on {modelname}')
-    logging.info(f'reading data from {datadir}')
+    print(f'reading data from {datadir}')
 
     lsource = pd.read_csv(datadir + '/tableA.csv')
     rsource = pd.read_csv(datadir + '/tableB.csv')
@@ -34,19 +34,29 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
     valid = pd.read_csv(datadir + '/valid.csv')
     test = pd.read_csv(datadir + '/test.csv')
 
-    try:
-        logging.info('loading model from {}', modeldir)
-        model.load(modeldir)
-    except:
-        logging.info('training model')
-        train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
-        test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
-        valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
-        model.train(train_df, valid_df, modelname)
+    print(f'data loaded')
 
-        precision, recall, fmeasure = model.evaluation(test_df)
-        text_file = open(modeldir + 'report.txt', "a")
-        text_file.write('p:' + str(precision) + ', r:' + str(recall) + ', f1:' + str(fmeasure))
-        text_file.close()
-        model.save(modeldir)
+    try:
+        try:
+            print(f'loading model from {modeldir}')
+            model.load(modeldir)
+        except:
+            print(model)
+            print(f'no valid model found at {modeldir}, now training')
+            print('merging sources')
+            train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
+            test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])
+            valid_df = merge_sources(valid, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
+            print(f'training model with {len(train_df)} samples ({len(valid_df)} validation, {len(test_df)} test)')
+            model.train(train_df, valid_df, modelname)
+            print('evaluating model')
+            precision, recall, fmeasure = model.evaluation(test_df)
+            text_file = open(modeldir + 'report.txt', "a")
+            text_file.write('p:' + str(precision) + ', r:' + str(recall) + ', f1:' + str(fmeasure))
+            text_file.close()
+            print('saving model')
+            model.save(modeldir)
+    except:
+        pass
+
     return model
