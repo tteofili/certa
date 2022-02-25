@@ -165,7 +165,6 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
         candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates,
                                                 lj=False, max=max_predict, lprefix=lprefix, rprefix=rprefix)
 
-    # balance
     max_len = min(len(candidates4r1), len(candidates4r2))
     candidates4r1 = candidates4r1.sample(n=max_len)
     candidates4r2 = candidates4r2.sample(n=max_len)
