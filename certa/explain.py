@@ -70,7 +70,8 @@ class CertaExplainer(object):
             if len(cf_ex) > 0:
                 cf_ex['attr_count'] = cf_ex.alteredAttributes.astype(str) \
                     .str.split(',').str.len()
-                cf_ex = cf_ex.sort_values(by=['attr_count'])
+                cf_ex = cf_ex[cf_ex['alteredAttributes'].isin([tuple(k.split('/')) for k in cf_summary.keys()])]\
+                    .astype(str).drop_duplicates(subset=['copiedValues', 'alteredAttributes', 'droppedValues'])
             return saliency_df, cf_summary, cf_ex, triangles
         else:
             logging.warning('no triangles found -> empty explanation')
