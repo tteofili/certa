@@ -16,7 +16,7 @@ from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
 from metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
-from metrics.saliency import get_faithfullness, get_confidence
+from metrics.saliency import get_faithfulness, get_confidence
 from models.utils import get_model
 
 experiments_dir = 'experiments/'
@@ -24,7 +24,7 @@ base_datadir = 'datasets/'
 
 
 def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
-             compare=False):
+             compare=False, da=None):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
     exp_dir = exp_dir + exp_type + '/'
@@ -51,20 +51,20 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
 
         if 'saliency' == exp_type:
             eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
-                          rsource, test_df, train_df)
+                          rsource, test_df, train_df, da)
         elif 'counterfactual' == exp_type:
             eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-                    train_df)
+                    train_df, da)
 
 
 def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-            train_df):
+            train_df, da):
     examples_df = pd.DataFrame()
     certas = pd.DataFrame()
     train_noids = train_df.copy().astype(str)
     if 'ltable_id' in train_noids.columns and 'rtable_id' in train_noids.columns:
         train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1)
-    certa_explainer = CertaExplainer(lsource, rsource)
+    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
     t = 10
     for i in range(len(test_df)):
         rand_row = test_df.iloc[i]
@@ -216,24 +216,26 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
 
 
 def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
-                  test_df, train_df):
-    certa_explainer = CertaExplainer(lsource, rsource)
-    mojito = Mojito(test_df.columns,
-                    attr_to_copy='left',
-                    split_expression=" ",
-                    class_names=['no_match', 'match'],
-                    lprefix='', rprefix='',
-                    feature_selection='lasso_path')
-    landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
-                                  exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
-                                  split_expression=r' ')
-    shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
-                                          train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
+                  test_df, train_df, da):
+    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
+    if compare:
+        mojito = Mojito(test_df.columns,
+                        attr_to_copy='left',
+                        split_expression=" ",
+                        class_names=['no_match', 'match'],
+                        lprefix='', rprefix='',
+                        feature_selection='lasso_path')
+        landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
+                                      exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
+                                      split_expression=r' ')
+        shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
+                                              train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
+        landmarks = pd.DataFrame()
+        shaps = pd.DataFrame()
+        mojitos = pd.DataFrame()
+
     examples = pd.DataFrame()
     certas = pd.DataFrame()
-    landmarks = pd.DataFrame()
-    shaps = pd.DataFrame()
-    mojitos = pd.DataFrame()
     for i in range(len(test_df)):
         rand_row = test_df.iloc[i]
         l_id = int(rand_row['ltable_id'])
@@ -345,12 +347,14 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
         mojitos.to_csv(exp_dir + dataset + '/' + model_name + '/mojito.csv')
         landmarks.to_csv(exp_dir + dataset + '/' + model_name + '/landmark.csv')
         shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
+        saliency_names = ['certa', 'landmark', 'mojito', 'shap']
+    else:
+        saliency_names = ['certa']
     examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
     certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    faithfulness = get_faithfullness(model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype),
-                                     test_df)
+    faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
     print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
-    ci = get_confidence(['certa', 'mojito', 'landmark', 'shap'], exp_dir + dataset + '/' + mtype)
+    ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
     print(f'{mtype}: confidence indication for {dataset}: {ci}')
 
 
@@ -373,6 +377,9 @@ if __name__ == "__main__":
                         help='no. of samples from the test set used for the evaluation')
     parser.add_argument('--compare', metavar='c', type=bool, default=False,
                         help='whether comparing CERTA with baselines')
+    parser.add_argument('--da', metavar='da', type=str, default='on_demand',
+                        help='whether enabling CERTA data-augmentation feature')
+
     args = parser.parse_args()
     base_datadir = args.base_dir
     if not base_datadir.endswith('/'):
@@ -382,5 +389,6 @@ if __name__ == "__main__":
     exp_type = args.exp_type
     samples = args.samples
     compare = args.compare
+    da = args.da
 
-    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare)
+    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare, da=da)
