@@ -1,7 +1,7 @@
 DEMO SCRIPT
 ===========
 
-# Explaining ER predictions with CERTA 
+# Option 1 : Explaining ER predictions with CERTA 
 0. Explanation visualization
    1. visualize how a given open triangle issues a flip by altering different attributes
 1. Train DeepER, DeepMatcher and Ditto on the following dataset kinds:
@@ -45,3 +45,16 @@ DEMO SCRIPT
       4. same predictions according to merged-attributes-trained-model and standard model 
          1. e.g. for Ditto it makes sense, from a neural network architecture perspective
          2. e.g. for DeepMatcher they should more likely differ as there's an attribute embedding piece in the NN architecture
+
+# Option 2 : Explaining ER predictions with CERTA
+## Highlights: 
+1. generate both CFs and Saliency explanations at the same time
+2. Explain explanations by means of flipped predictions
+## Script
+1. Show examples of the top salient attribute being modified and affecting the score
+2. Show a graph with bars for saliencies and line for actual model score --> this should highlight faithfulness of saliency
+3. Show CF explanations
+4. In case the prediction is different from the label:
+5. Post-train the model using a few CFs
+6. Re-execute the prediction
+7. Re-generate the explanation
