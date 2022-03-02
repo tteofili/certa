@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 
 from certa import local_explain, triangles_method
-from certa.local_explain import generate_subsequences
+from certa.local_explain import generate_subsequences, cs, get_row, get_original_prediction
+
+RIGHT_ILOC_J_ = top_k_right.iloc[j]
 
 
 class CertaExplainer(object):
@@ -61,6 +63,67 @@ class CertaExplainer(object):
 
         if attr_length <= 0:
             attr_length = min(len(l_tuple) - 1, len(r_tuple) - 1)
+        if len(support_samples) > 0:
+            extended_sources = [pd.concat([self.lsource, gright_df]), pd.concat([self.rsource, gleft_df])]
+            pns, pss, cf_ex, triangles = triangles_method.explain_samples(support_samples, extended_sources, predict_fn,
+                                                                          lprefix, rprefix, pc, attr_length=attr_length)
+            cf_summary = triangles_method.cf_summary(pss)
+            saliency_df = pd.DataFrame(data=[pns.values()], columns=pns.keys())
+            if len(cf_ex) > 0:
+                cf_ex['attr_count'] = cf_ex.alteredAttributes.astype(str) \
+                    .str.split(',').str.len()
+                cf_ex = cf_ex[cf_ex['alteredAttributes'].isin([tuple(k.split('/')) for k in cf_summary.keys()])]\
+                    .astype(str).drop_duplicates(subset=['copiedValues', 'alteredAttributes', 'droppedValues'])
+            return saliency_df, cf_summary, cf_ex, triangles
+        else:
+            logging.warning('no triangles found -> empty explanation')
+            return pd.DataFrame(), pd.Series(), pd.DataFrame(), []
+
+
+    def explain_similar(self, l_tuple, r_tuple, predict_fn, top_k: int = 5):
+        pc = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
+        l_record2text = " ".join([str(val) for k, val in l_tuple.to_dict().items() if k not in ['id']])
+        lscore = self.lsource.apply(lambda row: cs(l_record2text, " ".join(row.astype(str))))
+        top_k_left = self.lsource.sort_values(by=lscore, ascending=False)[:top_k]
+        r_record2text = " ".join([str(val) for k, val in r_tuple.to_dict().items() if k not in ['id']])
+        rscore = self.rsource.apply(lambda row: cs(r_record2text, " ".join(row.astype(str))))
+        top_k_right = self.rsource.sort_values(by=rscore, ascending=False)[:top_k]
+        rows_df = pd.DataFrame()
+        for i in np.arange(top_k):
+            for j in np.arange(top_k):
+                lt_c = top_k_left.iloc[i]
+                rt_c = top_k_right.iloc[j]
+                row = get_row(lt_c, rt_c)
+                if pc == np.argmax(get_original_prediction(lt_c, rt_c, predict_fn)):
+                    rows_df = pd.concat([rows_df, row])
+        return self.explain_group(rows_df, predict_fn)
+
+
+    def explain_group(self, rows_df, predict_fn, num_triangles: int = 100, lprefix='ltable_', rprefix='rtable_',
+                max_predict: int = -1, attr_length=-1,):
+        support_samples = pd.DataFrame()
+        gleft_df = pd.DataFrame()
+        gright_df = pd.DataFrame()
+        for i in range(len(rows_df)):
+            rand_row = rows_df.iloc[i]
+            l_id = int(rand_row['ltable_id'])
+            l_tuple = self.lsource.iloc[l_id]
+            r_id = int(rand_row['rtable_id'])
+            r_tuple = self.rsource.iloc[r_id]
+            if attr_length <= 0:
+                attr_length = min(len(l_tuple) - 1, len(r_tuple) - 1)
+            pc = np.argmax(local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn))
+            support_samples_c, gleft_df_c, gright_df_c = local_explain.support_predictions(l_tuple, r_tuple, self.lsource,
+                                                                                     self.rsource,
+                                                                                     predict_fn, lprefix, rprefix,
+                                                                                     class_to_explain=pc, use_w=True,
+                                                                                     use_q=True, use_all=self.use_all,
+                                                                                     num_triangles=num_triangles,
+                                                                                     max_predict=max_predict)
+            support_samples = pd.concat([support_samples, support_samples_c], axis=0)
+            gleft_df = pd.concat([gleft_df, gleft_df_c], axis=0)
+            gright_df = pd.concat([gright_df, gright_df_c], axis=0)
+
         if len(support_samples) > 0:
             extended_sources = [pd.concat([self.lsource, gright_df]), pd.concat([self.rsource, gleft_df])]
             pns, pss, cf_ex, triangles = triangles_method.explain_samples(support_samples, extended_sources, predict_fn,

@@ -306,30 +306,3 @@ def get_neighbors(find_positives, predict_fn, r1r2c, report: bool = False):
     else:
         neighborhood = unlabeled_predictions[unlabeled_predictions.match_score < 0.5].copy()
     return neighborhood
-
-
-def interleave_dataframes(dfs=None):
-    if dfs is None:
-        dfs = [pd.DataFrame(np.zeros(10)), pd.DataFrame(np.ones(25)), pd.DataFrame(np.ones(
-            8) * 2)]  # varialbe-sized pandas dataframe, these should have the same structure (i.e. # and order of the columns)
-
-    num_classes = len(dfs)
-
-    counters = [0 for i in
-                range(len(dfs))]  # these counters are used to check when a certain dataframe has been entirely consumed
-    tot_len = sum([len(x) for x in dfs])
-    new_df = pd.DataFrame(columns=dfs[0].columns, index=range(
-        tot_len))  # new dataframe will have length=tot_len and same structure as input dataframes
-
-    for i in range(tot_len):
-        added = False
-        sel = i % num_classes
-        while not added:
-            try:
-                new_df.ix[i] = dfs[sel].iloc[counters[sel]]  # if the dfs[sel] has still elements to process..
-                counters[sel] += 1
-                added = True
-            except:
-                sel = (sel + 1) % num_classes  # otherwise try with the next dataframe until all of them have been consumed
-
-    return new_df
