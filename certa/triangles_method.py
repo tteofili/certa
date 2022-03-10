@@ -218,7 +218,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                                                                            attr_length, predict_fn, sourcesMap, lprefix,
                                                                            rprefix)
         if persist_predictions:
-            all_predictions.to_csv('predictions.csv', mode='a')
+            all_predictions.to_csv('predictions.csv')
         explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
 
         flips = len(flipped_predictions) + len(allTriangles)
@@ -266,6 +266,7 @@ def cf_summary(explanation):
 def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
                     sourcesMap, lprefix, rprefix, monotonicity=True):
     if monotonicity:
+        all_predictions = pd.DataFrame()
         rankings = []
         transitivity = True
         flippedPredictions = []
@@ -300,6 +301,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
             if a != attr_length and not all_good:
                 predictions = predict_fn(perturbations_df.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
                 predictions = pd.concat([predictions, perturbations_df[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]], axis=1)
+                all_predictions = pd.concat([all_predictions, predictions])
                 proba = predictions[['nomatch_score', 'match_score']].values
 
                 curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
@@ -329,7 +331,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
             flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
         except:
             flippedPredictions_df = pd.DataFrame(flippedPredictions)
-        return flippedPredictions_df, rankings, []
+        return flippedPredictions_df, rankings, all_predictions
     else:
         rankings = []
         transitivity = True
@@ -367,7 +369,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
             flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
         except:
             flippedPredictions_df = pd.DataFrame(flippedPredictions)
-        return flippedPredictions_df, rankings
+        return flippedPredictions_df, rankings, predictions
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1
