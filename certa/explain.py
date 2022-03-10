@@ -89,7 +89,7 @@ class CertaExplainer(object):
                     lattice_dict = dict(zip(triangle_lattice.alteredAttributes, triangle_lattice.match_score))
                     triangle_edges = triangle.split(' ')
                     if triangle[0].startswith('0'):
-                        powerset = [set(s) for s in lattice_dict.keys()] + [set(), set([c for c in saliency_df.columns if c[0] == 'l' ])]
+                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [set([c for c in saliency_df.columns if c[0] == 'l' ])]
                         if pc == 0:
                             f = self.lsource[self.lsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
                             s = self.lsource[self.lsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
@@ -100,7 +100,7 @@ class CertaExplainer(object):
                         tl_tuple = s
                         tr_tuple = p
                     else:
-                        powerset = [set(s) for s in lattice_dict.keys()] + [set(), set([c for c in saliency_df.columns if c[0] == 'r'])]
+                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [set([c for c in saliency_df.columns if c[0] == 'r'])]
                         if pc == 0:
                             f = self.rsource[self.rsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
                             s = self.rsource[self.rsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
@@ -111,8 +111,12 @@ class CertaExplainer(object):
                         tl_tuple = p
                         tr_tuple = s
                     top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
-                    rank = list(lattice_dict.values()) + [prediction[1], top_lattice_prediction[1]]
+                    rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
                     lattice = Lattice(powerset, rank)
+                    try:
+                        lattice.Hasse()
+                    except:
+                        pass
                     lattices.append(lattice)
 
             return saliency_df, cf_summary, cf_ex, triangles, lattices

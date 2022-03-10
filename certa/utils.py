@@ -132,14 +132,15 @@ class Lattice(object):
         dotcode+='\"'+str(self.TopElement.unwrap)+'\" [shape=box];\n'
         dotcode+='\"'+str(self.BottonElement.unwrap)+'\" [shape=box];\n'
         for s, ds in graph.items():
-            if not self.WElementByIndex(s) in matching:
+            ebi = self.WElementByIndex(s).unwrap
+            if not str(ebi) in matching:
                 if self.ranks[s] > 0.5:
-                    matching.append(str(self.WElementByIndex(s)))
-            if not self.WElementByIndex(s) in non_matching:
+                    matching.append(str(ebi))
+            if not str(ebi) in non_matching:
                 if self.ranks[s] < 0.5:
-                    non_matching.append(str(self.WElementByIndex(s)))
+                    non_matching.append(str(ebi))
             for d in ds:
-                dotcode += "\""+str(self.WElementByIndex(s))+"\""
+                dotcode += "\""+str(ebi)+"\""
                 dotcode += " -> "
                 dotcode += "\""+str(self.WElementByIndex(d))+"\""
                 dotcode += ";\n"
@@ -173,7 +174,7 @@ class Lattice(object):
 
 class LatticeElement():
     def __init__(self, lattice, Uelement):
-        if Uelement not in lattice.Uelements: lattice.Uelements.append(Uelement)#raise ValueError(f'The given value {Uelement} is not a lattice element')
+        if Uelement not in lattice.Uelements: raise ValueError(f'The given value {Uelement} is not a lattice element') #lattice.Uelements.append(Uelement)
         self.lattice=lattice
         self.ElementIndex=lattice.Uelements.index(Uelement)
 
