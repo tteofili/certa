@@ -75,7 +75,7 @@ def diff(a: str, b: str):
     return d
 
 
-class Lattice(object):
+class lattice(object):
 
     def __init__(self, Uelements, ranks, join_func=lambda a,b : a.union(b), meet_func=lambda a,b : a.intersection(b)):
         '''Create a lattice:
@@ -118,7 +118,7 @@ class Lattice(object):
             botton &= self.wrap(element)
         return botton
 
-    def Hasse(self):
+    def hasse(self):
         graph=dict()
         matching = []
         non_matching = []
@@ -133,34 +133,20 @@ class Lattice(object):
         dotcode+='\"'+str(self.BottonElement.unwrap)+'\" [shape=box];\n'
         for s, ds in graph.items():
             ebi = self.WElementByIndex(s).unwrap
+            color = ''
             if not str(ebi) in matching:
                 if self.ranks[s] > 0.5:
-                    matching.append(str(ebi))
+                    color = 'green'
             if not str(ebi) in non_matching:
                 if self.ranks[s] < 0.5:
-                    non_matching.append(str(ebi))
+                    color = 'red'
+            dotcode += "\""+str(ebi)+"\" [color="+color+"];\n"
             for d in ds:
                 dotcode += "\""+str(ebi)+"\""
                 dotcode += " -> "
                 dotcode += "\""+str(self.WElementByIndex(d))+"\""
                 dotcode += ";\n"
-        matching_string = ' -> '.join([s for s in matching])
-        non_matching_string = ' -> '.join([s for s in non_matching])
         dotcode += "}"
-        dotcode += 'subgraph cluster_0 {\
-                        style=filled;\
-                        color=red;\
-                        node [style=filled,color=white];\
-                        '+matching_string+';\
-                        label = "non-match";\
-                      }\
-                    \
-                      subgraph cluster_1 {\
-                        node [style=filled];\
-                        '+non_matching_string+';\
-                        label = "match";\
-                        color=green\
-                      }'
         try:
             from scapy.all import do_graph
             do_graph(dotcode)

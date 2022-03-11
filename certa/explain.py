@@ -5,7 +5,7 @@ import pandas as pd
 
 from certa import local_explain, triangles_method
 from certa.local_explain import generate_subsequences
-from certa.utils import Lattice
+from certa.utils import lattice
 
 
 class CertaExplainer(object):
@@ -112,12 +112,8 @@ class CertaExplainer(object):
                         tr_tuple = s
                     top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
                     rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
-                    lattice = Lattice(powerset, rank)
-                    try:
-                        lattice.Hasse()
-                    except:
-                        pass
-                    lattices.append(lattice)
+                    latt = lattice(powerset, rank)
+                    lattices.append(latt)
 
             return saliency_df, cf_summary, cf_ex, triangles, lattices
         else:
