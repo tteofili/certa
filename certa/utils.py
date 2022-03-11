@@ -77,7 +77,8 @@ def diff(a: str, b: str):
 
 class lattice(object):
 
-    def __init__(self, Uelements, ranks, join_func=lambda a,b : a.union(b), meet_func=lambda a,b : a.intersection(b)):
+    def __init__(self, Uelements, ranks, join_func=lambda a,b : a.union(b), meet_func=lambda a,b : a.intersection(b),
+                 triangle=pd.DataFrame()):
         '''Create a lattice:
 
         Keyword arguments:
@@ -92,6 +93,7 @@ class lattice(object):
         self.ranks = ranks
         self.join=join_func
         self.meet=meet_func
+        self.triangle = triangle
 
     def wrap(self,object):
         '''Wraps an object as a lattice element:
@@ -118,7 +120,7 @@ class lattice(object):
             botton &= self.wrap(element)
         return botton
 
-    def hasse(self):
+    def hasse(self, depth=-1):
         graph=dict()
         matching = []
         non_matching = []
@@ -131,6 +133,7 @@ class lattice(object):
         dotcode='digraph G {\nsplines="line"\nrankdir=BT\n'
         dotcode+='\"'+str(self.TopElement.unwrap)+'\" [shape=box];\n'
         dotcode+='\"'+str(self.BottonElement.unwrap)+'\" [shape=box];\n'
+        dc = 0
         for s, ds in graph.items():
             ebi = self.WElementByIndex(s).unwrap
             color = ''
@@ -146,6 +149,9 @@ class lattice(object):
                 dotcode += " -> "
                 dotcode += "\""+str(self.WElementByIndex(d))+"\""
                 dotcode += ";\n"
+            dc+=1
+            if depth > 0 and dc==depth:
+                break
         dotcode += "}"
         try:
             from scapy.all import do_graph

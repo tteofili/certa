@@ -73,7 +73,7 @@ class CertaExplainer(object):
             if len(cf_ex) > 0:
                 cf_ex['attr_count'] = cf_ex.alteredAttributes.astype(str) \
                     .str.split(',').str.len()
-                cf_ex = cf_ex[cf_ex['alteredAttributes'].isin([tuple(k.split('/')) for k in cf_summary.keys()])]\
+                cf_ex = cf_ex[cf_ex['alteredAttributes'].isin([tuple(k.split('/')) for k in cf_summary.keys()])] \
                     .astype(str).drop_duplicates(subset=['copiedValues', 'alteredAttributes', 'droppedValues'])
             lattices = []
             if debug:
@@ -89,7 +89,8 @@ class CertaExplainer(object):
                     lattice_dict = dict(zip(triangle_lattice.alteredAttributes, triangle_lattice.match_score))
                     triangle_edges = triangle.split(' ')
                     if triangle[0].startswith('0'):
-                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [set([c for c in saliency_df.columns if c[0] == 'l' ])]
+                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
+                            set([c for c in saliency_df.columns if c[0] == 'l'])]
                         if pc == 0:
                             f = self.lsource[self.lsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
                             s = self.lsource[self.lsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
@@ -100,7 +101,8 @@ class CertaExplainer(object):
                         tl_tuple = s
                         tr_tuple = p
                     else:
-                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [set([c for c in saliency_df.columns if c[0] == 'r'])]
+                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
+                            set([c for c in saliency_df.columns if c[0] == 'r'])]
                         if pc == 0:
                             f = self.rsource[self.rsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
                             s = self.rsource[self.rsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
@@ -112,7 +114,9 @@ class CertaExplainer(object):
                         tr_tuple = s
                     top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
                     rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
-                    latt = lattice(powerset, rank)
+                    triangle_df = pd.concat([p, f, s], axis=1).T
+                    triangle_df['type'] = ['pivot', 'free', 'support']
+                    latt = lattice(powerset, rank, triangle=triangle_df)
                     lattices.append(latt)
 
             return saliency_df, cf_summary, cf_ex, triangles, lattices
