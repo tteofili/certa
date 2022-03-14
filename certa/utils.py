@@ -120,7 +120,7 @@ class lattice(object):
             botton &= self.wrap(element)
         return botton
 
-    def hasse(self, depth=-1):
+    def hasse(self, depth=-1, compress=True):
         graph=dict()
         matching = []
         non_matching = []
@@ -131,23 +131,34 @@ class lattice(object):
                     if not bool( sum([ int(self.WElementByIndex(x) <= self.wrap(elementD)) for x in graph[indexS]])) and not elementS==elementD:
                         graph[indexS]+=[indexD]
         dotcode='digraph G {\nsplines="line"\nrankdir=BT\n'
-        dotcode+='\"'+str(self.TopElement.unwrap)+'\" [shape=box];\n'
-        dotcode+='\"'+str(self.BottonElement.unwrap)+'\" [shape=box];\n'
+        topebi = str(self.TopElement.unwrap)
+        if compress:
+            topebi = compress_text(topebi)
+        dotcode+='\"' + topebi + '\" [shape=box];\n'
+        bebi = str(self.BottonElement.unwrap)
+        if compress:
+            bebi = compress_text(bebi)
+        dotcode+='\"' + bebi + '\" [shape=box];\n'
         dc = 0
         for s, ds in graph.items():
-            ebi = self.WElementByIndex(s).unwrap
+            ebi = str(self.WElementByIndex(s).unwrap)
+            if compress:
+                ebi = compress_text(ebi)
             color = ''
-            if not str(ebi) in matching:
+            if not ebi in matching:
                 if self.ranks[s] > 0.5:
                     color = 'green'
-            if not str(ebi) in non_matching:
+            if not ebi in non_matching:
                 if self.ranks[s] < 0.5:
                     color = 'red'
-            dotcode += "\""+str(ebi)+"\" [color="+color+"];\n"
+            dotcode += "\""+ebi+"\" [color="+color+"];\n"
             for d in ds:
-                dotcode += "\""+str(ebi)+"\""
+                dsebi = str(self.WElementByIndex(d))
+                if compress:
+                    dsebi = compress_text(dsebi)
+                dotcode += "\""+ebi+"\""
                 dotcode += " -> "
-                dotcode += "\""+str(self.WElementByIndex(d))+"\""
+                dotcode += "\"" + dsebi + "\""
                 dotcode += ";\n"
             dc+=1
             if depth > 0 and dc==depth:
@@ -163,6 +174,11 @@ class lattice(object):
     def __repr__(self):
         """Represents the lattice as an instance of Lattice."""
         return 'Lattice(%s,%s,%s)' % (self.Uelements,self.join,self.meet)
+
+
+def compress_text(s):
+    return ''.join(c for c in s.replace('{', '').replace('}', '') if c.isupper() or c == ',')
+
 
 class LatticeElement():
     def __init__(self, lattice, Uelement):
