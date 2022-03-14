@@ -164,11 +164,6 @@ class lattice(object):
             if depth > 0 and dc==depth:
                 break
         dotcode += "}"
-        try:
-            from scapy.all import do_graph
-            do_graph(dotcode)
-        except:
-            pass
         return dotcode
 
     def __repr__(self):
