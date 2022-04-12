@@ -56,7 +56,7 @@ class_to_explain = np.argmax(prediction)
 To explain the prediction using _CERTA_ :
 
 ```python
-saliency, summary, cfs, triangles = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
+saliency, summary, cfs, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
 ```
 _CERTA_ returns:
 * the saliency explanation within the _saliency_ pd.DataFrame 
