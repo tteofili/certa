@@ -203,6 +203,8 @@ class EMTERModel(ERModel):
 
     def load(self, path):
         self.model, self.tokenizer = models.emt.model.load_model(path, True)
+        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
+        self.model = self.model.to(device)
         return self.model
 
     def save(self, path):
