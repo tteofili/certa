@@ -56,7 +56,7 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
     find_positives, support = get_support(class_to_explain, pd.concat([lsource, copies_left]), max_predict,
                                          original_prediction, predict_fn, r1, r2, pd.concat([rsource, copies_right]),
-                                         use_w, use_q, lprefix, rprefix, num_triangles)
+                                         use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
 
     if len(support) > 0:
         if len(support) > num_triangles:
