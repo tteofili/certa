@@ -91,7 +91,7 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
             print('certa')
             t0 = time.perf_counter()
 
-            saliency_df, cf_summary, counterfactual_examples, triangles = certa_explainer.explain(l_tuple, r_tuple,
+            saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
                                                                                                   predict_fn)
 
             latency_c = time.perf_counter() - t0
@@ -255,7 +255,7 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
             print('certa')
             t0 = time.perf_counter()
 
-            saliency_df, cf_summary, cf_ex, triangles = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
+            saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
 
             latency_c = time.perf_counter() - t0
 
