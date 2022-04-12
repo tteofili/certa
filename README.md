@@ -68,3 +68,16 @@ _CERTA_ returns:
 
 Examples of using _CERTA_ can be found in the following notebooks:
 * [sample.ipynb](notebooks/sample.ipynb)
+
+# Citing CERTA
+
+If you extend or use this work, please cite the [paper](https://arxiv.org/abs/2203.12978):
+
+```
+@article{teofili2022effective,
+  title={Effective Explanations for Entity Resolution Models},
+  author={Teofili, Tommaso and Firmani, Donatella and Koudas, Nick and Martello, Vincenzo and Merialdo, Paolo and Srivastava, Divesh},
+  journal={arXiv preprint arXiv:2203.12978},
+  year={2022}
+}
+```
