@@ -27,7 +27,6 @@ class DittoModel(nn.Module):
             self.bert = AutoModel.from_pretrained(lm_mp[lm])
         else:
             self.bert = AutoModel.from_pretrained(lm)
-        print(device)
         self.device = device
         self.alpha_aug = alpha_aug
 

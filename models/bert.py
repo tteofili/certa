@@ -46,7 +46,6 @@ class EMTERModel(ERModel):
         config = config_class.from_pretrained('distilbert-base-uncased')
         self.tokenizer = tokenizer_class.from_pretrained('distilbert-base-uncased', do_lower_case=True)
         device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
-        print(device)
         if self.ditto:
             self.model = DittoModel(lm='distilbert', device=device)
         else:
@@ -187,11 +186,9 @@ class EMTERModel(ERModel):
                     else:
                         r += str(tup[c]) + ' '
                 inputs.append(l +'\t' + r +'\t0')
-            print(inputs)
             dataset = DittoDataset(inputs,
                                    max_len=256,
                                    lm=self.model_type)
-            # print(dataset[0])
             iterator = DataLoader(dataset=dataset,
                                        batch_size=len(dataset),
                                        shuffle=False,
@@ -201,7 +198,6 @@ class EMTERModel(ERModel):
             all_probs = []
             all_logits = []
             with torch.no_grad():
-                # print('Classification')
                 for i, batch in enumerate(iterator):
                     x_in, _ = batch
                     logits = self.model(x_in)
@@ -212,8 +208,6 @@ class EMTERModel(ERModel):
             threshold = 0.5
 
             pred = [1 if p > threshold else 0 for p in all_probs]
-            print(pred)
-            print(all_probs)
             xc['match_score'] = all_probs
             xc['nomatch_score'] = 1 - xc['match_score']
             if 'id' in x.columns:
