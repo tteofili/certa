@@ -28,7 +28,7 @@ class DittoModel(nn.Module):
         else:
             self.bert = AutoModel.from_pretrained(lm)
         print(device)
-        self.device = 'cpu'
+        self.device = device
         self.alpha_aug = alpha_aug
 
         # linear layer
