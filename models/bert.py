@@ -6,6 +6,9 @@ import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
 
+import torch
+from torch.utils.data import DataLoader
+
 import models.emt.model
 import models.emt.config
 import models.emt.data_representation
@@ -16,6 +19,9 @@ import models.emt.torch_initializer
 import models.emt.training
 import models.emt.prediction
 from models.ermodel import ERModel
+from models.ditto.ditto import DittoModel, DittoDataset
+from models.ditto.matcher import to_str
+from models.ditto.knowledge import GeneralDKInjector, ProductDKInjector
 
 BATCH_SIZE = 8
 
@@ -33,14 +39,27 @@ def emt_mojito_predict(model):
 
 class EMTERModel(ERModel):
 
-    def __init__(self):
+    def __init__(self, ditto=True, dk='product', summarizer=None):
         self.name = 'bert'
+        self.ditto = ditto
         super(EMTERModel, self).__init__()
         self.model_type = 'distilbert'
         config_class, model_class, tokenizer_class = models.emt.config.Config().MODEL_CLASSES[self.model_type]
         config = config_class.from_pretrained('distilbert-base-uncased')
         self.tokenizer = tokenizer_class.from_pretrained('distilbert-base-uncased', do_lower_case=True)
-        self.model = model_class.from_pretrained('distilbert-base-uncased', config=config)
+        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
+        if self.ditto:
+            self.model = DittoModel(lm=self.model_type, device=device)
+            self.summarizer = summarizer
+            if dk == 'product':
+                injector = ProductDKInjector(config, dk)
+            elif dk == 'general':
+                injector = GeneralDKInjector(config, '')
+            else:
+                injector = None
+            self.injector = injector
+        else:
+            self.model = model_class.from_pretrained('distilbert-base-uncased', config=config)
 
     def train(self, label_train, label_valid, dataset_name, epochs=7):
         try:
@@ -165,41 +184,87 @@ class EMTERModel(ERModel):
         if 'label' not in xc.columns:
             xc.insert(0, 'label', '')
         device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
-        processor = models.emt.data_representation.DeepMatcherProcessor()
-        tmpf = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
-        xc.to_csv(tmpf)
-        examples = processor.get_test_examples_file(tmpf)
-        test_data_loader = models.emt.data_loader.load_data(examples,
-                                                     processor.get_labels(),
-                                                     self.tokenizer,
-                                                     MAX_SEQ_LENGTH,
-                                                     BATCH_SIZE,
-                                                     models.emt.data_loader.DataType.TEST, self.model_type)
+        if self.ditto:
+            inputs = []
+            for idx in range(len(xc)):
+                tup = xc.iloc[idx]
+                l = ''
+                r = ''
+                for c in xc.columns:
+                    if c.startswith('ltable'):
+                        l += str(tup[c]) + ' '
+                    else:
+                        r += str(tup[c]) + ' '
+                input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector)
+                inputs.append(input_text)
+            dataset = DittoDataset(inputs,
+                                   max_len=256,
+                                   lm=self.model_type)
+            iterator = DataLoader(dataset=dataset,
+                                       batch_size=len(dataset),
+                                       shuffle=False,
+                                       num_workers=0,
+                                       collate_fn=DittoDataset.pad)
+            # prediction
+            all_probs = []
+            all_logits = []
+            with torch.no_grad():
+                for i, batch in enumerate(iterator):
+                    x_in, _ = batch
+                    logits = self.model(x_in)
+                    probs = logits.softmax(dim=1)[:, 1]
+                    all_probs += probs.cpu().numpy().tolist()
+                    all_logits += logits.cpu().numpy().tolist()
 
-        simple_accuracy, f1, classification_report, predictions = models.emt.prediction.predict(self.model, device,
-                                                                                         test_data_loader)
-        os.remove(tmpf)
-
-        predictions.index = np.arange(len(predictions))
-        if mojito:
-            full_df = np.dstack((predictions['nomatch_score'], predictions['match_score'])).squeeze()
-            res_shape = full_df.shape
-            if len(res_shape) == 1 and expand_dim:
-                full_df = np.expand_dims(full_df, axis=1).T
+            #threshold = 0.5
+            #pred = [1 if p > threshold else 0 for p in all_probs]
+            xc['match_score'] = all_probs
+            xc['nomatch_score'] = 1 - xc['match_score']
+            if 'id' in x.columns:
+                xc['id'] = x['id']
+            if 'ltable_id' in x.columns:
+                xc['ltable_id'] = x['ltable_id']
+            if 'rtable_id' in x.columns:
+                xc['rtable_id'] = x['rtable_id']
+            if 'label' in x.columns:
+                xc['label'] = x['label']
+            return xc
         else:
-            names = list(xc.columns)
-            names.extend(['classes', 'labels', 'nomatch_score', 'match_score'])
-            xc.index = np.arange(len(xc))
-            full_df = pd.concat([xc, predictions], axis=1, names=names)
-            full_df.columns = names
-            try:
-                original.reset_index(inplace=True)
-                full_df['ltable_id'] = original['ltable_id']
-                full_df['rtable_id'] = original['rtable_id']
-                full_df['id'] = original['id']
-            except:
-                pass
-        return full_df
+            processor = models.emt.data_representation.DeepMatcherProcessor()
+            tmpf = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
+            xc.to_csv(tmpf)
+            examples = processor.get_test_examples_file(tmpf)
+            test_data_loader = models.emt.data_loader.load_data(examples,
+                                                         processor.get_labels(),
+                                                         self.tokenizer,
+                                                         MAX_SEQ_LENGTH,
+                                                         BATCH_SIZE,
+                                                         models.emt.data_loader.DataType.TEST, self.model_type)
+
+            simple_accuracy, f1, classification_report, predictions = models.emt.prediction.predict(self.model, device,
+                                                                                             test_data_loader)
+            os.remove(tmpf)
+
+            predictions.index = np.arange(len(predictions))
+            if mojito:
+                full_df = np.dstack((predictions['nomatch_score'], predictions['match_score'])).squeeze()
+                res_shape = full_df.shape
+                if len(res_shape) == 1 and expand_dim:
+                    full_df = np.expand_dims(full_df, axis=1).T
+            else:
+                names = list(xc.columns)
+                names.extend(['classes', 'labels', 'nomatch_score', 'match_score'])
+                xc.index = np.arange(len(xc))
+                full_df = pd.concat([xc, predictions], axis=1, names=names)
+                full_df.columns = names
+                try:
+                    original.reset_index(inplace=True)
+                    full_df['ltable_id'] = original['ltable_id']
+                    full_df['rtable_id'] = original['rtable_id']
+                    full_df['id'] = original['id']
+                except:
+                    pass
+            return full_df
 
     def load(self, path):
         self.model, self.tokenizer = models.emt.model.load_model(path, True)
