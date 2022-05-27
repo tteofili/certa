@@ -20,6 +20,8 @@ import models.emt.training
 import models.emt.prediction
 from models.ermodel import ERModel
 from models.ditto.ditto import DittoModel, DittoDataset
+from models.ditto.matcher import to_str
+from models.ditto.knowledge import GeneralDKInjector, ProductDKInjector
 
 BATCH_SIZE = 8
 
@@ -37,7 +39,7 @@ def emt_mojito_predict(model):
 
 class EMTERModel(ERModel):
 
-    def __init__(self, ditto=True):
+    def __init__(self, ditto=True, dk='product', summarizer=None):
         self.name = 'bert'
         self.ditto = ditto
         super(EMTERModel, self).__init__()
@@ -47,7 +49,15 @@ class EMTERModel(ERModel):
         self.tokenizer = tokenizer_class.from_pretrained('distilbert-base-uncased', do_lower_case=True)
         device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
         if self.ditto:
-            self.model = DittoModel(lm='distilbert', device=device)
+            self.model = DittoModel(lm=self.model_type, device=device)
+            self.summarizer = summarizer
+            if dk == 'product':
+                injector = ProductDKInjector(config, dk)
+            elif dk == 'general':
+                injector = GeneralDKInjector(config, '')
+            else:
+                injector = None
+            self.injector = injector
         else:
             self.model = model_class.from_pretrained('distilbert-base-uncased', config=config)
 
@@ -185,7 +195,8 @@ class EMTERModel(ERModel):
                         l += str(tup[c]) + ' '
                     else:
                         r += str(tup[c]) + ' '
-                inputs.append(l +'\t' + r +'\t0')
+                input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector)
+                inputs.append(input_text)
             dataset = DittoDataset(inputs,
                                    max_len=256,
                                    lm=self.model_type)
@@ -205,9 +216,8 @@ class EMTERModel(ERModel):
                     all_probs += probs.cpu().numpy().tolist()
                     all_logits += logits.cpu().numpy().tolist()
 
-            threshold = 0.5
-
-            pred = [1 if p > threshold else 0 for p in all_probs]
+            #threshold = 0.5
+            #pred = [1 if p > threshold else 0 for p in all_probs]
             xc['match_score'] = all_probs
             xc['nomatch_score'] = 1 - xc['match_score']
             if 'id' in x.columns:
