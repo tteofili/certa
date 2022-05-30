@@ -160,7 +160,7 @@ class EMTERModel(ERModel):
 
         return float(p), float(r), float(f1)
 
-    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, **kwargs):
+    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, max_len=256, **kwargs):
         if isinstance(x, csr_matrix):
             x = pd.DataFrame(data=np.zeros(x.shape))
             if given_columns is not None:
@@ -194,7 +194,7 @@ class EMTERModel(ERModel):
                 input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,
-                                   max_len=256,
+                                   max_len=max_len,
                                    lm=self.model_type)
             iterator = DataLoader(dataset=dataset,
                                   batch_size=len(dataset),
