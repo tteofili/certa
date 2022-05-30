@@ -14,7 +14,7 @@ from tensorflow.keras.optimizers import Adam
 import gensim.downloader as api
 
 
-from models.ermodel import ERModel
+from certa.models.ermodel import ERModel
 
 
 def init_embeddings_index(embeddings_file):

@@ -10,7 +10,7 @@ from sklearn.metrics import max_error, mean_absolute_error
 from sklearn.model_selection import ShuffleSplit
 from sklearn.preprocessing import MinMaxScaler
 
-from models.ermodel import ERModel
+from certa.models.ermodel import ERModel
 
 
 def get_confidence(saliency_names: list, base_dir: str):

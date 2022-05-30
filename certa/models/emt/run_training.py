@@ -2,15 +2,15 @@ import logging
 import os
 from datetime import datetime
 
-from config import read_arguments_train, write_config_to_file, Config
-from logging_customized import setup_logging
-from data_loader import load_data, DataType
-from data_representation import DeepMatcherProcessor, QqpProcessor
-from evaluation import Evaluation
-from model import save_model
-from optimizer import build_optimizer
-from torch_initializer import initialize_gpu_seed
-from training import train
+from certa.models.emt.config import read_arguments_train, write_config_to_file, Config
+from certa.models.emt.logging_customized import setup_logging
+from certa.models.emt.data_loader import load_data, DataType
+from certa.models.emt.data_representation import DeepMatcherProcessor, QqpProcessor
+from certa.models.emt.evaluation import Evaluation
+from certa.models.emt.model import save_model
+from certa.models.emt.optimizer import build_optimizer
+from certa.models.emt.torch_initializer import initialize_gpu_seed
+from certa.models.emt.training import train
 
 setup_logging()
 

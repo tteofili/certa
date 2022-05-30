@@ -1,7 +1,7 @@
 import logging
 
-from models.emt.logging_customized import setup_logging
-from models.emt.data_representation import InputFeatures
+from certa.models.emt.logging_customized import setup_logging
+from certa.models.emt.data_representation import InputFeatures
 
 setup_logging()
 

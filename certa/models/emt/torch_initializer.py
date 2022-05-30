@@ -2,7 +2,7 @@ import random
 import numpy as np
 import torch
 
-from models.emt.logging_customized import setup_logging
+from certa.models.emt.logging_customized import setup_logging
 
 setup_logging()
 

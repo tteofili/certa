@@ -3,10 +3,10 @@ import os
 import pandas as pd
 
 from certa.utils import merge_sources
-from models.DeepER import DeepERModel
-from models.bert import EMTERModel
-from models.dm import DMERModel
-from models.ermodel import ERModel
+from certa.models.DeepER import DeepERModel
+from certa.models.bert import EMTERModel
+from certa.models.dm import DMERModel
+from certa.models.ermodel import ERModel
 
 
 def from_type(type: str):

@@ -15,9 +15,9 @@ from baselines.shap_c import ShapCounterfactual
 from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
-from metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
-from metrics.saliency import get_faithfulness, get_confidence
-from models.utils import get_model
+from certa.metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
+from certa.metrics.saliency import get_faithfulness, get_confidence
+from certa.models.utils import get_model
 
 experiments_dir = 'experiments/'
 base_datadir = 'datasets/'

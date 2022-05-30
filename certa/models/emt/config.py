@@ -8,7 +8,7 @@ from transformers import BertConfig, BertForSequenceClassification, BertTokenize
     RobertaTokenizer, RobertaForSequenceClassification, RobertaConfig, DistilBertConfig, \
     DistilBertForSequenceClassification, DistilBertTokenizer
 
-from models.emt.logging_customized import setup_logging
+from certa.models.emt.logging_customized import setup_logging
 
 setup_logging()
 

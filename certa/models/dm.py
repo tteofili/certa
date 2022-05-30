@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from scipy.sparse import csr_matrix
 
-from models.ermodel import ERModel
+from certa.models.ermodel import ERModel
 
 
 def wrapdm_mojito(model, ignore_columns=['label', 'id']):

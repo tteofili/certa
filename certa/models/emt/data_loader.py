@@ -3,8 +3,8 @@ from enum import Enum
 import torch
 from torch.utils.data import TensorDataset, RandomSampler, DataLoader, SequentialSampler
 
-from models.emt.logging_customized import setup_logging
-from models.emt.feature_extraction import convert_examples_to_features
+from certa.models.emt.logging_customized import setup_logging
+from certa.models.emt.feature_extraction import convert_examples_to_features
 
 setup_logging()
 
