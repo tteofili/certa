@@ -9,19 +9,19 @@ from scipy.sparse import csr_matrix
 import torch
 from torch.utils.data import DataLoader
 
-import models.emt.model
-import models.emt.config
-import models.emt.data_representation
-import models.emt.data_loader
-import models.emt.optimizer
-import models.emt.evaluation
-import models.emt.torch_initializer
-import models.emt.training
-import models.emt.prediction
-from models.ermodel import ERModel
-from models.ditto.ditto import DittoModel, DittoDataset
-from models.ditto.matcher import to_str
-from models.ditto.knowledge import GeneralDKInjector, ProductDKInjector
+import emt.model
+import emt.config
+import emt.data_representation
+import emt.data_loader
+import emt.optimizer
+import emt.evaluation
+import emt.torch_initializer
+import emt.training
+import emt.prediction
+from ermodel import ERModel
+from ditto.ditto import DittoModel, DittoDataset
+from ditto.matcher import to_str
+from ditto.knowledge import GeneralDKInjector, ProductDKInjector
 
 BATCH_SIZE = 8
 
@@ -44,10 +44,10 @@ class EMTERModel(ERModel):
         self.ditto = ditto
         super(EMTERModel, self).__init__()
         self.model_type = 'distilbert'
-        config_class, model_class, tokenizer_class = models.emt.config.Config().MODEL_CLASSES[self.model_type]
+        config_class, model_class, tokenizer_class = emt.config.Config().MODEL_CLASSES[self.model_type]
         config = config_class.from_pretrained('distilbert-base-uncased')
         self.tokenizer = tokenizer_class.from_pretrained('distilbert-base-uncased', do_lower_case=True)
-        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
+        device, n_gpu = emt.torch_initializer.initialize_gpu_seed(22)
         if self.ditto:
             self.model = DittoModel(lm=self.model_type, device=device)
             self.summarizer = summarizer
@@ -74,7 +74,7 @@ class EMTERModel(ERModel):
             # balanced datasets
             # g_train = label_train.groupby('label')
             # label_train = pandas.DataFrame(g_train.apply(lambda x: x.sample(g_train.size().min()).reset_index(drop=True)))
-            processor = models.emt.data_representation.DeepMatcherProcessor()
+            processor = emt.data_representation.DeepMatcherProcessor()
             # trainF, validF = dm_train.tofiles(label_train, label_valid, dataset_name)
             trainF = dataset_name + '_train.csv'
             validF = dataset_name + '_valid.csv'
@@ -82,12 +82,12 @@ class EMTERModel(ERModel):
             label_valid.to_csv(validF)
             train_examples = processor.get_train_examples_file(trainF)
             label_list = processor.get_labels()
-            training_data_loader = models.emt.data_loader.load_data(train_examples,
+            training_data_loader = emt.data_loader.load_data(train_examples,
                                                              label_list,
                                                              self.tokenizer,
                                                              MAX_SEQ_LENGTH,
                                                              BATCH_SIZE,
-                                                             models.emt.data_loader.DataType.TRAINING, self.model_type)
+                                                             emt.data_loader.DataType.TRAINING, self.model_type)
             num_epochs = epochs
             num_train_steps = len(training_data_loader) * num_epochs
 
@@ -95,23 +95,23 @@ class EMTERModel(ERModel):
             adam_eps = 1e-8
             warmup_steps = 1
             weight_decay = 0
-            optimizer, scheduler = models.emt.optimizer.build_optimizer(self.model,
+            optimizer, scheduler = emt.optimizer.build_optimizer(self.model,
                                                                  num_train_steps,
                                                                  learning_rate,
                                                                  adam_eps,
                                                                  warmup_steps,
                                                                  weight_decay)
             eval_examples = processor.get_test_examples_file(validF)
-            evaluation_data_loader = models.emt.data_loader.load_data(eval_examples,
+            evaluation_data_loader = emt.data_loader.load_data(eval_examples,
                                                                label_list,
                                                                self.tokenizer,
                                                                MAX_SEQ_LENGTH,
                                                                BATCH_SIZE,
-                                                               models.emt.data_loader.DataType.EVALUATION, self.model_type)
+                                                               emt.data_loader.DataType.EVALUATION, self.model_type)
 
-            evaluation = models.emt.evaluation.Evaluation(evaluation_data_loader, '', exp_dir, len(label_list), self.model_type)
+            evaluation = emt.evaluation.Evaluation(evaluation_data_loader, '', exp_dir, len(label_list), self.model_type)
 
-            result = models.emt.training.train(device,
+            result = emt.training.train(device,
                                training_data_loader,
                                self.model,
                                optimizer,
@@ -124,25 +124,25 @@ class EMTERModel(ERModel):
                                output_dir=exp_dir,
                                model_type=self.model_type)
 
-        models.emt.model.save_model(self.model, '', exp_dir, tokenizer=self.tokenizer)
+        model.save_model(self.model, '', exp_dir, tokenizer=self.tokenizer)
         logging.info('MODEL SAVED {}', exp_dir)
         return result
 
     def evaluation(self, test_set):
-        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
-        processor = models.emt.data_representation.DeepMatcherProcessor()
+        device, n_gpu = emt.torch_initializer.initialize_gpu_seed(22)
+        processor = emt.data_representation.DeepMatcherProcessor()
         tmpf = 'tmp.csv'
         test_set.to_csv(tmpf)
         examples = processor.get_test_examples_file(tmpf)
-        test_data_loader = models.emt.data_loader.load_data(examples,
+        test_data_loader = emt.data_loader.load_data(examples,
                                                      processor.get_labels(),
                                                      self.tokenizer,
                                                      MAX_SEQ_LENGTH,
                                                      BATCH_SIZE,
-                                                     models.emt.data_loader.DataType.EVALUATION, self.model_type)
+                                                     emt.data_loader.DataType.EVALUATION, self.model_type)
 
 
-        evaluation = models.emt.evaluation.Evaluation(test_data_loader, '', '', len(test_set),
+        evaluation = emt.evaluation.Evaluation(test_data_loader, '', '', len(test_set),
                                                self.model_type)
 
         result = evaluation.evaluate(self.model, device, -1)
@@ -183,7 +183,7 @@ class EMTERModel(ERModel):
             xc = xc.drop(['rtable_id'], axis=1)
         if 'label' not in xc.columns:
             xc.insert(0, 'label', '')
-        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
+        device, n_gpu = emt.torch_initializer.initialize_gpu_seed(22)
         if self.ditto:
             inputs = []
             for idx in range(len(xc)):
@@ -230,18 +230,18 @@ class EMTERModel(ERModel):
                 xc['label'] = x['label']
             return xc
         else:
-            processor = models.emt.data_representation.DeepMatcherProcessor()
+            processor = emt.data_representation.DeepMatcherProcessor()
             tmpf = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
             xc.to_csv(tmpf)
             examples = processor.get_test_examples_file(tmpf)
-            test_data_loader = models.emt.data_loader.load_data(examples,
+            test_data_loader = emt.data_loader.load_data(examples,
                                                          processor.get_labels(),
                                                          self.tokenizer,
                                                          MAX_SEQ_LENGTH,
                                                          BATCH_SIZE,
-                                                         models.emt.data_loader.DataType.TEST, self.model_type)
+                                                         emt.data_loader.DataType.TEST, self.model_type)
 
-            simple_accuracy, f1, classification_report, predictions = models.emt.prediction.predict(self.model, device,
+            simple_accuracy, f1, classification_report, predictions = emt.prediction.predict(self.model, device,
                                                                                              test_data_loader)
             os.remove(tmpf)
 
@@ -267,13 +267,13 @@ class EMTERModel(ERModel):
             return full_df
 
     def load(self, path):
-        self.model, self.tokenizer = models.emt.model.load_model(path, True)
-        device, n_gpu = models.emt.torch_initializer.initialize_gpu_seed(22)
+        self.model, self.tokenizer = emt.model.load_model(path, True)
+        device, n_gpu = emt.torch_initializer.initialize_gpu_seed(22)
         self.model = self.model.to(device)
         return self.model
 
     def save(self, path):
-        models.emt.model.save_model(self.model, '', path, tokenizer=self.tokenizer)
+        emt.model.save_model(self.model, '', path, tokenizer=self.tokenizer)
 
     def predict_proba(self, x, **kwargs):
         return self.predict(x, mojito=True, expand_dim=True)
