@@ -67,7 +67,7 @@ _CERTA_ returns:
 # Examples
 
 Examples of using _CERTA_ can be found in the following notebooks:
-* [Explain DeepMatcher predictions.ipynb](notebooks/sample.ipynb)
+* [Explain DeepMatcher predictions](notebooks/sample.ipynb)
 * [Explain Ditto predictions](https://gist.github.com/tteofili/b4c81a3de6aef40e8dfa27eaf22f116d)
 
 # Citing CERTA
