@@ -17,7 +17,7 @@ The _get_model_ utility method will load an existing model, if available, or tra
 E.g. for a _DeepMatcher_ model use:
 
 ```python
-from models.utils import get_model
+from certa.models.utils import get_model
 
 model = get_model('dm', '/path/where/to/save', '/path/to/dataset', 'modelname')
 ```
