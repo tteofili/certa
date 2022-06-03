@@ -52,11 +52,20 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
 
-    copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
-
-    find_positives, support = get_support(class_to_explain, pd.concat([lsource, copies_left]), max_predict,
-                                         original_prediction, predict_fn, r1, r2, pd.concat([rsource, copies_right]),
+    find_positives, support = get_support(class_to_explain, lsource, max_predict,
+                                         original_prediction, predict_fn, r1, r2, rsource,
                                          use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
+
+    if len(support) < num_triangles:
+        try:
+            copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
+            find_positives2, support2 = get_support(class_to_explain, copies_right, max_predict,
+                                              original_prediction, predict_fn, r1, r2, copies_left,
+                                              use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
+            if len(support2) > 0:
+                support = pd.concat([support, support2])
+        except:
+            pass
 
     if len(support) > 0:
         if len(support) > num_triangles:
@@ -78,9 +87,10 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         return pd.DataFrame(), copies_left, copies_right
 
 
-def find_candidates_predict(record, source, find_positives, predict_fn, num_candidates, lj=True,
-                            max=-1, lprefix='ltable_', rprefix='rtable_', batched: bool = True):
+def find_candidates_predict(record, source, find_positives, predict_fn, num_candidates, lj=True, scored: bool = True,
+                            max_predict=-1, lprefix='ltable_', rprefix='rtable_', batched: bool = True):
     if lj:
+        prefix = rprefix
         records = pd.DataFrame()
         records = records.append([record] * len(source), ignore_index=True)
         copy = source.copy()
@@ -89,6 +99,7 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
         records.index = copy.index
         samples = pd.concat([records, copy], axis=1)
     else:
+        prefix = lprefix
         copy = source.copy()
         records = pd.DataFrame()
         records = records.append([record] * len(source), ignore_index=True)
@@ -97,19 +108,17 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
         records.columns = list(map(lambda col: rprefix + col, records.columns))
         samples = pd.concat([copy, records], axis=1)
 
-    if max > 0:
-        samples = samples.sample(frac=1)[:max]
+    if max_predict > 0:
+        samples = samples.sample(frac=1)[:max_predict]
 
-    record2text = " ".join([str(val) for k, val in record.to_dict().items() if k not in ['id']])
-    samples['score'] = samples.T.apply(lambda row: cs(record2text, " ".join(row.astype(str))))
-    samples = samples.sort_values(by='score', ascending=not find_positives)
-    samples = samples.drop(['score'], axis=1)
+    record_text = record_to_text(record)
+    if scored:
+        samples['score'] = samples.filter(regex='^'+prefix).T.apply(lambda row: cs(record_text, record_to_text(row)))
+        samples = samples.sort_values(by='score', ascending=not find_positives)
+        samples = samples.drop(['score'], axis=1)
     result = pd.DataFrame()
     batch = num_candidates * 4
-    if max > 0:
-        splits = min(max, int(len(samples) / batch))
-    else:
-        splits = int(len(samples) / batch)
+    splits = min(20, int(len(samples) / batch))
     i = 0
     if batched:
         while len(result) < num_candidates and i < splits:
@@ -134,6 +143,10 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
         if len(out) > 0:
             result = pd.concat([result, out], axis=0)
     return result
+
+
+def record_to_text(record, ignored_columns = ['id', 'ltable_id', 'rtable_id', 'label']):
+    return " ".join([str(val) for k, val in record.to_dict().items() if k not in [ignored_columns]])
 
 
 def generate_subsequences(lsource, rsource, max=-1):
@@ -165,10 +178,10 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
         findPositives = bool(0 == int(class_to_explain))
     if use_q:
         candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates, batched=not use_all,
-                                                lj=True, max=max_predict, lprefix=lprefix, rprefix=rprefix)
+                                                lj=True, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
     if use_w:
         candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates,
-                                                lj=False, max=max_predict, lprefix=lprefix, rprefix=rprefix)
+                                                lj=False, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
 
     max_len = min(len(candidates4r1), len(candidates4r2))
     candidates4r1 = candidates4r1.sample(n=max_len)
