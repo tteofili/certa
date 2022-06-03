@@ -75,7 +75,7 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
         return support_pairs, copies_left, copies_right
     else:
         logging.warning('no triangles found')
-        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+        return pd.DataFrame(), copies_left, copies_right
 
 
 def find_candidates_predict(record, source, find_positives, predict_fn, num_candidates, lj=True,
@@ -106,11 +106,16 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
     samples = samples.drop(['score'], axis=1)
     result = pd.DataFrame()
     batch = num_candidates * 4
-    splits = min(10, int(len(samples) / batch))
+    if max > 0:
+        splits = min(max, int(len(samples) / batch))
+    else:
+        splits = int(len(samples) / batch)
     i = 0
     if batched:
         while len(result) < num_candidates and i < splits:
-            batch_samples = samples[batch * i:batch * (i + 1)]
+            start = batch * i
+            end = batch * (i + 1)
+            batch_samples = samples[start:end]
             predicted = predict_fn(batch_samples)
             if find_positives:
                 out = predicted[predicted["match_score"] > 0.5]
