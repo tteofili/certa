@@ -24,7 +24,7 @@ base_datadir = 'datasets/'
 
 
 def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
-             compare=False, da=None):
+             compare=False, da=None, num_triangles=10, token=False):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
     exp_dir = exp_dir + exp_type + '/'
@@ -51,14 +51,14 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
 
         if 'saliency' == exp_type:
             eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
-                          rsource, test_df, train_df, da)
+                          rsource, test_df, train_df, da, num_triangles, token)
         elif 'counterfactual' == exp_type:
             eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-                    train_df, da)
+                    train_df, da, num_triangles, token)
 
 
 def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-            train_df, da):
+            train_df, da, num_triangles, token):
     examples_df = pd.DataFrame()
     certas = pd.DataFrame()
     train_noids = train_df.copy().astype(str)
@@ -92,7 +92,7 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
             t0 = time.perf_counter()
 
             saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
-                                                                                                  predict_fn)
+                                                                                                  predict_fn, num_triangles=num_triangles)
 
             latency_c = time.perf_counter() - t0
 
@@ -216,7 +216,7 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
 
 
 def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
-                  test_df, train_df, da):
+                  test_df, train_df, da, num_triangles, token):
     certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
     if compare:
         mojito = Mojito(test_df.columns,
@@ -255,7 +255,9 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
             print('certa')
             t0 = time.perf_counter()
 
-            saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
+            saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
+                                                                                          num_triangles=num_triangles,
+                                                                                          token=token)
 
             latency_c = time.perf_counter() - t0
 
@@ -276,8 +278,16 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
                                                   num_perturbation=100)
 
                     latency_m = time.perf_counter() - t0
-
-                    mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
+                    if token:
+                        md = dict()
+                        for i in range(len(mojito_exp_drop)):
+                            row = mojito_exp_drop.iloc[i]
+                            att = row['attribute']
+                            if att not in ['id', 'rtable_id', 'ltable_id']:
+                                md[att + '__' + row['token']] = float(row['weight'])
+                        mojito_exp = md
+                    else:
+                        mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
                 else:
                     t0 = time.perf_counter()
                     mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
@@ -285,8 +295,16 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
                                                   num_perturbation=100)
 
                     latency_m = time.perf_counter() - t0
-
-                    mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
+                    if token:
+                        md = dict()
+                        for i in range(len(mojito_exp_copy)):
+                            row = mojito_exp_copy.iloc[i]
+                            att = row['attribute']
+                            if att not in ['id', 'rtable_id', 'ltable_id']:
+                                md[att + '__' + row['token']] = float(row['weight'])
+                        mojito_exp = md
+                    else:
+                        mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
 
                 if 'id' in mojito_exp:
                     mojito_exp.pop('id', None)
@@ -306,32 +324,43 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
                 land_explanation = landmark_explainer.explain(labelled_item)
                 latency_l = time.perf_counter() - t0
 
-                land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
+                if token:
+                    ld = dict()
+                    for i in range(len(land_explanation)):
+                        row = land_explanation.iloc[i]
+                        att = row['column']
+                        if att not in ['id', 'rtable_id', 'ltable_id']:
+                            ld[att + '__' + row['word']] = float(row['impact'])
+
+                    land_exp = ld
+                else:
+                    land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
 
                 land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
                             'match': class_to_explain,
                             'label': label, 'row': row_id, 'prediction': prediction}
                 landmarks = landmarks.append(land_row, ignore_index=True)
 
-                # SHAP
-                print('shap')
-                shap_instance = test_df.iloc[i, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
+                if not token:
+                    # SHAP
+                    print('shap')
+                    shap_instance = test_df.iloc[i, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
 
-                t0 = time.perf_counter()
-                shap_values = shap_explainer.shap_values(shap_instance, nsamples=10)
+                    t0 = time.perf_counter()
+                    shap_values = shap_explainer.shap_values(shap_instance, nsamples=10)
 
-                latency_s = time.perf_counter() - t0
+                    latency_s = time.perf_counter() - t0
 
-                match_shap_values = shap_values
+                    match_shap_values = shap_values
 
-                shap_saliency = dict()
-                for sv in range(len(match_shap_values)):
-                    shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
+                    shap_saliency = dict()
+                    for sv in range(len(match_shap_values)):
+                        shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
 
-                shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
-                            'match': class_to_explain,
-                            'label': label, 'row': row_id, 'prediction': prediction}
-                shaps = shaps.append(shap_row, ignore_index=True)
+                    shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
+                                'match': class_to_explain,
+                                'label': label, 'row': row_id, 'prediction': prediction}
+                    shaps = shaps.append(shap_row, ignore_index=True)
 
             item['match'] = prediction[1]
             item['label'] = label
@@ -379,6 +408,10 @@ if __name__ == "__main__":
                         help='whether comparing CERTA with baselines')
     parser.add_argument('--da', metavar='da', type=str, default='on_demand',
                         help='whether enabling CERTA data-augmentation feature')
+    parser.add_argument('--num_triangles', metavar='t', type=int, default=10,
+                        help='no. of open triangles used to generate CERTA explanations')
+    parser.add_argument('--token', metavar='tk', type=bool, default=False,
+                        help='whether generating token-level explanations')
 
     args = parser.parse_args()
     base_datadir = args.base_dir
@@ -390,5 +423,8 @@ if __name__ == "__main__":
     samples = args.samples
     compare = args.compare
     da = args.da
+    num_triangles = args.num_triangles
+    token = args.token
 
-    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare, da=da)
+    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare, da=da,
+             num_triangles=num_triangles, token=token)

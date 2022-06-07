@@ -156,7 +156,12 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
                 if int(preds[i]) == 0:
                     reverse = False
                 explanation = saliency_df.iloc[i]['explanation']
-                attributes_dict = json.loads(explanation.replace("'", "\""))
+                attributes_dict = dict()
+                for t in explanation[1:-1].split(','):
+                    vals = t.split(':')
+                    attr = vals[0].replace(' ', '')[1:-1]
+                    score = float(vals[1].replace(' ', ''))
+                    attributes_dict[attr] = score
                 if saliency == 'certa':
                     sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1),
                                                     reverse=True)
@@ -165,7 +170,11 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
                                                     reverse=reverse)
                 top_k_attributes = sorted_attributes_dict[:top_k]
                 for t in top_k_attributes:
-                    test_set_df_c.at[i, t[0]] = ''
+                    split = t[0].split('__')
+                    if len(split) == 2:
+                        test_set_df_c.at[i, split[0]] = test_set_df_c.iloc[i][split[0]].replace(split[1], '')
+                    else:
+                        test_set_df_c.at[i, t[0]] = ''
             evaluation = model.evaluation(test_set_df_c)
             model_scores.append(evaluation[2])
         auc_sal = auc(thresholds, model_scores)

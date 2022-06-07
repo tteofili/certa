@@ -56,9 +56,9 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                          original_prediction, predict_fn, r1, r2, rsource,
                                          use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
 
+    copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
     if len(support) < num_triangles:
         try:
-            copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
             find_positives2, support2 = get_support(class_to_explain, copies_right, max_predict,
                                               original_prediction, predict_fn, r1, r2, copies_left,
                                               use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
