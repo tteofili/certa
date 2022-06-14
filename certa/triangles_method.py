@@ -6,6 +6,7 @@ from itertools import combinations
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import nltk
 
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
@@ -122,7 +123,7 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
 
 
 def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
-                                    rprefix):
+                                    rprefix, idx, check=False):
     # generate power set of attributes
     allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
@@ -141,44 +142,69 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
         if not all(elem.split('__')[0] in free.index.to_list() for elem in subset):
             continue
 
+        repls = []
+        aa = []
         replacements = dict()
         for tbc in subset:  # iterate over the attribute:tokens
             affected_attribute = tbc.split('__')[0]  # attribute to be affected
+            aa.append(affected_attribute)
             if affected_attribute in support.index:
                 replacement_value = support[affected_attribute]
                 replacement_tokens = replacement_value.split(' ')
                 replacements[affected_attribute] = replacement_tokens
+                for rt in replacement_tokens:
+                    repls.append('__'.join([affected_attribute, rt]))
 
-        while len(replacements) > 0:
+        all_rt_combs = list(_powerset(repls, maxLenAttributeSet, maxLenAttributeSet))
+        filtered_combs = []
+        for comb in all_rt_combs:
+            naas = []
+            for rt in comb:
+                naas.append(rt.split('__')[0])
+            if aa == naas:
+                filtered_combs.append(comb)
+
+        for comb in filtered_combs:
+            naas = []
+            for rt in comb:
+                naas.append(rt.split('__')[0])
             newRecord = free.copy()
             dv = []
             cv = []
-            for tbc in subset: # iterate over the attribute:tokens
-                affected_attribute = tbc.split('__')[0] # attribute to be affected
-                affected_token = tbc.split('__')[1] # token to be replaced
+            affected_attributes = []
+            ic = 0
+            for tbc in subset:  # iterate over the attribute:tokens
+                affected_attribute = tbc.split('__')[0]  # attribute to be affected
+                affected_token = tbc.split('__')[1]  # token to be replaced
                 if affected_attribute in support.index and affected_attribute in replacements \
                         and len(replacements[affected_attribute]) > 0:
-                    replacement_token = replacements[affected_attribute].pop()
-                    original_text = newRecord[affected_attribute]
-                    split = original_text.split(affected_token)
-                    prev_text = split[0].split(' ')
-                    prev_span = prev_text[len(prev_text) - 1] + ' ' + replacement_token
-                    next_text = split[1].split(' ')
-                    next_span = replacement_token + ' ' + next_text[0]
-                    if free.index[0].startswith(lprefix):
-                        ds = sourcesMap[0]
-                    else:
-                        ds = sourcesMap[1]
-                    if len(ds.loc[ds[affected_attribute].str.contains(prev_span, case=False)]) > 0 or len(ds.loc[ds[affected_attribute].str.contains(next_span, case=False)]) > 0:
-                        newRecord[affected_attribute] = newRecord[affected_attribute].replace(affected_token, replacement_token)
-                        dv.append(affected_token)
-                        cv.append(replacement_token)
-                        if len(replacements[affected_attribute]) == 0:
-                            replacements.pop(affected_attribute)
-            droppedValues.append(dv)
-            copiedValues.append(cv)
-            perturbations.append(newRecord)
-            perturbedAttributes.append(subset)
+                    replacement_token = comb[ic].split('__')[1]
+                    newRecord[affected_attribute] = newRecord[affected_attribute].replace(affected_token,
+                                                                                          replacement_token)
+                    dv.append(affected_token)
+                    cv.append(replacement_token)
+                    affected_attributes.append(tbc)
+                    ic +=1
+            if not all(newRecord == free) and len(dv) == maxLenAttributeSet:
+                good = True
+                if check:
+                    for i in range(len(cv)):
+                        original_text = free[aa[i]]
+                        split = original_text.split(dv[i])
+                        prev_text = split[0].strip().split(' ')
+                        prev_token = prev_text[len(prev_text) - 1]
+                        prev_span = prev_token + ' ' + cv[i]
+                        next_text = split[1].strip().split(' ')
+                        next_token = next_text[0]
+                        next_span = cv[i] + ' ' + next_token
+                        good = good and (prev_token == '' or prev_span.strip() in idx) \
+                               or (next_token == '' or next_span.strip() in idx)
+                if good:
+                    droppedValues.append(dv)
+                    copiedValues.append(cv)
+                    perturbations.append(newRecord)
+                    perturbedAttributes.append(subset)
+
 
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
@@ -277,22 +303,41 @@ def check_properties(triangle, sourcesMap, predict_fn):
 
 
 def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_length, predict_fn,
-                          sourcesMap, lprefix, rprefix):
+                          sourcesMap, lprefix, rprefix, token_combinations=3):
     all_predictions = pd.DataFrame()
     rankings = []
     flippedPredictions = []
     # lattice stratified predictions
+    idx = None
+    for att in sourcesMap[0]:
+        if att not in ['ltable_id', 'id', 'rtable_id', 'label']:
+            ar2 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.split(' ')))]).values))
+            ar1 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.split(' '), 1))]).values))
+            ar = np.concatenate([ar1, ar2])
+            if idx is None:
+                idx = ar
+            else:
+                idx = np.concatenate((ar, idx), axis=0)
+    for att in sourcesMap[1]:
+        if att not in ['ltable_id', 'id', 'rtable_id', 'label']:
+            ar2 = np.concatenate(list(sourcesMap[1][att].apply(
+                lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.split(' ')))]).values))
+            ar1 = np.concatenate(list(sourcesMap[1][att].apply(
+                lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.split(' '), 1))]).values))
+            ar = np.concatenate([ar1, ar2])
+            idx = np.concatenate((ar, idx), axis=0)
+
     all_good = False
-    for a in range(1, attr_length):
+    for a in range(1, token_combinations):
         t_i = 0
         perturbations = []
         for triangle in tqdm(allTriangles):
             try:
                 currentPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, attributes, a,
-                                                                       class_to_explain, lprefix, rprefix)
+                                                                       class_to_explain, lprefix, rprefix, idx)
                 currentPerturbations['triangle'] = ' '.join(triangle)
                 perturbations.append(currentPerturbations)
-            except:
+            except Exception as e:
                 pass
             t_i += 1
 
@@ -325,8 +370,10 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
 
             curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1)
             proba = proba.values
+            all_predictions = pd.concat([all_predictions, curr_flippedPredictions])
 
         flippedPredictions.append(curr_flippedPredictions)
+
         ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
         rankings.append(ranking)
 
@@ -364,7 +411,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                                                                              class_to_explain,
                                                                              attr_length, predict_fn, sourcesMap,
                                                                              lprefix,
-                                                                             rprefix)
+                                                                             rprefix, token_combinations=int(len(attributes)/2))
             if persist_predictions:
                 all_predictions.to_csv('predictions.csv')
             explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
@@ -392,10 +439,11 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
 
                 return saliency, filtered_exp, flipped_predictions, allTriangles
             else:
-                return dict(), [], pd.DataFrame(), []
+                logging.warning(f'empty explanation !?')
+                return dict(), pd.DataFrame(), pd.DataFrame(), []
         else:
             logging.warning(f'empty triangles !?')
-            return dict(), [], pd.DataFrame(), []
+            return dict(), pd.DataFrame(), pd.DataFrame(), []
 
 
     else:

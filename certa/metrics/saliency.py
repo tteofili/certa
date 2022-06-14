@@ -38,8 +38,13 @@ def get_confidence(saliency_names: list, base_dir: str):
             instance_tokens = []
             for _cls in classes:
                 cls_sals = []
-                explanation = instance_saliency['explanation']
-                attributes_dict = json.loads(explanation.replace("'", "\""))
+                explanation = saliency_df.iloc[i]['explanation']
+                attributes_dict = dict()
+                for t in explanation[1:-1].split(','):
+                    vals = t.split(':')
+                    attr = vals[0].replace(' ', '')[1:-1]
+                    score = float(vals[1].replace(' ', ''))
+                    attributes_dict[attr] = score
                 for _token, sal in attributes_dict.items():
                     if _cls == 0:
                         instance_tokens.append(_token)

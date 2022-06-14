@@ -387,9 +387,6 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
     print(f'{mtype}: confidence indication for {dataset}: {ci}')
 
 
-import warnings
-
-warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
 
