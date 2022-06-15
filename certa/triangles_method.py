@@ -188,7 +188,8 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
             if not all(newRecord == free) and len(dv) == maxLenAttributeSet:
                 good = True
                 if check:
-                    for i in range(len(cv)):
+                    i = 0
+                    while good and i < len(cv):
                         original_text = free[aa[i]]
                         split = original_text.split(dv[i])
                         prev_text = split[0].strip().split(' ')
@@ -197,8 +198,9 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
                         next_text = split[1].strip().split(' ')
                         next_token = next_text[0]
                         next_span = cv[i] + ' ' + next_token
-                        good = good and (prev_token == '' or prev_span.strip() in idx) \
-                               or (next_token == '' or next_span.strip() in idx)
+                        good = good and ((prev_token == '' or prev_span.strip() in idx) \
+                               or (next_token == '' or next_span.strip() in idx))
+                        i += 1
                 if good:
                     droppedValues.append(dv)
                     copiedValues.append(cv)
@@ -311,8 +313,8 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
     idx = None
     for att in sourcesMap[0]:
         if att not in ['ltable_id', 'id', 'rtable_id', 'label']:
-            ar2 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.split(' ')))]).values))
-            ar1 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.split(' '), 1))]).values))
+            ar2 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.astype(str).split(' ')))]).values))
+            ar1 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.astype(str).split(' '), 1))]).values))
             ar = np.concatenate([ar1, ar2])
             if idx is None:
                 idx = ar
@@ -321,9 +323,9 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
     for att in sourcesMap[1]:
         if att not in ['ltable_id', 'id', 'rtable_id', 'label']:
             ar2 = np.concatenate(list(sourcesMap[1][att].apply(
-                lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.split(' ')))]).values))
+                lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.astype(str).split(' ')))]).values))
             ar1 = np.concatenate(list(sourcesMap[1][att].apply(
-                lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.split(' '), 1))]).values))
+                lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.astype(str).split(' '), 1))]).values))
             ar = np.concatenate([ar1, ar2])
             idx = np.concatenate((ar, idx), axis=0)
 
