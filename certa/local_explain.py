@@ -56,6 +56,8 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                          original_prediction, predict_fn, r1, r2, rsource,
                                          use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
 
+    copies_right = pd.DataFrame()
+    copies_left = pd.DataFrame()
     if len(support) < num_triangles:
         try:
             copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
@@ -184,8 +186,13 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
                                                 lj=False, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
 
     max_len = min(len(candidates4r1), len(candidates4r2))
-    candidates4r1 = candidates4r1.sample(n=max_len)
-    candidates4r2 = candidates4r2.sample(n=max_len)
+    if max_len == 0:
+        max_len = max(len(candidates4r1), len(candidates4r2))
+    try:
+        candidates4r1 = candidates4r1.sample(n=max_len)
+        candidates4r2 = candidates4r2.sample(n=max_len)
+    except:
+        pass
     candidates = pd.concat([candidates4r1, candidates4r2]).sample(frac=1)
 
     neighborhood = pd.DataFrame()

@@ -191,7 +191,7 @@ class EMTERModel(ERModel):
                         l += str(tup[c]) + ' '
                     else:
                         r += str(tup[c]) + ' '
-                input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector)
+                input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,
                                    max_len=max_len,
@@ -269,7 +269,7 @@ class EMTERModel(ERModel):
         return self.model
 
     def save(self, path):
-        models.emt.model.save_model(self.model, '', path, tokenizer=self.tokenizer)
+        save_model(self.model, '', path, tokenizer=self.tokenizer)
 
     def predict_proba(self, x, **kwargs):
         return self.predict(x, mojito=True, expand_dim=True)
