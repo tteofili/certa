@@ -18,7 +18,6 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
     for _, row in table.iterrows():
         leftid = row[left_prefix + 'id']
         rightid = row[right_prefix + 'id']
-
         new_row = {column: row[column] for column in copy_from_table}
         l_tuple = left_source.loc[left_source['id'] == leftid].iloc[0]
         r_tuple = right_source.loc[right_source['id'] == rightid].iloc[0]
@@ -27,8 +26,8 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                 l_tuple = l_tuple.drop([ic])
             if ic in r_tuple:
                 r_tuple = r_tuple.drop([ic])
-        new_row['label'] = row['label']
         new_row = get_row(l_tuple, r_tuple, lprefix=left_prefix, rprefix=right_prefix)
+        new_row['label'] = row['label']
         dataset = dataset.append(new_row, ignore_index=True)
 
     if robust:
