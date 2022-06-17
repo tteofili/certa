@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import nltk
+import random
 
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
@@ -123,7 +124,7 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
 
 
 def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
-                                    rprefix, idx, check=False):
+                                    rprefix, idx, check=False, max_combs=2):
     # generate power set of attributes
     allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
@@ -153,7 +154,9 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
                 replacement_tokens = replacement_value.split(' ')
                 replacements[affected_attribute] = replacement_tokens
                 for rt in replacement_tokens:
-                    repls.append('__'.join([affected_attribute, rt]))
+                    new_repl = '__'.join([affected_attribute, rt])
+                    if not new_repl in repls:
+                        repls.append(new_repl)
 
         all_rt_combs = list(_powerset(repls, maxLenAttributeSet, maxLenAttributeSet))
         filtered_combs = []
@@ -164,6 +167,7 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
             if aa == naas:
                 filtered_combs.append(comb)
 
+        filtered_combs = random.sample(filtered_combs, min(max_combs, len(filtered_combs)))
         for comb in filtered_combs:
             naas = []
             for rt in comb:
@@ -188,19 +192,10 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
             if not all(newRecord == free) and len(dv) == maxLenAttributeSet:
                 good = True
                 if check:
-                    i = 0
-                    while good and i < len(cv):
-                        original_text = free[aa[i]]
-                        split = original_text.split(dv[i])
-                        prev_text = split[0].strip().split(' ')
-                        prev_token = prev_text[len(prev_text) - 1]
-                        prev_span = prev_token + ' ' + cv[i]
-                        next_text = split[1].strip().split(' ')
-                        next_token = next_text[0]
-                        next_span = cv[i] + ' ' + next_token
-                        good = good and ((prev_token == '' or prev_span.strip() in idx) \
-                               or (next_token == '' or next_span.strip() in idx))
-                        i += 1
+                    for c in newRecord.columns:
+                        good = good and all(t in idx for t in nltk.bigrams(newRecord[c].astype(str).split(' ')))
+                        if not good:
+                            break
                 if good:
                     droppedValues.append(dv)
                     copiedValues.append(cv)
@@ -313,8 +308,8 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
     idx = None
     for att in sourcesMap[0]:
         if att not in ['ltable_id', 'id', 'rtable_id', 'label']:
-            ar2 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.astype(str).split(' ')))]).values))
-            ar1 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.astype(str).split(' '), 1))]).values))
+            ar2 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(str(row).split(' ')))]).values))
+            ar1 = np.concatenate(list(sourcesMap[0][att].apply(lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(str(row).split(' '), 1))]).values))
             ar = np.concatenate([ar1, ar2])
             if idx is None:
                 idx = ar
@@ -323,14 +318,15 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
     for att in sourcesMap[1]:
         if att not in ['ltable_id', 'id', 'rtable_id', 'label']:
             ar2 = np.concatenate(list(sourcesMap[1][att].apply(
-                lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(row.astype(str).split(' ')))]).values))
+                lambda row: [r for r in (' '.join(t) for t in nltk.bigrams(str(row).split(' ')))]).values))
             ar1 = np.concatenate(list(sourcesMap[1][att].apply(
-                lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(row.astype(str).split(' '), 1))]).values))
+                lambda row: [r for r in (' '.join(t) for t in nltk.ngrams(str(row).split(' '), 1))]).values))
             ar = np.concatenate([ar1, ar2])
             idx = np.concatenate((ar, idx), axis=0)
 
     all_good = False
     for a in range(1, token_combinations):
+        print(a)
         t_i = 0
         perturbations = []
         for triangle in tqdm(allTriangles):
@@ -413,7 +409,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                                                                              class_to_explain,
                                                                              attr_length, predict_fn, sourcesMap,
                                                                              lprefix,
-                                                                             rprefix, token_combinations=int(len(attributes)/2))
+                                                                             rprefix, token_combinations=len(attributes))
             if persist_predictions:
                 all_predictions.to_csv('predictions.csv')
             explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
