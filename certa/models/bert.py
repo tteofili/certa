@@ -184,14 +184,9 @@ class EMTERModel(ERModel):
             inputs = []
             for idx in range(len(xc)):
                 tup = xc.iloc[idx]
-                l = ''
-                r = ''
-                for c in xc.columns:
-                    if c.startswith('ltable'):
-                        l += str(tup[c]) + ' '
-                    else:
-                        r += str(tup[c]) + ' '
-                input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
+                l_tuple = tup.filter(regex='^ltable_')
+                r_tuple = tup.filter(regex='^rtable_')
+                input_text = to_str(l_tuple.to_dict(), r_tuple.to_dict(), summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,
                                    max_len=max_len,
