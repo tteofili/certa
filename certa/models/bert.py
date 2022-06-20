@@ -186,7 +186,15 @@ class EMTERModel(ERModel):
                 tup = xc.iloc[idx]
                 l_tuple = tup.filter(regex='^ltable_')
                 r_tuple = tup.filter(regex='^rtable_')
-                input_text = to_str(l_tuple.to_dict(), r_tuple.to_dict(), summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
+                ld = l_tuple.to_dict()
+                rd = r_tuple.to_dict()
+                lrec = dict()
+                for k, v in ld.items():
+                    lrec[k.replace('ltable_','')] = v
+                rrec = dict()
+                for k, v in rd.items():
+                    rrec[k.replace('rtable_', '')] = v
+                input_text = to_str(lrec, rrec, summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,
                                    max_len=max_len,
