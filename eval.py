@@ -236,8 +236,8 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
 
     examples = pd.DataFrame()
     certas = pd.DataFrame()
-    for i in range(len(test_df)):
-        rand_row = test_df.iloc[i]
+    for idx in range(len(test_df)):
+        rand_row = test_df.iloc[idx]
         l_id = int(rand_row['ltable_id'])
         l_tuple = lsource.iloc[l_id]
         r_id = int(rand_row['rtable_id'])
@@ -318,7 +318,7 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
                 print('landmark')
                 labelled_item = item.copy()
                 labelled_item['label'] = int(label)
-                labelled_item['id'] = i
+                labelled_item['id'] = idx
 
                 t0 = time.perf_counter()
                 land_explanation = landmark_explainer.explain(labelled_item)
@@ -344,7 +344,7 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
                 if not token:
                     # SHAP
                     print('shap')
-                    shap_instance = test_df.iloc[i, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
+                    shap_instance = test_df.iloc[idx, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
 
                     t0 = time.perf_counter()
                     shap_values = shap_explainer.shap_values(shap_instance, nsamples=10)
@@ -366,10 +366,10 @@ def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, 
             item['label'] = label
             examples = examples.append(item, ignore_index=True)
             print(item)
-            print(i)
+            print(idx)
         except:
             print(traceback.format_exc())
-            print(f'skipped item {str(i)}')
+            print(f'skipped item {str(idx)}')
             item.head()
     os.makedirs(exp_dir + dataset + '/' + model_name, exist_ok=True)
     if compare:

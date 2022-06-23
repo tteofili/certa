@@ -124,8 +124,8 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
 
 
 def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
-                                    rprefix, idx, check=False, max_combs=2):
-    # generate power set of attributes
+                                    rprefix, idx, check=True, max_combs=2, predict_fn=None, min_t=0.45, max_t=0.55):
+    # generate power set of token-attributes
     allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
     perturbations = []
@@ -146,7 +146,7 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
         repls = []
         aa = []
         replacements = dict()
-        for tbc in subset:  # iterate over the attribute:tokens
+        for tbc in subset:  # iterate over the attribute:token items
             affected_attribute = tbc.split('__')[0]  # attribute to be affected
             aa.append(affected_attribute)
             if affected_attribute in support.index:
@@ -192,16 +192,20 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
             if not all(newRecord == free) and len(dv) == maxLenAttributeSet:
                 good = True
                 if check:
-                    for c in newRecord.columns:
-                        good = good and all(t in idx for t in nltk.bigrams(newRecord[c].astype(str).split(' ')))
-                        if not good:
-                            break
+                    if predict_fn is not None:
+                        conf = predict_fn(pd.DataFrame(newRecord).T)['match_score'].values[0]
+                        if conf > min_t and conf < max_t:
+                            good = False
+                    else:
+                        for c in newRecord.columns:
+                            good = good and all(t in idx for t in nltk.bigrams(newRecord[c].astype(str).split(' ')))
+                            if not good:
+                                break
                 if good:
                     droppedValues.append(dv)
                     copiedValues.append(cv)
                     perturbations.append(newRecord)
                     perturbedAttributes.append(subset)
-
 
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
@@ -300,7 +304,7 @@ def check_properties(triangle, sourcesMap, predict_fn):
 
 
 def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_length, predict_fn,
-                          sourcesMap, lprefix, rprefix, token_combinations=3):
+                          sourcesMap, lprefix, rprefix, token_combinations=4):
     all_predictions = pd.DataFrame()
     rankings = []
     flippedPredictions = []
@@ -326,13 +330,12 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
 
     all_good = False
     for a in range(1, token_combinations):
-        print(a)
         t_i = 0
         perturbations = []
         for triangle in tqdm(allTriangles):
             try:
                 currentPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, attributes, a,
-                                                                       class_to_explain, lprefix, rprefix, idx)
+                                                                       class_to_explain, lprefix, rprefix, idx, predict_fn=predict_fn)
                 currentPerturbations['triangle'] = ' '.join(triangle)
                 perturbations.append(currentPerturbations)
             except Exception as e:
@@ -409,7 +412,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                                                                              class_to_explain,
                                                                              attr_length, predict_fn, sourcesMap,
                                                                              lprefix,
-                                                                             rprefix, token_combinations=len(attributes))
+                                                                             rprefix)
             if persist_predictions:
                 all_predictions.to_csv('predictions.csv')
             explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
