@@ -13,7 +13,7 @@ from certa.models.ditto import summarize
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
-SML=8
+SML=3
 
 def _renameColumnsWithPrefix(prefix, df):
     newcol = []
