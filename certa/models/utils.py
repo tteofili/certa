@@ -22,8 +22,12 @@ def from_type(type: str):
 
 def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
     model = from_type(mtype)
-
-    os.makedirs(modeldir, exist_ok=True)
+    if mtype == 'ditto':
+        modeldir = modeldir + '/model.pt'
+    try:
+        os.makedirs(modeldir, exist_ok=True)
+    except:
+        pass
 
     print(f'working on {modelname}')
     print(f'reading data from {datadir}')

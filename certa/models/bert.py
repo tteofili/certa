@@ -187,10 +187,14 @@ class EMTERModel(ERModel):
                 l = ''
                 r = ''
                 for c in xc.columns:
-                    if c.startswith('ltable'):
+                    if str(c).startswith('ltable'):
                         l += str(tup[c]) + ' '
                     else:
                         r += str(tup[c]) + ' '
+                if len(l) == 0:
+                    l = 'NaN'
+                if len(r) == 0:
+                    r = 'NaN'
                 input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,
@@ -216,14 +220,15 @@ class EMTERModel(ERModel):
             # pred = [1 if p > threshold else 0 for p in all_probs]
             xc['match_score'] = all_probs
             xc['nomatch_score'] = 1 - xc['match_score']
-            if 'id' in x.columns:
-                xc['id'] = x['id']
-            if 'ltable_id' in x.columns:
-                xc['ltable_id'] = x['ltable_id']
-            if 'rtable_id' in x.columns:
-                xc['rtable_id'] = x['rtable_id']
-            if 'label' in x.columns:
-                xc['label'] = x['label']
+            if isinstance(x, pd.DataFrame):
+                if 'id' in x.columns:
+                    xc['id'] = x['id']
+                if 'ltable_id' in x.columns:
+                    xc['ltable_id'] = x['ltable_id']
+                if 'rtable_id' in x.columns:
+                    xc['rtable_id'] = x['rtable_id']
+                if 'label' in x.columns:
+                    xc['label'] = x['label']
             return xc
         else:
             processor = DeepMatcherProcessor()
@@ -263,13 +268,20 @@ class EMTERModel(ERModel):
             return full_df
 
     def load(self, path):
-        self.model, self.tokenizer = load_model(path, True)
-        device, n_gpu = initialize_gpu_seed(22)
-        self.model = self.model.to(device)
+        if self.ditto:
+            device, n_gpu = initialize_gpu_seed(22)
+            pt_model_dict = torch.load(path, map_location=torch.device(device))
+            ditto_model = DittoModel(lm='distilbert', device=device)
+            ditto_model.load_state_dict(pt_model_dict['model'])
+            self.model = ditto_model
+        else:
+            self.model, self.tokenizer = load_model(path, True)
+            device, n_gpu = initialize_gpu_seed(22)
+            self.model = self.model.to(device)
         return self.model
 
     def save(self, path):
-        models.emt.model.save_model(self.model, '', path, tokenizer=self.tokenizer)
+        save_model(self.model, '', path, tokenizer=self.tokenizer)
 
     def predict_proba(self, x, **kwargs):
         return self.predict(x, mojito=True, expand_dim=True)

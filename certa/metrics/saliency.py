@@ -181,7 +181,12 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
                     else:
                         test_set_df_c.at[i, t[0]] = ''
             evaluation = model.evaluation(test_set_df_c)
-            model_scores.append(evaluation[2])
+            eval = evaluation[2]
+            try:
+                eval = eval.view(-1).cpu()
+            except:
+                pass
+            model_scores.append(eval)
         auc_sal = auc(thresholds, model_scores)
         aucs[saliency] = auc_sal
     return aucs
