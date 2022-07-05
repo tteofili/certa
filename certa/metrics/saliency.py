@@ -1,4 +1,3 @@
-import json
 import operator
 import os
 
@@ -22,7 +21,8 @@ def get_confidence(saliency_names: list, base_dir: str):
         test_scores = []
 
         saliency_df = pd.read_csv(os.path.join(base_dir, saliency + '.csv'))
-
+        if len(saliency_df) == 0:
+            continue
         predictions = saliency_df['prediction']
         class_preds = predictions.apply(lambda x: np.argmax(x))
         logits = predictions.copy()

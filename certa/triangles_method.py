@@ -13,7 +13,7 @@ from certa.models.ditto import summarize
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
-SML=3
+SML=10
 
 def _renameColumnsWithPrefix(prefix, df):
     newcol = []
@@ -127,7 +127,7 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenA
 
 
 def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
-                                    rprefix, idx=None, check=True, max_combs=10, predict_fn=None, min_t=0.45, max_t=0.55,
+                                    rprefix, idx=None, check=False, max_combs=10, predict_fn=None, min_t=0.45, max_t=0.55,
                                          summarizer=None):
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
     if classToExplain == 1:
@@ -136,18 +136,6 @@ def createTokenPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, ma
     else:
         support = triangle[0].copy()
         free = triangle[2].copy()
-    pivot = triangle[1].copy()
-    if summarizer is not None:
-        check = False
-        fr = free.copy()
-        pr = pivot.copy()
-        row = get_row_string(fr, pr)
-        transformed_row = summarizer.transform(row.lower(), max_len=SML)
-        filtered_attributes = []
-        for ca in attributes:
-            if ca.split('__')[1].lower() in transformed_row:
-                filtered_attributes.append(ca)
-        attributes = filtered_attributes
 
     # generate power set of token-attributes
     allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
@@ -355,7 +343,17 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
 
     summarizer = summarize.Summarizer(sourcesMap[0], sourcesMap[1], 'distilbert')
     t0 = __getRecords(sourcesMap, allTriangles[0], lprefix, rprefix)
-    token_combinations = int(len(summarizer.transform(get_row_string(t0[0], t0[1]).lower(), max_len=SML).split(' ')) / 2)
+    fr = t0[0]
+    pr = t0[1]
+    row_text = get_row_string(fr, pr)
+    transformed_row_text = summarizer.transform(row_text.lower(), max_len=SML)
+    token_combinations = max(int(len(transformed_row_text.split(' '))), 3)
+
+    filtered_attributes = []
+    for ca in attributes:
+        if ca.split('__')[1].lower() in transformed_row_text:
+            filtered_attributes.append(ca)
+    attributes = filtered_attributes
 
     # lattice stratified predictions
     # idx = None
@@ -379,13 +377,14 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
 
     all_good = False
     for a in range(1, token_combinations):
+        if all_good:
+            break
         t_i = 0
         perturbations = []
         for triangle in tqdm(allTriangles):
             try:
                 currentPerturbations = createTokenPerturbationsFromTriangle(triangle, sourcesMap, attributes, a,
-                                                                       class_to_explain, lprefix, rprefix, idx=None,
-                                                                            predict_fn=None, summarizer=summarizer)
+                                                                       class_to_explain, lprefix, rprefix)
                 currentPerturbations['triangle'] = ' '.join(triangle)
                 perturbations.append(currentPerturbations)
             except Exception as e:
@@ -443,9 +442,45 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
 def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
                     class_to_explain: int, attr_length: int, check: bool = False,
                     discard_bad: bool = False, return_top: bool = False,
-                    persist_predictions: bool = False, token: bool = False):
+                    persist_predictions: bool = False, token: bool = False, two_step_token: bool = False):
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
+
+    allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
+    if two_step_token:
+        attributes = [col for col in list(sources[0]) if col not in [lprefix + 'id']]
+        attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
+
+        if len(allTriangles) > 0:
+            explanation, _, _ = attribute_level_expl(allTriangles, attr_length, attributes,
+                                                                          check, class_to_explain, dataset,
+                                                                          discard_bad, lprefix, persist_predictions,
+                                                                          predict_fn, rprefix, sourcesMap)
+
+            series = cf_summary(explanation)
+            combs = []
+            for sc in series.index:
+                for scc in sc.split('/'):
+                    combs.append(scc)
+
+            record = pd.DataFrame(dataset.iloc[0]).T
+
+            attributes = []
+            for column in record.columns:
+                if column not in ['label', 'id', lprefix + 'id', rprefix + 'id'] and column in combs:
+                    tokens = str(record[column].values[0]).split(' ')
+                    for t in tokens:
+                        attributes.append(column + '__' + t)
+            attr_length = len(attributes)
+
+            if len(allTriangles) > 0:
+                saliency, filtered_exp, flipped_predictions, allTriangles = token_level_expl(allTriangles, attr_length, attributes, class_to_explain, lprefix,
+                                        persist_predictions, predict_fn, return_top, rprefix, sourcesMap)
+                return saliency, filtered_exp, flipped_predictions, allTriangles
+            else:
+                logging.warning(f'empty triangles !?')
+                return dict(), pd.DataFrame(), pd.DataFrame(), []
+
 
     if token:
         record = pd.DataFrame(dataset.iloc[0]).T
@@ -457,42 +492,10 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                 for t in tokens:
                     attributes.append(column+'__'+t)
         attr_length = len(attributes)
-        allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
+
         if len(allTriangles) > 0:
-            flipped_predictions, rankings, all_predictions = perturb_predict_token(allTriangles, attributes,
-                                                                             class_to_explain,
-                                                                             attr_length, predict_fn, sourcesMap,
-                                                                             lprefix,
-                                                                             rprefix)
-            if persist_predictions:
-                all_predictions.to_csv('predictions.csv')
-            explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
-
-            flips = len(flipped_predictions) + len(allTriangles)
-            saliency = dict()
-
-            for ranking in rankings:
-                for k, v in ranking.items():
-                    for a in k:
-                        if a not in saliency:
-                            saliency[a] = len(allTriangles) / flips
-                        saliency[a] += v / flips
-
-            if len(explanation) > 0:
-                if len(flipped_predictions) > 0:
-                    flipped_predictions['attr_count'] = flipped_predictions.alteredAttributes.astype(str) \
-                        .str.split(',').str.len()
-                    flipped_predictions = flipped_predictions.sort_values(by=['attr_count'])
-                if return_top:
-                    series = cf_summary(explanation)
-                    filtered_exp = series
-                else:
-                    filtered_exp = explanation
-
-                return saliency, filtered_exp, flipped_predictions, allTriangles
-            else:
-                logging.warning(f'empty explanation !?')
-                return dict(), pd.DataFrame(), pd.DataFrame(), []
+            return token_level_expl(allTriangles, attr_length, attributes, class_to_explain, lprefix,
+                                    persist_predictions, predict_fn, return_top, rprefix, sourcesMap)
         else:
             logging.warning(f'empty triangles !?')
             return dict(), pd.DataFrame(), pd.DataFrame(), []
@@ -502,26 +505,11 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
         attributes = [col for col in list(sources[0]) if col not in [lprefix + 'id']]
         attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
 
-        allTriangles, sourcesMap = getMixedTriangles(dataset, sources)
         if len(allTriangles) > 0:
-            flipped_predictions, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
-                                                                               class_to_explain, discard_bad,
-                                                                               attr_length, predict_fn, sourcesMap, lprefix,
-                                                                               rprefix)
-            if persist_predictions:
-                all_predictions.to_csv('predictions.csv')
-            explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
-
-            flips = len(flipped_predictions) + len(allTriangles)
-            saliency = dict()
-            for a in dataset.columns:
-                if (a.startswith(lprefix) or a.startswith(rprefix)) and not (a == lprefix + 'id' or a == rprefix + 'id'):
-                    saliency[a] = len(allTriangles) / flips # all attributes have a flip for the entire attribute set A
-
-            for ranking in rankings:
-                for k, v in ranking.items():
-                    for a in k:
-                        saliency[a] += v / flips
+            explanation, flipped_predictions, saliency = attribute_level_expl(allTriangles, attr_length, attributes,
+                                                                              check, class_to_explain, dataset,
+                                                                              discard_bad, lprefix, persist_predictions,
+                                                                              predict_fn, rprefix, sourcesMap)
 
             if len(explanation) > 0:
                 if len(flipped_predictions) > 0:
@@ -540,6 +528,62 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
         else:
             logging.warning(f'empty triangles !?')
             return dict(), [], pd.DataFrame(), []
+
+
+def token_level_expl(allTriangles, attr_length, attributes, class_to_explain, lprefix, persist_predictions, predict_fn,
+                     return_top, rprefix, sourcesMap):
+    flipped_predictions, rankings, all_predictions = perturb_predict_token(allTriangles, attributes,
+                                                                           class_to_explain,
+                                                                           attr_length, predict_fn, sourcesMap,
+                                                                           lprefix,
+                                                                           rprefix)
+    if persist_predictions:
+        all_predictions.to_csv('predictions.csv')
+    explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
+    flips = len(flipped_predictions) + len(allTriangles)
+    saliency = dict()
+    for ranking in rankings:
+        for k, v in ranking.items():
+            for a in k:
+                if a not in saliency:
+                    saliency[a] = len(allTriangles) / flips
+                saliency[a] += v / flips
+    if len(explanation) > 0:
+        if len(flipped_predictions) > 0:
+            flipped_predictions['attr_count'] = flipped_predictions.alteredAttributes.astype(str) \
+                .str.split(',').str.len()
+            flipped_predictions = flipped_predictions.sort_values(by=['attr_count'])
+        if return_top:
+            series = cf_summary(explanation)
+            filtered_exp = series
+        else:
+            filtered_exp = explanation
+
+        return saliency, filtered_exp, flipped_predictions, allTriangles
+    else:
+        logging.warning(f'empty explanation !?')
+        return dict(), pd.DataFrame(), pd.DataFrame(), []
+
+
+def attribute_level_expl(allTriangles, attr_length, attributes, check, class_to_explain, dataset, discard_bad, lprefix,
+                         persist_predictions, predict_fn, rprefix, sourcesMap):
+    flipped_predictions, rankings, all_predictions = perturb_predict(allTriangles, attributes, check,
+                                                                     class_to_explain, discard_bad,
+                                                                     attr_length, predict_fn, sourcesMap, lprefix,
+                                                                     rprefix)
+    if persist_predictions:
+        all_predictions.to_csv('predictions.csv')
+    explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)
+    flips = len(flipped_predictions) + len(allTriangles)
+    saliency = dict()
+    for a in dataset.columns:
+        if (a.startswith(lprefix) or a.startswith(rprefix)) and not (a == lprefix + 'id' or a == rprefix + 'id'):
+            saliency[a] = len(allTriangles) / flips  # all attributes have a flip for the entire attribute set A
+    for ranking in rankings:
+        for k, v in ranking.items():
+            for a in k:
+                saliency[a] += v / flips
+    return explanation, flipped_predictions, saliency
 
 
 def cf_summary(explanation):
