@@ -13,7 +13,7 @@ from certa.models.ditto import summarize
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
-SML=10
+SML=16
 
 def _renameColumnsWithPrefix(prefix, df):
     newcol = []
@@ -335,8 +335,7 @@ def check_properties(triangle, sourcesMap, predict_fn):
         return False, False, False
 
 
-def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_length, predict_fn,
-                          sourcesMap, lprefix, rprefix):
+def perturb_predict_token(allTriangles, attributes, class_to_explain, predict_fn, sourcesMap, lprefix, rprefix):
     all_predictions = pd.DataFrame()
     rankings = []
     flippedPredictions = []
@@ -398,7 +397,7 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, attr_lengt
         if len(perturbations_df) == 0 or 'alteredAttributes' not in perturbations_df.columns:
             continue
         currPerturbedAttr = perturbations_df.alteredAttributes.values
-        if a != attr_length and not all_good:
+        if a != token_combinations and not all_good:
             predictions = predict_fn(
                 perturbations_df.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
             predictions = pd.concat(
@@ -533,10 +532,8 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
 def token_level_expl(allTriangles, attr_length, attributes, class_to_explain, lprefix, persist_predictions, predict_fn,
                      return_top, rprefix, sourcesMap):
     flipped_predictions, rankings, all_predictions = perturb_predict_token(allTriangles, attributes,
-                                                                           class_to_explain,
-                                                                           attr_length, predict_fn, sourcesMap,
-                                                                           lprefix,
-                                                                           rprefix)
+                                                                           class_to_explain, predict_fn, sourcesMap,
+                                                                           lprefix, rprefix)
     if persist_predictions:
         all_predictions.to_csv('predictions.csv')
     explanation = aggregateRankings(rankings, lenTriangles=len(allTriangles), attr_length=attr_length)

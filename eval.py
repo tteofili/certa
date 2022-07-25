@@ -23,6 +23,303 @@ experiments_dir = 'experiments/'
 base_datadir = 'datasets/'
 
 
+def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
+             test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c):
+    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
+    if compare:
+        train_noids = train_df.copy().astype(str)
+        if 'ltable_id' in train_noids.columns and 'rtable_id' in train_noids.columns:
+            train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1)
+
+        mojito = Mojito(test_df.columns,
+                        attr_to_copy='left',
+                        split_expression=" ",
+                        class_names=['no_match', 'match'],
+                        lprefix='', rprefix='',
+                        feature_selection='lasso_path')
+        landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
+                                      exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
+                                      split_expression=r' ')
+        shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
+                                              train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
+
+        limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5, train_noids.columns, time_maximum=300,
+                                             class_names=['nomatch_score', 'match_score'])
+
+        shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, train_noids.columns, time_maximum=300)
+
+        d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
+                         continuous_features=[],
+                         outcome_name='label')
+        # random
+        m = dice_ml.Model(model=model, backend='sklearn')
+        exp = dice_ml.Dice(d, m, method='random')
+
+        landmarks = pd.DataFrame()
+        shaps = pd.DataFrame()
+        mojitos = pd.DataFrame()
+
+    if not eval_only:
+        examples = pd.DataFrame()
+        certas = pd.DataFrame()
+
+        for idx in range(len(test_df)):
+            rand_row = test_df.iloc[idx]
+            l_id = int(rand_row['ltable_id'])
+            l_tuple = lsource.iloc[l_id]
+            r_id = int(rand_row['rtable_id'])
+            r_tuple = rsource.iloc[r_id]
+
+            cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
+            os.makedirs(cf_dir, exist_ok=True)
+
+
+            prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
+            class_to_explain = np.argmax(prediction)
+
+            label = rand_row["label"]
+            row_id = str(l_id) + '-' + str(r_id)
+            item = get_row(l_tuple, r_tuple)
+
+            try:
+                # CERTA
+                print('certa')
+                t0 = time.perf_counter()
+
+                saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
+                                                                                              predict_fn,
+                                                                                              num_triangles=num_triangles,
+                                                                                              token=token)
+
+                latency_c = time.perf_counter() - t0
+
+
+                certa_saliency = saliency_df.transpose().to_dict()[0]
+                certa_row = {'summary': cf_summary, 'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
+                             'match': class_to_explain,
+                             'label': label, 'row': row_id, 'prediction': prediction}
+
+                certas = certas.append(certa_row, ignore_index=True)
+                certa_dest_file = cf_dir + '/certa.csv'
+                cf_ex.to_csv(certa_dest_file)
+
+                if compare:
+                    # Mojito
+                    print('mojito')
+                    if class_to_explain == 1:
+                        t0 = time.perf_counter()
+                        mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
+                                                      num_features=15,
+                                                      num_perturbation=100)
+
+                        latency_m = time.perf_counter() - t0
+                        if token:
+                            md = dict()
+                            for i in range(len(mojito_exp_drop)):
+                                row = mojito_exp_drop.iloc[i]
+                                att = row['attribute']
+                                if att not in ['id', 'rtable_id', 'ltable_id']:
+                                    md[att + '__' + row['token']] = float(row['weight'])
+                            mojito_exp = md
+                        else:
+                            mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
+                    else:
+                        t0 = time.perf_counter()
+                        mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
+                                                      num_features=15,
+                                                      num_perturbation=100)
+
+                        latency_m = time.perf_counter() - t0
+                        if token:
+                            md = dict()
+                            for i in range(len(mojito_exp_copy)):
+                                row = mojito_exp_copy.iloc[i]
+                                att = row['attribute']
+                                if att not in ['id', 'rtable_id', 'ltable_id']:
+                                    md[att + '__' + row['token']] = float(row['weight'])
+                            mojito_exp = md
+                        else:
+                            mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
+
+                    if 'id' in mojito_exp:
+                        mojito_exp.pop('id', None)
+
+                    mojito_row = {'explanation': mojito_exp, 'type': 'mojito', 'latency': latency_m,
+                                  'match': class_to_explain,
+                                  'label': label, 'row': row_id, 'prediction': prediction}
+                    mojitos = mojitos.append(mojito_row, ignore_index=True)
+
+                    # landmark
+                    print('landmark')
+                    labelled_item = item.copy()
+                    labelled_item['label'] = int(label)
+                    labelled_item['id'] = idx
+
+                    t0 = time.perf_counter()
+                    land_explanation = landmark_explainer.explain(labelled_item)
+                    latency_l = time.perf_counter() - t0
+
+                    if token:
+                        ld = dict()
+                        for i in range(len(land_explanation)):
+                            row = land_explanation.iloc[i]
+                            att = row['column']
+                            if att not in ['id', 'rtable_id', 'ltable_id']:
+                                ld[att + '__' + row['word']] = float(row['impact'])
+
+                        land_exp = ld
+                    else:
+                        land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
+
+                    land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
+                                'match': class_to_explain,
+                                'label': label, 'row': row_id, 'prediction': prediction}
+                    landmarks = landmarks.append(land_row, ignore_index=True)
+
+                    if not token:
+                        # SHAP
+                        print('shap')
+                        shap_instance = test_df.iloc[idx, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
+
+                        t0 = time.perf_counter()
+                        shap_values = shap_explainer.shap_values(shap_instance, nsamples=10)
+
+                        latency_s = time.perf_counter() - t0
+
+                        match_shap_values = shap_values
+
+                        shap_saliency = dict()
+                        for sv in range(len(match_shap_values)):
+                            shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
+
+                        shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
+                                    'match': class_to_explain,
+                                    'label': label, 'row': row_id, 'prediction': prediction}
+                        shaps = shaps.append(shap_row, ignore_index=True)
+
+                    instance = pd.DataFrame(rand_row).transpose().astype(str)
+                    for c in ['label', 'ltable_id', 'rtable_id']:
+                        if c in instance.columns:
+                            instance = instance.drop([c], axis=1)
+
+                    if not os.path.exists(cf_dir + '/limec.csv'):
+                        print('lime-c')
+                        try:
+                            if token:
+                                limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5,
+                                                                     instance.apply(lambda x: ' '.join(x), axis = 1).values[0].split(' '), time_maximum=300,
+                                                                     class_names=['nomatch_score', 'match_score'])
+
+                            limec_exp = limec_explainer.explanation(instance)
+                            print(limec_exp)
+                            if limec_exp is not None:
+                                limec_exp['cf_example'].to_csv(cf_dir + '/limec.csv')
+                        except:
+                            print(traceback.format_exc())
+                            print(f'skipped item {str(idx)}')
+                            pass
+
+                    if not os.path.exists(cf_dir + '/shapc.csv'):
+                        print('shap-c')
+                        try:
+                            if token:
+                                shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, instance.split(' '),
+                                                                     time_maximum=300)
+
+                            sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
+                            print(f'{idx}- shap-c:{sc_exp}')
+                            if sc_exp is not None:
+                                sc_exp['cf_example'].to_csv(cf_dir + '/shapc.csv')
+                        except:
+                            print(traceback.format_exc())
+                            print(f'skipped item {str(idx)}')
+                            pass
+
+                    if not os.path.exists(cf_dir + '/dice_random.csv'):
+                        print('dice_r')
+                        try:
+                            dice_exp = exp.generate_counterfactuals(instance,
+                                                                    total_CFs=10, desired_class="opposite")
+                            dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
+                            print(f'dice_r:{idx}:{dice_exp_df}')
+                            if dice_exp_df is not None:
+                                dice_exp_df.to_csv(cf_dir + '/dice_random.csv')
+                        except:
+                            print(traceback.format_exc())
+                            print(f'skipped item {str(idx)}')
+                            pass
+
+                item['match'] = prediction[1]
+                item['label'] = label
+                examples = examples.append(item, ignore_index=True)
+                print(item)
+                print(idx)
+            except:
+                print(traceback.format_exc())
+                print(f'skipped item {str(idx)}')
+                item.head()
+        os.makedirs(exp_dir + dataset + '/' + model_name, exist_ok=True)
+        if compare:
+            mojitos.to_csv(exp_dir + dataset + '/' + model_name + '/mojito.csv')
+            landmarks.to_csv(exp_dir + dataset + '/' + model_name + '/landmark.csv')
+            shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
+            saliency_names = ['certa', 'landmark', 'mojito', 'shap']
+        else:
+            saliency_names = ['certa']
+        examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
+        certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
+    else:
+        saliency_names = ['certa', 'landmark', 'mojito', 'shap']
+    faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
+    print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
+    ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
+    print(f'{mtype}: confidence indication for {dataset}: {ci}')
+
+    t = 10
+    cf_eval = dict()
+    cf_names = ['certa', 'dice_random', 'shapc', 'limec']
+    for cf_name in cf_names:
+        print(f'processing {cf_name}')
+        validity = 0
+        proximity = 0
+        sparsity = 0
+        diversity = 0
+        length = 0
+        count = 1e-10
+        for i in range(len(examples)):
+            try:
+                # get cfs
+                expl_df = pd.read_csv(exp_dir + dataset + '/' + model_name + '/' + str(i) + '/' + cf_name + '.csv')
+
+                example_row = examples.iloc[i]
+                instance = example_row.drop(['ltable_id', 'rtable_id', 'match', 'label'])
+                score = example_row['match']
+                predicted_class = int(float(score) > 0.5)
+
+                # validity
+                validity += get_validity(model, expl_df[:t], predicted_class)
+
+                # proximity
+                proximity += get_proximity(expl_df[:t], instance)
+
+                # sparsity
+                sparsity += get_sparsity(expl_df[:t], instance)
+
+                # diversity
+                diversity += get_diversity(expl_df[:t])
+
+                length += len(expl_df)
+                count += 1
+            except:
+                pass
+        row = {'validity': validity / count, 'proximity': proximity / count,
+               'sparsity': sparsity / count, 'diversity': diversity / count,
+               'length': length / count}
+        print(f'{cf_name}:{row}')
+        cf_eval[cf_name] = row
+    print(f'{mtype}: cf-eval for {dataset}: {cf_eval}')
+
+
 def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
              compare=False, da=None, num_triangles=10, token=False, eval_only=False):
     if not exp_dir.endswith('/'):
@@ -42,6 +339,9 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
         def predict_fn_mojito(x):
             return model.predict(x, mojito=True)
 
+        def predict_fn_c(x, **kwargs):
+            return model.predict(x, **kwargs)['match_score']
+
         test = pd.read_csv(datadir + '/test.csv')
         lsource = pd.read_csv(datadir + '/tableA.csv')
         rsource = pd.read_csv(datadir + '/tableB.csv')
@@ -55,6 +355,9 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
         elif 'counterfactual' == exp_type:
             eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
                     train_df, da, num_triangles, token, eval_only)
+        else:
+            eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
+                          rsource, test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c)
 
 
 def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
@@ -145,7 +448,7 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
 
                         d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
                                          continuous_features=[],
-                                         outcome_name='outcome')
+                                         outcome_name='label')
                         # random
                         m = dice_ml.Model(model=model, backend='sklearn')
                         exp = dice_ml.Dice(d, m, method='random')
@@ -398,7 +701,7 @@ if __name__ == "__main__":
                         choices=['dm', 'deeper', 'ditto'], required=True)
     parser.add_argument('--datasets', metavar='d', type=str, nargs='+', required=True,
                         help='the datasets to be used for the evaluation')
-    parser.add_argument('--exp_type', metavar='e', type=str, choices=['saliency', 'counterfactual'],
+    parser.add_argument('--exp_type', metavar='e', type=str, choices=['saliency', 'counterfactual', 'all'],
                         help='the type of explanations to evaluate', required=True)
     parser.add_argument('--samples', metavar='s', type=int, default=-1,
                         help='no. of samples from the test set used for the evaluation')
