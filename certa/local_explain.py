@@ -172,7 +172,7 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
         candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates, batched=not use_all,
                                                 lj=True, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
     if use_w:
-        candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates,
+        candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates, batched=not use_all,
                                                 lj=False, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
 
     max_len = min(len(candidates4r1), len(candidates4r2))
