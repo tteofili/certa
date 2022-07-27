@@ -178,11 +178,11 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
     max_len = min(len(candidates4r1), len(candidates4r2))
     if max_len == 0:
         max_len = max(len(candidates4r1), len(candidates4r2))
-    try:
+
+    if len(candidates4r1) > max_len:
         candidates4r1 = candidates4r1.sample(n=max_len)
+    if len(candidates4r2) > max_len:
         candidates4r2 = candidates4r2.sample(n=max_len)
-    except:
-        pass
     candidates = pd.concat([candidates4r1, candidates4r2]).sample(frac=1)
 
     neighborhood = pd.DataFrame()

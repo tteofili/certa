@@ -108,7 +108,7 @@ class LimeCounterfactual(object):
 
         tic = time.time()  # start timer
         nb_active_features = np.size(instance)
-        score_predicted = self.classifier_fn(instance)[0]
+        score_predicted = self.classifier_fn(instance)
         idx = np.argmax(score_predicted)
         explainer = Mojito(instance.columns,
                         attr_to_copy='left',
@@ -163,7 +163,7 @@ class LimeCounterfactual(object):
                             perturbed_instance.iloc[:, index_feature] = self.off_value
                             feature_names_full_index.append(index_feature)
                             feature_coefficient.append(feature[1])
-                score_new = self.classifier_fn(perturbed_instance)[0]
+                score_new = self.classifier_fn(perturbed_instance)
 
             if (score_new[idx] < self.threshold_classifier):
                 time_elapsed = time.time() - tic

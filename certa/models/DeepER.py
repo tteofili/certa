@@ -109,7 +109,7 @@ def init_DeepER_model(embedding_dim):
     # Creazione modello
     deeper_model = Model(inputs=[emb_a, emb_b], outputs=[output])
 
-    optimizer = Adam(learning_rate=0.0001, amsgrad=True)
+    optimizer = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=False)
 
     # Compilazione per addestramento
     deeper_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy', 'mse'])
@@ -516,7 +516,7 @@ class DeepERModel(ERModel):
 
         return precision, recall, fmeasure
 
-    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=[], **kwargs):
+    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=['id', 'ltable_id', 'rtable_id'], **kwargs):
         if isinstance(x, csr_matrix):
             x = pd.DataFrame(data=np.zeros(x.shape))
             if given_columns is not None:
@@ -551,8 +551,9 @@ class DeepERModel(ERModel):
         return self.predict(x, mojito=True, expand_dim=True)
 
 
-def to_deeper_data(df: pd.DataFrame):
+def to_deeper_data(df: pd.DataFrame, ignore_columns=['id', 'ltable_id', 'rtable_id']):
     res = []
+    df = df.drop([c for c in ignore_columns if c in df.columns], axis=1)
     for r in range(len(df)):
         row = df.iloc[r]
         lpd = row.filter(regex='^ltable_')
