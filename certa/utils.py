@@ -126,7 +126,7 @@ class lattice(object):
             botton &= self.wrap(element)
         return botton
 
-    def hasse(self, depth=-1, compress=True):
+    def hasse(self, depth=-1, compress=False):
         graph=dict()
         matching = []
         non_matching = []
@@ -178,12 +178,23 @@ class lattice(object):
 
 
 def compress_text(s):
-    return ''.join(c for c in s.replace('{', '').replace('}', '') if c.isupper() or c == ',')
+    attrs = []
+    for attr in s.replace('{', '').replace('}', '').split(','):
+        parts = []
+        for part in attr.split('_'):
+            if 'ltable' in part:
+                parts.append('L')
+            elif 'rtable' in part:
+                parts.append('R')
+            else:
+                parts.append(part[:3].replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''))
+        attrs.append(parts)
+    return '_'.join(parts)
 
 
 class LatticeElement():
     def __init__(self, lattice, Uelement):
-        if Uelement not in lattice.Uelements: raise ValueError(f'The given value {Uelement} is not a lattice element') #lattice.Uelements.append(Uelement)
+        if Uelement not in lattice.Uelements: lattice.Uelements.append(Uelement)
         self.lattice=lattice
         self.ElementIndex=lattice.Uelements.index(Uelement)
 

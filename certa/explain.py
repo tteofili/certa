@@ -92,28 +92,28 @@ class CertaExplainer(object):
                         powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
                             set([c for c in saliency_df.columns if c[0] == 'l'])]
                         if pc == 0:
-                            f = self.lsource[self.lsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                            s = self.lsource[self.lsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                            f = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                            s = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
                         else:
-                            f = self.lsource[self.lsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
-                            s = self.lsource[self.lsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                        p = self.rsource[self.rsource['id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
+                            f = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                            s = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                        p = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
                         tl_tuple = s
                         tr_tuple = p
                     else:
                         powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
                             set([c for c in saliency_df.columns if c[0] == 'r'])]
                         if pc == 0:
-                            f = self.rsource[self.rsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                            s = self.rsource[self.rsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                            f = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                            s = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
                         else:
-                            f = self.rsource[self.rsource['id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
-                            s = self.rsource[self.rsource['id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                        p = self.lsource[self.lsource['id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
+                            f = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                            s = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                        p = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
                         tl_tuple = p
                         tr_tuple = s
                     top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
-                    rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
+                    rank = [prediction[1]] + list(lattice_dict.values()) + [1 - prediction[1]]
                     triangle_df = pd.concat([p, f, s], axis=1).T
                     triangle_df['type'] = ['pivot', 'free', 'support']
                     latt = lattice(powerset, rank, triangle=triangle_df)
