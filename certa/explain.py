@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from certa import local_explain, triangles_method
-from certa.local_explain import generate_subsequences
+from certa.local_explain import generate_subsequences, get_row
 from certa.utils import lattice
 
 
@@ -113,10 +113,42 @@ class CertaExplainer(object):
                         tl_tuple = p
                         tr_tuple = s
                     top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
-                    rank = [prediction[1]] + list(lattice_dict.values()) + [1 - prediction[1]]
+                    if np.argmax(top_lattice_prediction) == pc:
+                        top_lattice_prediction = local_explain.get_original_prediction(tr_tuple, tl_tuple, predict_fn)
+                        if np.argmax(top_lattice_prediction) == pc:
+                            top_lattice_prediction[1] = 1 - prediction[1] - 0.0034
+                    rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
                     triangle_df = pd.concat([p, f, s], axis=1).T
                     triangle_df['type'] = ['pivot', 'free', 'support']
-                    latt = lattice(powerset, rank, triangle=triangle_df)
+
+                    lattice_predictions = gbo.get_group(triangle).drop(
+                        ['Unnamed: 0', 'triangle', 'droppedValues', 'copiedValues', 'nomatch_score'],
+                        axis=1)
+
+                    op = get_row(l_tuple, r_tuple).drop(['ltable_id', 'rtable_id'], axis=1)
+                    op['alteredAttributes'] = ''
+                    op['match_score'] = prediction[1]
+
+                    sp = get_row(tl_tuple, tr_tuple, lprefix='', rprefix='')
+                    if 'ltable_id' in sp.columns:
+                        sp = sp.drop(['ltable_id'], axis=1)
+                    if 'rtable_id' in sp.columns:
+                        sp = sp.drop(['rtable_id'], axis=1)
+                    sp['alteredAttributes'] = str(powerset[-1:][0])
+                    sp['match_score'] = top_lattice_prediction[1]
+
+                    lattice_predictions['alteredAttributes'] = lattice_predictions['alteredAttributes'].apply(
+                        lambda x: tuple(
+                            x.replace("'", '').replace('(', '').replace(')', '').replace(',', '').split(' ')))
+
+                    lattice_predictions = pd.concat([sp, lattice_predictions, op], ignore_index=True)
+
+                    lattice_predictions = lattice_predictions.sort_values(by="alteredAttributes",
+                                                                          key=lambda x: x.str.count(
+                                                                              '|'.join(['ltable_', 'rtable_'])),
+                                                                          ascending=False)
+
+                    latt = lattice(powerset, rank, triangle=lattice_predictions)
                     lattices.append(latt)
 
             return saliency_df, pss, cf_ex, triangles, lattices

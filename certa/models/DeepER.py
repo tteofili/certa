@@ -109,7 +109,7 @@ def init_DeepER_model(embedding_dim):
     # Creazione modello
     deeper_model = Model(inputs=[emb_a, emb_b], outputs=[output])
 
-    optimizer = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=False)
+    optimizer = Adam(learning_rate=0.1, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=False)
 
     # Compilazione per addestramento
     deeper_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy', 'mse'])
