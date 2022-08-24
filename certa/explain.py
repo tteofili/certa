@@ -112,6 +112,9 @@ class CertaExplainer(object):
                         p = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
                         tl_tuple = p
                         tr_tuple = s
+                    tl_tuple.index = tl_tuple.index.str.lstrip("ltable_")
+                    tr_tuple.index = tr_tuple.index.str.lstrip("rtable_")
+
                     top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
                     if np.argmax(top_lattice_prediction) == pc:
                         top_lattice_prediction = local_explain.get_original_prediction(tr_tuple, tl_tuple, predict_fn)
@@ -129,7 +132,7 @@ class CertaExplainer(object):
                     op['alteredAttributes'] = ''
                     op['match_score'] = prediction[1]
 
-                    sp = get_row(tl_tuple, tr_tuple, lprefix='', rprefix='')
+                    sp = get_row(tl_tuple, tr_tuple)
                     if 'ltable_id' in sp.columns:
                         sp = sp.drop(['ltable_id'], axis=1)
                     if 'rtable_id' in sp.columns:
