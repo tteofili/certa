@@ -15,8 +15,6 @@ from baselines.shap_c import ShapCounterfactual
 from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
 from certa.utils import merge_sources
-from certa.metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
-from certa.metrics.saliency import get_faithfulness, get_confidence
 from certa.models.utils import get_model
 
 experiments_dir = 'experiments/'
@@ -51,164 +49,6 @@ def generate(mtype: str, samples: int = -1, filtered_datasets: list = [], exp_di
 
         generate_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
                           rsource, test_df, train_df, da)
-
-
-def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-            train_df, da):
-    examples_df = pd.DataFrame()
-    certas = pd.DataFrame()
-    train_noids = train_df.copy().astype(str)
-    if 'ltable_id' in train_noids.columns and 'rtable_id' in train_noids.columns:
-        train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1)
-    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
-    t = 10
-    for i in range(len(test_df)):
-        rand_row = test_df.iloc[i]
-        l_id = int(rand_row['ltable_id'])
-        l_tuple = lsource.iloc[l_id]
-        r_id = int(rand_row['rtable_id'])
-        r_tuple = rsource.iloc[r_id]
-
-        prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
-        class_to_explain = np.argmax(prediction)
-
-        label = rand_row["label"]
-        row_id = str(l_id) + '-' + str(r_id)
-        item = get_row(l_tuple, r_tuple)
-
-        try:
-            cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(i)
-            os.makedirs(cf_dir, exist_ok=True)
-            dest_file = cf_dir + '/certa.csv'
-            if os.path.exists(dest_file):
-                continue
-
-            # CERTA
-            print('certa')
-            t0 = time.perf_counter()
-
-            saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
-                                                                                                  predict_fn)
-
-            latency_c = time.perf_counter() - t0
-
-            certa_row = {'summary': cf_summary, 'type': 'certa', 'latency': latency_c,
-                         'match': class_to_explain,
-                         'label': label, 'row': row_id, 'prediction': prediction}
-
-            certas = certas.append(certa_row, ignore_index=True)
-
-            counterfactual_examples.to_csv(dest_file)
-
-            if compare:
-                instance = pd.DataFrame(rand_row).transpose().astype(str)
-                for c in ['outcome', 'ltable_id', 'rtable_id']:
-                    if c in instance.columns:
-                        instance = instance.drop([c], axis=1)
-
-                if not os.path.exists(cf_dir + '/limec.csv'):
-                    print('lime-c')
-                    try:
-                        limec_explainer = LimeCounterfactual(model, predict_fn, None, 0.5,
-                                                             train_noids.columns, time_maximum=300)
-                        limec_exp = limec_explainer.explanation(instance)
-                        print(limec_exp)
-                        if limec_exp is not None:
-                            limec_exp['cf_example'].to_csv(cf_dir + '/limec.csv')
-                    except:
-                        print(traceback.format_exc())
-                        print(f'skipped item {str(i)}')
-                        pass
-
-                if not os.path.exists(cf_dir + '/shapc.csv'):
-                    print('shap-c')
-                    try:
-                        shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
-                                                             train_noids.columns, time_maximum=300)
-
-                        sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
-                        print(f'{i}- shap-c:{sc_exp}')
-                        if sc_exp is not None:
-                            sc_exp['cf_example'].to_csv(cf_dir + '/shapc.csv')
-                    except:
-                        print(traceback.format_exc())
-                        print(f'skipped item {str(i)}')
-                        pass
-
-                if not os.path.exists(cf_dir + '/dice_random.csv'):
-                    print('dice_r')
-                    try:
-
-                        d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
-                                         continuous_features=[],
-                                         outcome_name='outcome')
-                        # random
-                        m = dice_ml.Model(model=model, backend='sklearn')
-                        exp = dice_ml.Dice(d, m, method='random')
-                        dice_exp = exp.generate_counterfactuals(instance,
-                                                                total_CFs=10, desired_class="opposite")
-                        dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
-                        print(f'random:{i}:{dice_exp_df}')
-                        if dice_exp_df is not None:
-                            dice_exp_df.to_csv(cf_dir + '/dice_random.csv')
-                    except:
-                        print(traceback.format_exc())
-                        print(f'skipped item {str(i)}')
-                        pass
-
-            item['match'] = prediction[1]
-            item['label'] = label
-            examples_df = examples_df.append(item, ignore_index=True)
-            print(item)
-            print(i)
-        except:
-            print(traceback.format_exc())
-            print(f'skipped item {str(i)}')
-            item.head()
-    certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    examples_df.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
-    cf_eval = dict()
-    saliency_names = ['certa', 'dice_random', 'shapc', 'limec']
-    for saliency in saliency_names:
-        print(f'processing {saliency}')
-        validity = 0
-        proximity = 0
-        sparsity = 0
-        diversity = 0
-        length = 0
-        count = 1e-10
-        for i in range(samples):
-            try:
-                # get cfs
-                expl_df = pd.read_csv(exp_dir + dataset + '/' + model_name + '/' + str(i) + '/' + saliency + '.csv')
-
-                example_row = examples_df.iloc[i]
-                instance = example_row.drop(['ltable_id', 'rtable_id', 'match', 'label'])
-                score = example_row['match']
-                predicted_class = int(float(score) > 0.5)
-
-                # validity
-                validity += get_validity(model, expl_df[:t], predicted_class)
-
-                # proximity
-                proximity += get_proximity(expl_df[:t], instance)
-
-                # sparsity
-                sparsity += get_sparsity(expl_df[:t], instance)
-
-                # diversity
-                diversity += get_diversity(expl_df[:t])
-
-                length += len(expl_df)
-                count += 1
-            except:
-                pass
-        row = {'validity': validity / count, 'proximity': proximity / count,
-               'sparsity': sparsity / count, 'diversity': diversity / count,
-               'length': length / count}
-        print(f'{saliency}:{row}')
-        cf_eval[saliency] = row
-    print(f'{mtype}: cf-eval for {dataset}: {cf_eval}')
 
 
 def generate_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
@@ -253,33 +93,32 @@ def generate_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, p
             cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
             os.makedirs(cf_dir, exist_ok=True)
             dest_file = cf_dir + '/certa.csv'
-            #if os.path.exists(dest_file):
-            #    continue
+            if not os.path.exists(dest_file):
 
-            # CERTA
-            print('certa')
-            t0 = time.perf_counter()
+                # CERTA
+                print('certa')
+                t0 = time.perf_counter()
 
-            saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
-                                                                                          debug=True, num_triangles=10)
+                saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
+                                                                                              debug=True, num_triangles=10)
 
-            latency_c = time.perf_counter() - t0
+                latency_c = time.perf_counter() - t0
 
-            certa_saliency = saliency_df.transpose().to_dict()[0]
-            certa_row = {'explanation': certa_saliency, 'summary' : cf_summary.to_dict(), 'type': 'certa', 'latency': latency_c,
-                         'match': class_to_explain,
-                         'label': label, 'row': row_id, 'prediction': prediction}
+                certa_saliency = saliency_df.transpose().to_dict()[0]
+                certa_row = {'explanation': certa_saliency, 'summary' : cf_summary.to_dict(), 'type': 'certa', 'latency': latency_c,
+                             'match': class_to_explain,
+                             'label': label, 'row': row_id, 'prediction': prediction}
 
-            cf_ex.to_csv(dest_file)
-            lidx = 0
-            for lattice in lattices:
-                lattice.triangle.to_csv(cf_dir + '/triangle_' + str(lidx) + '.csv')
-                dot_lattice = lattice.hasse()
-                with open(cf_dir + '/lattice_' + str(lidx) + '.dot', 'w') as f:
-                    f.write(dot_lattice)
-                lidx += 1
+                cf_ex.to_csv(dest_file)
+                lidx = 0
+                for lattice in lattices:
+                    lattice.triangle.to_csv(cf_dir + '/triangle_' + str(lidx) + '.csv')
+                    dot_lattice = lattice.hasse()
+                    with open(cf_dir + '/lattice_' + str(lidx) + '.dot', 'w') as f:
+                        f.write(dot_lattice)
+                    lidx += 1
 
-            certas = certas.append(certa_row, ignore_index=True)
+                certas = certas.append(certa_row, ignore_index=True)
 
             if compare:
                 instance = pd.DataFrame(rand_row).transpose().astype(str)
@@ -418,15 +257,8 @@ def generate_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, p
         mojitos.to_csv(exp_dir + dataset + '/' + model_name + '/mojito.csv')
         landmarks.to_csv(exp_dir + dataset + '/' + model_name + '/landmark.csv')
         shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
-        saliency_names = ['certa', 'landmark', 'mojito', 'shap']
-    else:
-        saliency_names = ['certa']
     examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
     certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
-    print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
-    ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
-    print(f'{mtype}: confidence indication for {dataset}: {ci}')
 
 
 import warnings
