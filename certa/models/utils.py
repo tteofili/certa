@@ -7,7 +7,7 @@ from certa.models.DeepER import DeepERModel
 from certa.models.bert import EMTERModel
 from certa.models.dm import DMERModel
 from certa.models.ermodel import ERModel
-
+import traceback
 
 def from_type(type: str):
     model = ERModel()
@@ -46,6 +46,7 @@ def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
             print(f'loading model from {modeldir}')
             model.load(modeldir)
         except:
+            print(traceback.format_exc())
             print(model)
             print(f'no valid model found at {modeldir}, now training')
             print('merging sources')

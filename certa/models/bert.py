@@ -277,6 +277,7 @@ class EMTERModel(ERModel):
 
     def load(self, path):
         if self.ditto:
+            print('ditto')
             device, n_gpu = initialize_gpu_seed(22)
             pt_model_dict = torch.load(path, map_location=torch.device(device))
             ditto_model = DittoModel(lm='distilbert', device=device)
