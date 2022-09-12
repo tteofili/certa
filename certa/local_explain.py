@@ -61,7 +61,7 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
     if len(support) > 0:
         if len(support) > num_triangles:
-            support = support.sample(n=num_triangles)
+            support = pd.concat([support[:int(num_triangles/2)], support[-int(num_triangles/2):]], axis=0)
         else:
             logging.warning(f'could find {str(len(support))} triangles of the {str(num_triangles)} requested')
 
