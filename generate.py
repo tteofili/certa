@@ -98,13 +98,22 @@ def generate_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, p
                 # CERTA
                 print('certa')
                 t0 = time.perf_counter()
+                certa_saliency = None
+                num_triangles = 10
+                while certa_saliency is None:
+                    try:
+                        saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
+                                                                                              debug=True, num_triangles=num_triangles)
 
-                saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
-                                                                                              debug=True, num_triangles=10)
 
-                latency_c = time.perf_counter() - t0
+                        latency_c = time.perf_counter() - t0
 
-                certa_saliency = saliency_df.transpose().to_dict()[0]
+                        certa_saliency = saliency_df.transpose().to_dict()[0]
+                    except:
+                        pass
+                    num_triangles += 50
+                    if num_triangles > 200:
+                        break
                 certa_row = {'explanation': certa_saliency, 'summary' : cf_summary.to_dict(), 'type': 'certa', 'latency': latency_c,
                              'match': class_to_explain,
                              'label': label, 'row': row_id, 'prediction': prediction}

@@ -3,6 +3,7 @@ from certa.utils import merge_sources
 from certa.models.utils import from_type
 
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import pandas as pd
 import numpy as np
 import traceback
@@ -15,7 +16,7 @@ d_dict = {'abt_buy':'AB', 'beers': 'BA', 'itunes_amazon':'IA'}
 dataset = 'abt_buy'
 target_dir = d_dict[dataset]
 datadir = os.path.join(root_datadir, dataset)
-mtype = 'dm'
+mtype = 'deeper'
 mdir_dict = {'ditto':'Ditto', 'deeper': 'DeepER', 'dm':'DeepMatcher'}
 model_dir = mdir_dict[mtype]
 

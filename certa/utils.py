@@ -152,10 +152,10 @@ class lattice(object):
                 ebi = compress_text(ebi)
             color = ''
             if not ebi in matching:
-                if s in self.ranks and self.ranks[s] > 0.5:
+                if self.ranks[s] > 0.5:
                     color = 'green'
             if not ebi in non_matching:
-                if s in self.ranks and self.ranks[s] < 0.5:
+                if self.ranks[s] < 0.5:
                     color = 'red'
             dotcode += "\""+ebi+"\" [color="+color+"];\n"
             for d in ds:

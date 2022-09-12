@@ -109,7 +109,7 @@ def init_DeepER_model(embedding_dim):
     # Creazione modello
     deeper_model = Model(inputs=[emb_a, emb_b], outputs=[output])
 
-    optimizer = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=True)
+    optimizer = Adam(learning_rate=0.01, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=True)
 
     # Compilazione per addestramento
     deeper_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy', 'mse'])
@@ -199,7 +199,7 @@ def train_model_ER(data, valid, model, embeddings_model, tokenizer, pretraining=
                          save_best_only=True)
 
     # Addestramento modello
-    param_batch_size = 32
+    param_batch_size = 64
     print('Batch size:', param_batch_size)
     model.fit([x1, x2], labels, batch_size=param_batch_size, epochs=64, validation_data=([v1, v2], vlabels),
               callbacks=[es, mc])
