@@ -13,7 +13,7 @@ from certa.models.ditto import summarize
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
 
-SML=16
+SML=10
 
 def _renameColumnsWithPrefix(prefix, df):
     newcol = []
@@ -440,8 +440,8 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, predict_fn
 
 def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
                     class_to_explain: int, attr_length: int, check: bool = False,
-                    discard_bad: bool = False, return_top: bool = False,
-                    persist_predictions: bool = False, token: bool = False, two_step_token: bool = False):
+                    discard_bad: bool = False, return_top: bool = False, persist_predictions: bool = False,
+                    token: bool = False, two_step_token: bool = False, use_nec: bool = True):
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
 
@@ -451,16 +451,31 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
         attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
 
         if len(allTriangles) > 0:
-            explanation, _, _ = attribute_level_expl(allTriangles, attr_length, attributes,
+            attribute_ps, _, attribute_pn = attribute_level_expl(allTriangles, attr_length, attributes,
                                                                           check, class_to_explain, dataset,
                                                                           discard_bad, lprefix, persist_predictions,
                                                                           predict_fn, rprefix, sourcesMap)
 
-            series = cf_summary(explanation)
-            combs = []
-            for sc in series.index:
-                for scc in sc.split('/'):
-                    combs.append(scc)
+            if use_nec:
+                top_k_attr = 2
+                sorted_pns = sorted(attribute_pn.items(), key=lambda kv: kv[1], reverse=True)
+                topl = []
+                topr = []
+                spidx = 0
+                while len(topl) < top_k_attr or len(topr) < top_k_attr:
+                    c_attr = sorted_pns[spidx][0]
+                    if c_attr.startswith(lprefix) and len(topl) < top_k_attr:
+                        topl.append(c_attr)
+                    if c_attr.startswith(rprefix) and len(topr) < top_k_attr:
+                        topr.append(c_attr)
+                    spidx += 1
+                combs = topl + topr
+            else:
+                series = cf_summary(attribute_ps)
+                combs = []
+                for sc in series.index:
+                    for scc in sc.split('/'):
+                        combs.append(scc)
 
             record = pd.DataFrame(dataset.iloc[0]).T
 

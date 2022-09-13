@@ -6,21 +6,12 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
-from certa.utils import diff
+from certa.utils import diff, get_row
 
 
 def get_original_prediction(r1, r2, predict_fn):
     r1r2 = get_row(r1, r2)
     return predict_fn(r1r2)[['nomatch_score', 'match_score']].values[0]
-
-
-def get_row(r1, r2, lprefix='ltable_', rprefix='rtable_'):
-    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
-    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
-    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
-    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
-    r1r2 = pd.concat([r1_df, r2_df], axis=1)
-    return r1r2
 
 
 def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
@@ -56,12 +47,14 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
                                          original_prediction, predict_fn, r1, r2, rsource,
                                          use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
 
-    copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
+    copies_left = pd.DataFrame()
+    copies_right = pd.DataFrame()
     if len(support) < num_triangles:
         try:
+            copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
             find_positives2, support2 = get_support(class_to_explain, copies_right, max_predict,
-                                              original_prediction, predict_fn, r1, r2, copies_left,
-                                              use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
+                                                    original_prediction, predict_fn, r1, r2, copies_left,
+                                                    use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
             if len(support2) > 0:
                 support = pd.concat([support, support2])
         except:
@@ -69,7 +62,7 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
     if len(support) > 0:
         if len(support) > num_triangles:
-            support = support.sample(n=num_triangles)
+            support = pd.concat([support[:int(num_triangles/2)], support[-int(num_triangles/2):]], axis=0)
         else:
             logging.warning(f'could find {str(len(support))} triangles of the {str(num_triangles)} requested')
 
@@ -180,12 +173,17 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
         candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates, batched=not use_all,
                                                 lj=True, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
     if use_w:
-        candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates,
+        candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates, batched=not use_all,
                                                 lj=False, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
 
     max_len = min(len(candidates4r1), len(candidates4r2))
-    candidates4r1 = candidates4r1.sample(n=max_len)
-    candidates4r2 = candidates4r2.sample(n=max_len)
+    if max_len == 0:
+        max_len = max(len(candidates4r1), len(candidates4r2))
+
+    if len(candidates4r1) > max_len:
+        candidates4r1 = candidates4r1.sample(n=max_len)
+    if len(candidates4r2) > max_len:
+        candidates4r2 = candidates4r2.sample(n=max_len)
     candidates = pd.concat([candidates4r1, candidates4r2]).sample(frac=1)
 
     neighborhood = pd.DataFrame()

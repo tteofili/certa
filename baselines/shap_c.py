@@ -103,7 +103,7 @@ class ShapCounterfactual(object):
         reference = np.reshape(np.zeros(np.shape(instance)[1]), (1, len(np.zeros(np.shape(instance)[1]))))
         reference = sparse.csr_matrix(reference)
 
-        proba = self.classifier_fn(instance)[0]
+        proba = self.classifier_fn(instance)
         idx = np.argmax(proba)
 
         explainer = shap.KernelExplainer(self.classifier_fn, background, link="identity")

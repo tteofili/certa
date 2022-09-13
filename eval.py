@@ -89,7 +89,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
                                                                                               predict_fn,
                                                                                               num_triangles=num_triangles,
-                                                                                              token=token)
+                                                                                              token=token, two_step_token=token)
 
                 latency_c = time.perf_counter() - t0
 
@@ -269,12 +269,20 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
         certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
     else:
+        examples = pd.read_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
         saliency_names = ['certa', 'landmark', 'mojito', 'shap']
-    faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
-    print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
-    ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
-    print(f'{mtype}: confidence indication for {dataset}: {ci}')
+    print('evaluating saliencies')
+    try:
+        faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
+        print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
+        ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
+        print(f'{mtype}: confidence indication for {dataset}: {ci}')
+        pd.DataFrame(faithfulness, index=[0]).to_csv(f'eval_faithfulness_{dataset}_{mtype}.csv')
+        pd.DataFrame(ci, index=[0]).to_csv(f'eval_ci_{dataset}_{mtype}.csv')
+    except:
+        pass
 
+    print('evaluating cfs')
     t = 10
     cf_eval = dict()
     cf_names = ['certa', 'dice_random', 'shapc', 'limec']
@@ -312,12 +320,21 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 count += 1
             except:
                 pass
-        row = {'validity': validity / count, 'proximity': proximity / count,
-               'sparsity': sparsity / count, 'diversity': diversity / count,
-               'length': length / count}
+        mean_validity = validity / count
+        mean_proximity = proximity / count
+        mean_sparsity = sparsity / count
+        mean_diversity = diversity / count
+        mean_length = length / count
+        row = {'validity': mean_validity, 'proximity': mean_proximity,
+               'sparsity': mean_sparsity, 'diversity': mean_diversity,
+               'length': mean_length}
         print(f'{cf_name}:{row}')
         cf_eval[cf_name] = row
     print(f'{mtype}: cf-eval for {dataset}: {cf_eval}')
+    try:
+        pd.DataFrame(cf_eval, colums=['metric','certa','dice_random','shapc','limec']).to_csv(f'eval_cf_{dataset}_{mtype}.csv')
+    except:
+        pass
 
 
 def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
@@ -395,7 +412,7 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
             t0 = time.perf_counter()
 
             saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
-                                                                                                  predict_fn, num_triangles=num_triangles)
+                                                                                                  predict_fn, num_triangles=num_triangles, token=token, two_step_token=token)
 
             latency_c = time.perf_counter() - t0
 

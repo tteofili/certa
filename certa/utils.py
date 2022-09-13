@@ -1,6 +1,15 @@
 import pandas as pd
 
 
+def get_row(r1, r2, lprefix='ltable_', rprefix='rtable_'):
+    r1_df = pd.DataFrame(data=[r1.values], columns=r1.index)
+    r2_df = pd.DataFrame(data=[r2.values], columns=r2.index)
+    r1_df.columns = list(map(lambda col: lprefix + col, r1_df.columns))
+    r2_df.columns = list(map(lambda col: rprefix + col, r2_df.columns))
+    r1r2 = pd.concat([r1_df, r2_df], axis=1)
+    return r1r2
+
+
 def merge_sources(table, left_prefix, right_prefix, left_source, right_source, copy_from_table, ignore_from_table,
                   robust: bool = False):
     dataset = pd.DataFrame(columns={col: table[col].dtype for col in copy_from_table})
@@ -9,21 +18,18 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
     for _, row in table.iterrows():
         leftid = row[left_prefix + 'id']
         rightid = row[right_prefix + 'id']
+        l_tuple = left_source.loc[left_source['id'] == leftid].iloc[0]
+        r_tuple = right_source.loc[right_source['id'] == rightid].iloc[0]
+        for ic in ignore_column:
+            if ic in l_tuple:
+                l_tuple = l_tuple.drop([ic])
+            if ic in r_tuple:
+                r_tuple = r_tuple.drop([ic])
+        new_row = get_row(l_tuple, r_tuple, lprefix=left_prefix, rprefix=right_prefix)
+        new_row['label'] = row['label']
+        dataset = dataset.append(new_row, ignore_index=True)
 
-        new_row = {column: row[column] for column in copy_from_table}
-
-        try:
-            for id, source, prefix in [(leftid, left_source, left_prefix), (rightid, right_source, right_prefix)]:
-
-                for column in source.keys():
-                    if column not in ignore_column:
-                        new_row[prefix + column] = source.loc[id][column]
-
-            dataset = dataset.append(new_row, ignore_index=True)
-        except:
-            pass
-
-        if robust:
+    if robust:
             # symmetry
             sym_new_row = {column: row[column] for column in copy_from_table}
             try:
@@ -120,7 +126,7 @@ class lattice(object):
             botton &= self.wrap(element)
         return botton
 
-    def hasse(self, depth=-1, compress=True):
+    def hasse(self, depth=-1, compress=False):
         graph=dict()
         matching = []
         non_matching = []
@@ -172,12 +178,23 @@ class lattice(object):
 
 
 def compress_text(s):
-    return ''.join(c for c in s.replace('{', '').replace('}', '') if c.isupper() or c == ',')
+    attrs = []
+    for attr in s.replace('{', '').replace('}', '').split(','):
+        parts = []
+        for part in attr.split('_'):
+            if 'ltable' in part:
+                parts.append('L')
+            elif 'rtable' in part:
+                parts.append('R')
+            else:
+                parts.append(part[:3].replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''))
+        attrs.append(parts)
+    return '_'.join(parts)
 
 
 class LatticeElement():
     def __init__(self, lattice, Uelement):
-        if Uelement not in lattice.Uelements: raise ValueError(f'The given value {Uelement} is not a lattice element') #lattice.Uelements.append(Uelement)
+        if Uelement not in lattice.Uelements: lattice.Uelements.append(Uelement)
         self.lattice=lattice
         self.ElementIndex=lattice.Uelements.index(Uelement)
 

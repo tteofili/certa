@@ -22,6 +22,7 @@ def from_type(type: str):
 
 def get_model(mtype: str, modeldir: str, datadir: str, modelname: str):
     model = from_type(mtype)
+
     if mtype == 'ditto':
         modeldir = modeldir + '/model.pt'
     try:

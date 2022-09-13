@@ -184,7 +184,21 @@ class EMTERModel(ERModel):
             inputs = []
             for idx in range(len(xc)):
                 tup = xc.iloc[idx]
-                l = ''
+                l_tuple = tup.filter(regex='^ltable_')
+                r_tuple = tup.filter(regex='^rtable_')
+                ld = l_tuple.to_dict()
+                rd = r_tuple.to_dict()
+                lrec = dict()
+                for k, v in ld.items():
+                    lrec[k.replace('ltable_','')] = v
+                rrec = dict()
+                for k, v in rd.items():
+                    rrec[k.replace('rtable_', '')] = v
+                if len(lrec) == 0:
+                    lrec = 'NaN'
+                if len(rrec) == 0:
+                    rrec = 'NaN'
+                '''l = ''
                 r = ''
                 for c in xc.columns:
                     if str(c).startswith('ltable'):
@@ -195,7 +209,8 @@ class EMTERModel(ERModel):
                     l = 'NaN'
                 if len(r) == 0:
                     r = 'NaN'
-                input_text = to_str(l, r, summarizer=self.summarizer, dk_injector=self.injector)
+                    '''
+                input_text = to_str(lrec, rrec, summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,
                                    max_len=max_len,
@@ -229,6 +244,13 @@ class EMTERModel(ERModel):
                     xc['rtable_id'] = x['rtable_id']
                 if 'label' in x.columns:
                     xc['label'] = x['label']
+            if mojito:
+                full_df = np.dstack((xc['nomatch_score'], xc['match_score'])).squeeze()
+                res_shape = full_df.shape
+                if len(res_shape) == 1 and expand_dim:
+                    xc = np.expand_dims(full_df, axis=1).T
+                else:
+                    xc = full_df
             return xc
         else:
             processor = DeepMatcherProcessor()
