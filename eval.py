@@ -89,7 +89,8 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
                                                                                               predict_fn,
                                                                                               num_triangles=num_triangles,
-                                                                                              token=token, two_step_token=token)
+                                                                                              token=token, two_step_token=token,
+                                                                                              debug=True)
 
                 latency_c = time.perf_counter() - t0
 
@@ -102,6 +103,14 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 certas = certas.append(certa_row, ignore_index=True)
                 certa_dest_file = cf_dir + '/certa.csv'
                 cf_ex.to_csv(certa_dest_file)
+
+                lidx = 0
+                for lattice in lattices:
+                    lattice.triangle.to_csv(cf_dir + '/triangle_' + str(lidx) + '.csv')
+                    dot_lattice = lattice.hasse()
+                    with open(cf_dir + '/lattice_' + str(lidx) + '.dot', 'w') as f:
+                        f.write(dot_lattice)
+                    lidx += 1
 
                 if compare:
                     # Mojito
@@ -209,8 +218,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                                 limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5,
                                                                      instance.apply(lambda x: ' '.join(x), axis = 1).values[0].split(' '), time_maximum=300,
                                                                      class_names=['nomatch_score', 'match_score'])
-
-                            limec_exp = limec_explainer.explanation(instance)
+                                limec_exp = limec_explainer.explanation(instance.apply(lambda x: ' '.join(x), axis = 1).values[0])
+                            else:
+                                limec_exp = limec_explainer.explanation(instance)
                             print(limec_exp)
                             if limec_exp is not None:
                                 limec_exp['cf_example'].to_csv(cf_dir + '/limec.csv')
@@ -225,8 +235,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             if token:
                                 shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, instance.split(' '),
                                                                      time_maximum=300)
-
-                            sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
+                                sc_exp = shapc_explainer.explanation(instance, train_noids.apply(lambda x: ' '.join(x), axis = 1))
+                            else:
+                                sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
                             print(f'{idx}- shap-c:{sc_exp}')
                             if sc_exp is not None:
                                 sc_exp['cf_example'].to_csv(cf_dir + '/shapc.csv')
