@@ -6,11 +6,11 @@ import pandas as pd
 from certa import local_explain, triangles_method
 from certa.local_explain import generate_subsequences
 from certa.utils import lattice, get_row
-
+from certa.models.ditto import summarize
 
 class CertaExplainer(object):
 
-    def __init__(self, lsource, rsource, data_augmentation: str = 'on_demand'):
+    def __init__(self, lsource, rsource, data_augmentation: str = 'on_demand', token=False):
         '''
         Create the CERTA explainer
         :param lsource: the data source for "left" records
@@ -30,6 +30,10 @@ class CertaExplainer(object):
             self.lsource = lsource
             self.rsource = rsource
             self.use_all = False
+        if token:
+            self.summarizer = summarize.Summarizer(lsource, rsource, 'distilbert')
+        else:
+            self.summarizer = None
 
     def explain(self, l_tuple, r_tuple, predict_fn, left=True, right=True, attr_length=-1,
                 num_triangles: int = 100, lprefix='ltable_', rprefix='rtable_',
@@ -52,6 +56,9 @@ class CertaExplainer(object):
         :param two_step_token: whether to perform two step token explanation (attribute for feature selection, then token level)
         :return: saliency explanation, the probabilities of sufficiency, all the generated cf explanations, the open triangles
         '''
+        if (token or two_step_token) and self.summarizer is None:
+            self.summarizer = summarize.Summarizer(self.lsource, self.rsource, 'distilbert')
+
         prediction = local_explain.get_original_prediction(l_tuple, r_tuple, predict_fn)
         pc = np.argmax(prediction)
         support_samples, gleft_df, gright_df = local_explain.support_predictions(l_tuple, r_tuple, self.lsource,
@@ -67,7 +74,7 @@ class CertaExplainer(object):
         if len(support_samples) > 0:
             extended_sources = [pd.concat([self.lsource, gright_df]), pd.concat([self.rsource, gleft_df])]
             pns, pss, cf_ex, triangles = triangles_method.explain_samples(support_samples, extended_sources, predict_fn,
-                                                                          lprefix, rprefix, pc, attr_length=attr_length,
+                                                                          lprefix, rprefix, pc, attr_length, self.summarizer,
                                                                           persist_predictions=debug, token=token,
                                                                           two_step_token=two_step_token)
             cf_summary = triangles_method.cf_summary(pss)
@@ -84,75 +91,86 @@ class CertaExplainer(object):
                 gbo = triangle_predictions.groupby('triangle')
                 triangle_ids = list(gbo.groups.keys())
                 for i in np.arange(len(triangle_ids)):
-                    triangle = triangle_ids[i]
-                    triangle_lattice = gbo.get_group(triangle)[['alteredAttributes', 'match_score']]
-                    triangle_lattice['alteredAttributes'] = triangle_lattice['alteredAttributes'].apply(lambda x: tuple(
-                        x.replace("'", '').replace('(', '').replace(')', '').replace(',', '').split(' ')))
-                    lattice_dict = dict(zip(triangle_lattice.alteredAttributes, triangle_lattice.match_score))
-                    triangle_edges = triangle.split(' ')
-                    if triangle[0].startswith('0'):
-                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
-                            set([c for c in saliency_df.columns if c[0] == 'l'])]
-                        if pc == 0:
-                            f = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                            s = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
-                        else:
-                            f = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
-                            s = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                        p = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
-                        tl_tuple = s
-                        tr_tuple = p
-                    else:
-                        powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
-                            set([c for c in saliency_df.columns if c[0] == 'r'])]
-                        if pc == 0:
-                            f = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                            s = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
-                        else:
-                            f = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
-                            s = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
-                        p = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
-                        tl_tuple = p
-                        tr_tuple = s
-
-                    tl_tuple.index = tl_tuple.index.str.lstrip("ltable_")
-                    tr_tuple.index = tr_tuple.index.str.lstrip("rtable_")
-
-                    top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
-                    if np.argmax(top_lattice_prediction) == pc:
-                        top_lattice_prediction = local_explain.get_original_prediction(tr_tuple, tl_tuple, predict_fn)
-                    rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
-                    triangle_df = pd.concat([p, f, s], axis=1).T
-                    triangle_df['type'] = ['pivot', 'free', 'support']
-                    lattice_predictions = gbo.get_group(triangle).drop(
-                        ['Unnamed: 0', 'triangle', 'droppedValues', 'copiedValues', 'nomatch_score'],
-                        axis=1)
-
-                    op = get_row(l_tuple, r_tuple).drop(['ltable_id', 'rtable_id'], axis=1)
-                    op['alteredAttributes'] = ''
-                    op['match_score'] = prediction[1]
-
-                    sp = get_row(tl_tuple, tr_tuple)
-                    if 'ltable_id' in sp.columns:
-                        sp = sp.drop(['ltable_id'], axis=1)
-                    if 'rtable_id' in sp.columns:
-                        sp = sp.drop(['rtable_id'], axis=1)
-                    sp['alteredAttributes'] = str(powerset[-1:][0])
-                    sp['match_score'] = top_lattice_prediction[1]
-
-                    lattice_predictions['alteredAttributes'] = lattice_predictions['alteredAttributes'].apply(
-                        lambda x: tuple(
+                    try:
+                        triangle = triangle_ids[i]
+                        triangle_lattice = gbo.get_group(triangle)[['alteredAttributes', 'match_score']]
+                        triangle_lattice['alteredAttributes'] = triangle_lattice['alteredAttributes'].apply(lambda x: tuple(
                             x.replace("'", '').replace('(', '').replace(')', '').replace(',', '').split(' ')))
+                        lattice_dict = dict(zip(triangle_lattice.alteredAttributes, triangle_lattice.match_score)) # FIXME in token case, create more lattices / triangles out of triangle_lattice object
+                        triangle_edges = triangle.split(' ')
+                        if triangle[0].startswith('0'):
+                            powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
+                                set([c for c in saliency_df.columns if c[0] == 'l'])]
+                            if pc == 0:
+                                f = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                                s = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                            else:
+                                f = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                                s = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                            p = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
+                            tl_tuple = s
+                            tr_tuple = p
+                        else:
+                            powerset = [set()] + [set(s) for s in lattice_dict.keys()] + [
+                                set([c for c in saliency_df.columns if c[0] == 'r'])]
+                            if pc == 0:
+                                f = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                                s = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                            else:
+                                f = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[0].split('@')[1])].iloc[0]
+                                s = extended_sources[1][extended_sources[1]['rtable_id'] == int(triangle_edges[2].split('@')[1])].iloc[0]
+                            p = extended_sources[0][extended_sources[0]['ltable_id'] == int(triangle_edges[1].split('@')[1])].iloc[0]
+                            tl_tuple = p
+                            tr_tuple = s
+                        tl_tuple.index = tl_tuple.index.str.lstrip("ltable_")
+                        tr_tuple.index = tr_tuple.index.str.lstrip("rtable_")
 
-                    lattice_predictions = pd.concat([sp, lattice_predictions, op], ignore_index=True)
+                        top_lattice_prediction = local_explain.get_original_prediction(tl_tuple, tr_tuple, predict_fn)
+                        if np.argmax(top_lattice_prediction) == pc:
+                            top_lattice_prediction = local_explain.get_original_prediction(tr_tuple, tl_tuple, predict_fn)
+                        rank = [prediction[1]] + list(lattice_dict.values()) + [top_lattice_prediction[1]]
+                        if len(powerset) != len(rank):
+                            print(f'skipping differing: {powerset}\n {rank}')
+                            continue
+                        triangle_df = pd.concat([p, f, s], axis=1).T
+                        triangle_df['type'] = ['pivot', 'free', 'support']
+                        lattice_predictions = gbo.get_group(triangle).drop(
+                            ['Unnamed: 0', 'triangle', 'droppedValues', 'copiedValues', 'nomatch_score'],
+                            axis=1)
 
-                    lattice_predictions = lattice_predictions.sort_values(by="alteredAttributes",
-                                                                          key=lambda x: x.str.count(
-                                                                              '|'.join(['ltable_', 'rtable_'])),
-                                                                          ascending=False)
+                        op = get_row(l_tuple, r_tuple).drop(['ltable_id', 'rtable_id'], axis=1)
+                        op['alteredAttributes'] = ''
+                        op['match_score'] = prediction[1]
 
-                    latt = lattice(powerset, rank, triangle=lattice_predictions)
-                    lattices.append(latt)
+                        sp = get_row(tl_tuple, tr_tuple)
+                        if 'ltable_id' in sp.columns:
+                            sp = sp.drop(['ltable_id'], axis=1)
+                        if 'rtable_id' in sp.columns:
+                            sp = sp.drop(['rtable_id'], axis=1)
+                        sp['alteredAttributes'] = str(powerset[-1:][0])
+                        sp['match_score'] = top_lattice_prediction[1]
+
+                        lattice_predictions['alteredAttributes'] = lattice_predictions['alteredAttributes'].apply(
+                            lambda x: tuple(
+                                x.replace("'", '').replace('(', '').replace(')', '').replace(',', '').split(' ')))
+
+                        lattice_predictions = pd.concat([sp, lattice_predictions, op], ignore_index=True)
+
+                        lattice_predictions = lattice_predictions.sort_values(by="alteredAttributes",
+                                                                              key=lambda x: x.str.count(
+                                                                                  '|'.join(['ltable_', 'rtable_'])),
+                                                                              ascending=False)
+
+                        '''ld = dict()
+                        for p in range(len(powerset)):
+                            k = tuple(powerset[p])
+                            if k not in ld:
+                                ld[k] = rank[p]
+                        sorted(ld.items(), key=lambda x: len(x))'''
+                        latt = lattice(powerset, rank, triangle=lattice_predictions)
+                        lattices.append(latt)
+                    except:
+                        pass
 
             return saliency_df, pss, cf_ex, triangles, lattices
         else:

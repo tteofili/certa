@@ -128,9 +128,7 @@ class lattice(object):
 
     def hasse(self, depth=-1, compress=False):
         graph=dict()
-        matching = []
-        non_matching = []
-        for indexS,elementS in enumerate(self.Uelements):
+        for indexS, elementS in enumerate(self.Uelements):
             graph[indexS]=[]
             for indexD,elementD in enumerate(self.Uelements):
                 if self.wrap(elementS) <= self.wrap(elementD):
@@ -150,13 +148,13 @@ class lattice(object):
             ebi = str(self.WElementByIndex(s).unwrap)
             if compress:
                 ebi = compress_text(ebi)
-            color = ''
-            if not ebi in matching:
-                if self.ranks[s] > 0.5:
-                    color = 'green'
-            if not ebi in non_matching:
-                if self.ranks[s] < 0.5:
-                    color = 'red'
+            color = 'gray'
+            if s >= len(self.ranks):
+                continue
+            elif self.ranks[s] > 0.5:
+                color = 'green'
+            elif self.ranks[s] < 0.5:
+                color = 'red'
             dotcode += "\""+ebi+"\" [color="+color+"];\n"
             for d in ds:
                 dsebi = str(self.WElementByIndex(d))

@@ -101,15 +101,19 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                              'label': label, 'row': row_id, 'prediction': prediction}
 
                 certas = certas.append(certa_row, ignore_index=True)
+                certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
                 certa_dest_file = cf_dir + '/certa.csv'
                 cf_ex.to_csv(certa_dest_file)
 
                 lidx = 0
                 for lattice in lattices:
                     lattice.triangle.to_csv(cf_dir + '/triangle_' + str(lidx) + '.csv')
-                    dot_lattice = lattice.hasse()
-                    with open(cf_dir + '/lattice_' + str(lidx) + '.dot', 'w') as f:
-                        f.write(dot_lattice)
+                    try:
+                        dot_lattice = lattice.hasse()
+                        with open(cf_dir + '/lattice_' + str(lidx) + '.dot', 'w') as f:
+                            f.write(dot_lattice)
+                    except:
+                        pass
                     lidx += 1
 
                 if compare:
