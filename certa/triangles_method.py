@@ -420,7 +420,7 @@ def perturb_predict_token(allTriangles, attributes, class_to_explain, predict_fn
         attributes = filtered_attributes
 
     #token_combinations = max(int(len(transformed_row_text.split(' '))), 3)
-    token_combinations = 3
+    token_combinations = 4
 
     if num_threads != 1:
         '''lattice_depth_results = Parallel(n_jobs=num_threads)(delayed(lattice_stratified_process)
@@ -630,7 +630,10 @@ def token_level_expl(allTriangles, attr_length, attributes, class_to_explain, lp
         lambda x: x.replace("'", '').replace('(', '').replace(',)', '').replace(', ', '/').replace(')', ''))
     perturb_count = all_predictions.groupby('alteredAttributes').size()
     for att in explanation.index:
-        explanation[att] = explanation[att] / perturb_count[att]
+        if att in perturb_count:
+            explanation[att] = explanation[att] / perturb_count[att]
+        else:
+            print(f'{att} not found in {perturb_count}')
     flips = len(flipped_predictions)
     saliency = dict()
     for ranking in rankings:
