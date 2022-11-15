@@ -145,7 +145,7 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
 
                         d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
                                          continuous_features=[],
-                                         outcome_name='outcome')
+                                         outcome_name='label')
                         # random
                         m = dice_ml.Model(model=model, backend='sklearn')
                         exp = dice_ml.Dice(d, m, method='random')
