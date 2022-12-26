@@ -81,6 +81,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
             row_id = str(l_id) + '-' + str(r_id)
             item = get_row(l_tuple, r_tuple)
 
+            dices = pd.DataFrame()
+            limecs = pd.DataFrame()
+            shapcs = pd.DataFrame()
             try:
                 # CERTA
                 print('certa')
@@ -218,6 +221,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                     if not os.path.exists(cf_dir + '/limec.csv'):
                         print('lime-c')
                         try:
+                            t0 = time.perf_counter()
                             if token:
                                 limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5,
                                                                      instance.apply(lambda x: ' '.join(x), axis = 1).values[0].split(' '), time_maximum=300,
@@ -226,6 +230,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             else:
                                 limec_exp = limec_explainer.explanation(instance)
                             print(limec_exp)
+                            latency_lc = time.perf_counter() - t0
+                            limec_row = {'latency': latency_lc}
+                            limecs = limecs.append(limec_row, ignore_index=True)
                             if limec_exp is not None:
                                 limec_exp['cf_example'].to_csv(cf_dir + '/limec.csv')
                         except:
@@ -236,12 +243,16 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                     if not os.path.exists(cf_dir + '/shapc.csv'):
                         print('shap-c')
                         try:
+                            t0 = time.perf_counter()
                             if token:
                                 shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, instance.split(' '),
                                                                      time_maximum=300)
                                 sc_exp = shapc_explainer.explanation(instance, train_noids.apply(lambda x: ' '.join(x), axis = 1))
                             else:
                                 sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
+                            latency_sc = time.perf_counter() - t0
+                            shapc_row = {'latency': latency_sc}
+                            shapcs = limecs.append(shapc_row, ignore_index=True)
                             print(f'{idx}- shap-c:{sc_exp}')
                             if sc_exp is not None:
                                 sc_exp['cf_example'].to_csv(cf_dir + '/shapc.csv')
@@ -253,8 +264,12 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                     if not os.path.exists(cf_dir + '/dice_random.csv'):
                         print('dice_r')
                         try:
+                            t0 = time.perf_counter()
                             dice_exp = exp.generate_counterfactuals(instance,
                                                                     total_CFs=10, desired_class="opposite")
+                            latency_dc = time.perf_counter() - t0
+                            dice_row = {'latency': latency_dc}
+                            dices = limecs.append(dice_row, ignore_index=True)
                             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
                             print(f'dice_r:{idx}:{dice_exp_df}')
                             if dice_exp_df is not None:
@@ -274,15 +289,26 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 print(f'skipped item {str(idx)}')
                 item.head()
         os.makedirs(exp_dir + dataset + '/' + model_name, exist_ok=True)
+        print('--latency--')
         if compare:
             mojitos.to_csv(exp_dir + dataset + '/' + model_name + '/mojito.csv')
             landmarks.to_csv(exp_dir + dataset + '/' + model_name + '/landmark.csv')
             shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
+            shapcs.to_csv(exp_dir + dataset + '/' + model_name + '/shapc.csv')
+            limecs.to_csv(exp_dir + dataset + '/' + model_name + '/limec.csv')
+            dices.to_csv(exp_dir + dataset + '/' + model_name + '/dice.csv')
             saliency_names = ['certa', 'landmark', 'mojito', 'shap']
+            print(f"mojito: {mojitos['latency'].mean()}")
+            print(f"landmark: {landmarks['latency'].mean()}")
+            print(f"shap: {shaps['latency'].mean()}")
+            print(f"shap-c: {shapcs['latency'].mean()}")
+            print(f"lime-c: {limecs['latency'].mean()}")
+            print(f"dice: {dices['latency'].mean()}")
         else:
             saliency_names = ['certa']
         examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
         certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
+        print(f"certa: {certas['latency'].mean()}")
     else:
         examples = pd.read_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
         saliency_names = ['certa', 'landmark', 'mojito', 'shap']
