@@ -14,7 +14,7 @@ from baselines.mojito import Mojito
 from baselines.shap_c import ShapCounterfactual
 from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
-from certa.utils import merge_sources
+from certa.utils import merge_sources, to_token_df
 from certa.metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
 from certa.metrics.saliency import get_faithfulness, get_confidence
 from certa.models.utils import get_model
@@ -192,7 +192,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                                 'label': label, 'row': row_id, 'prediction': prediction}
                     landmarks = landmarks.append(land_row, ignore_index=True)
 
-                    if not token:
+                    if token:
                         # SHAP
                         print('shap')
                         shap_instance = test_df.iloc[idx, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
@@ -224,9 +224,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             t0 = time.perf_counter()
                             if token:
                                 limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5,
-                                                                     instance.apply(lambda x: ' '.join(x), axis = 1).values[0].split(' '), time_maximum=300,
+                                                                     to_token_df(instance), time_maximum=300,
                                                                      class_names=['nomatch_score', 'match_score'])
-                                limec_exp = limec_explainer.explanation(instance.apply(lambda x: ' '.join(x), axis = 1).values[0])
+                                limec_exp = limec_explainer.explanation(to_token_df(instance))
                             else:
                                 limec_exp = limec_explainer.explanation(instance)
                             print(limec_exp)
@@ -245,9 +245,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                         try:
                             t0 = time.perf_counter()
                             if token:
-                                shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, instance.split(' '),
+                                shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, to_token_df(instance),
                                                                      time_maximum=300)
-                                sc_exp = shapc_explainer.explanation(instance, train_noids.apply(lambda x: ' '.join(x), axis = 1))
+                                sc_exp = shapc_explainer.explanation(to_token_df(instance), train_noids.apply(lambda x: ' '.join(x), axis = 1))
                             else:
                                 sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
                             latency_sc = time.perf_counter() - t0
@@ -453,7 +453,8 @@ def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predic
             t0 = time.perf_counter()
 
             saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
-                                                                                                  predict_fn, num_triangles=num_triangles, token=token, two_step_token=token)
+                                                                                                  predict_fn, num_triangles=num_triangles,
+                                                                                                            token=token)
 
             latency_c = time.perf_counter() - t0
 
