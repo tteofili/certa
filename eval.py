@@ -263,13 +263,15 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
 
                     if not os.path.exists(cf_dir + '/dice_random.csv'):
                         print('dice_r')
+                        if token:
+                            continue
                         try:
                             t0 = time.perf_counter()
                             dice_exp = exp.generate_counterfactuals(instance,
                                                                     total_CFs=10, desired_class="opposite")
                             latency_dc = time.perf_counter() - t0
                             dice_row = {'latency': latency_dc}
-                            dices = limecs.append(dice_row, ignore_index=True)
+                            dices = dices.append(dice_row, ignore_index=True)
                             dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
                             print(f'dice_r:{idx}:{dice_exp_df}')
                             if dice_exp_df is not None:
@@ -301,9 +303,18 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
             print(f"mojito: {mojitos['latency'].mean()}")
             print(f"landmark: {landmarks['latency'].mean()}")
             print(f"shap: {shaps['latency'].mean()}")
-            print(f"shap-c: {shapcs['latency'].mean()}")
-            print(f"lime-c: {limecs['latency'].mean()}")
-            print(f"dice: {dices['latency'].mean()}")
+            try:
+                print(f"shap-c: {shapcs['latency'].mean()}")
+            except:
+                pass
+            try:
+                print(f"lime-c: {limecs['latency'].mean()}")
+            except:
+                pass
+            try:
+                print(f"dice: {dices['latency'].mean()}")
+            except:
+                pass
         else:
             saliency_names = ['certa']
         examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
