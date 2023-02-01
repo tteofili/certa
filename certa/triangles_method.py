@@ -1,3 +1,4 @@
+import functools
 import logging
 from collections import defaultdict
 from functools import partialmethod
@@ -8,7 +9,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from joblib import Parallel, delayed
-import random
+import itertools
 
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
@@ -131,6 +132,7 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
                                       rprefix, idx=None, check=False, max_combs=10, predict_fn=None, min_t=0.45,
                                       max_t=0.55,
                                       summarizer=None):
+    all_good = False
     triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
     if classToExplain == 1:
         support = triangle[2].copy()
@@ -244,8 +246,29 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
     allPerturbations['alteredAttributes'] = perturbedAttributes
     allPerturbations['droppedValues'] = droppedValues
     allPerturbations['copiedValues'] = copiedValues
+    allPerturbations['triangle'] = ' '.join(triangleIds)
 
-    return allPerturbations
+    currPerturbedAttr = allPerturbations.alteredAttributes.values
+
+    predictions = predict_fn(
+        allPerturbations.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
+    predictions = pd.concat(
+        [predictions, allPerturbations[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
+        axis=1)
+
+    proba = predictions[['nomatch_score', 'match_score']].values
+
+    curr_flippedPredictions = predictions[proba[:, classToExplain] < 0.5]
+
+    ranking = getAttributeRanking(proba, currPerturbedAttr, classToExplain)
+
+    if len(curr_flippedPredictions) == len(perturbations_df):
+        logging.info(f'skipped predictions at depth >= {maxLenAttributeSet}')
+        all_good = True
+    else:
+        logging.debug(f'predicted depth {maxLenAttributeSet}')
+
+    return allPerturbations, predictions, curr_flippedPredictions, all_good, ranking
 
 
 def get_row_string(fr, pr):
@@ -342,23 +365,17 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
                                rprefix, num_threads=-1):
     all_good = False
     if num_threads != 1:
-        perturbations = Parallel(n_jobs=num_threads)(delayed(token_perturbations_from_triangle)
-                                                     (triangle, sourcesMap, attributes, depth, class_to_explain,
-                                                      lprefix,
-                                                      rprefix)
-                                                     for triangle in tqdm(allTriangles))
-        ne_perturbations = []
-        t_i = 0
-        for tr in tqdm(allTriangles):
-            curr_pert = perturbations[t_i]
-            if len(curr_pert) > 0:
-                curr_pert['triangle'] = ' '.join(tr)
-                ne_perturbations.append(curr_pert)
-            t_i += 1
-        if len(ne_perturbations) == 0:
-            perturbations_df = pd.DataFrame()
-        else:
-            perturbations_df = pd.concat(ne_perturbations)
+        pert_df, pred_df, cfp_df, all_good, ranking = zip(*Parallel(n_jobs=num_threads, prefer='threads')(
+            delayed(token_perturbations_from_triangle)(triangle, sourcesMap, attributes, depth, class_to_explain,
+                                                      lprefix, rprefix, predict_fn=predict_fn)
+            for triangle in tqdm(allTriangles)))
+
+        perturbations_df = pd.concat(pert_df)
+        predictions = pd.concat(pred_df)
+        curr_flippedPredictions = pd.concat(cfp_df)
+        all_good = all(all_good)
+        ranking = functools.reduce(lambda d1, d2: {**d1, **d2}, ranking)
+        return perturbations_df, predictions, curr_flippedPredictions, all_good, ranking
     else:
         t_i = 0
         perturbations = []
@@ -408,11 +425,11 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
     return perturbations_df, predictions, curr_flippedPredictions, all_good, ranking
 
 
-def perturb_predict_token(allTriangles: list, tokenlevel_attributes: list, class_to_explain: int, predict_fn,
-                          sourcesMap: dict, lprefix: str, rprefix: str, summarizer,
-                          tf_idf_filter: bool = True, num_threads: int = -1, lattice_stratified: bool = True):
+def perturb_predict_token(all_triangles: list, tokenlevel_attributes: list, class_to_explain: int, predict_fn,
+                          sources_map: dict, lprefix: str, rprefix: str, summarizer,
+                          tf_idf_filter: bool = True, num_threads: int = -1):
     if tf_idf_filter:
-        t0 = __getRecords(sourcesMap, allTriangles[0], lprefix, rprefix)
+        t0 = __getRecords(sources_map, all_triangles[0], lprefix, rprefix)
         fr = t0[0]
         pr = t0[1]
         row_text = get_row_string(fr, pr)
@@ -426,111 +443,35 @@ def perturb_predict_token(allTriangles: list, tokenlevel_attributes: list, class
     # token_combinations = max(int(len(transformed_row_text.split(' '))), 3)
     token_combinations = 4
 
-    if num_threads != 1:
-        '''lattice_depth_results = Parallel(n_jobs=num_threads)(delayed(lattice_stratified_process)
-                                                     (depth, allTriangles, attributes, class_to_explain, predict_fn, sourcesMap, lprefix, rprefix, num_threads)
-                                                     for depth in range(token_combinations))'''
-        # (perturbations_df, predictions, curr_flippedPredictions, all_good, ranking)
-        if lattice_stratified:
-            print('lattice_stratified')
-            perturbations_df, predictions, flippedPredictions, all_good, rankings = zip(
-                *Parallel(n_jobs=1)(delayed(lattice_stratified_process)
-                                    (depth, allTriangles, tokenlevel_attributes, class_to_explain, predict_fn,
-                                     sourcesMap, lprefix, rprefix, num_threads=num_threads)
-                                    for depth in range(token_combinations)))
+    all_predictions = pd.DataFrame()
+    rankings = []
+    flipped_predictions = []
+    # lattice stratified predictions
+    all_good = False
+    for a in range(1, token_combinations):
+        print(f'depth-{a}')
+        if all_good:
+            break
+        pert_df, pred_df, cfp_df, all_good, ranking = lattice_stratified_process(a, all_triangles, tokenlevel_attributes,
+                                                                                 class_to_explain, predict_fn, sources_map,
+                                                                                 lprefix, rprefix, num_threads=num_threads)
+
+        flipped_predictions.append(cfp_df)
+        all_predictions = pd.concat([pred_df, all_predictions])
+
+        rankings.append(ranking)
+
+        if len(cfp_df) == len(pert_df):
+            logging.info(f'skipped predictions at depth >= {a}')
+            all_good = True
         else:
-            # for triangle in allTriangles:
-            #    predictions, flippedPredictions, rankings = process_triangle(triangle, attributes, class_to_explain, predict_fn, sourcesMap, lprefix, rprefix)
-            '''predictions, flippedPredictions, rankings = zip(*Parallel(n_jobs=num_threads)(delayed(process_triangle)
-                                    (triangle, tokenlevel_attributes, class_to_explain, predict_fn, sourcesMap, lprefix, rprefix)
-                                    for triangle in allTriangles))'''
-            for triangle in allTriangles:
-                predictions, flippedPredictions, rankings = process_triangle(triangle, tokenlevel_attributes,
-                                                                             class_to_explain, predict_fn, sourcesMap,
-                                                                             lprefix, rprefix)
-        '''flippedPredictions_df = pd.concat(outputs_list[2])
-        rankings = outputs_list[4]
-        all_predictions = pd.concat(outputs_list[1])'''
-        return pd.concat(flippedPredictions), rankings, pd.concat(predictions)
-    else:
-        all_predictions = pd.DataFrame()
-        rankings = []
-        flippedPredictions = []
-        # lattice stratified predictions
-        all_good = False
-        for a in range(1, token_combinations):
-            if all_good:
-                break
-            if num_threads != 1:
-                perturbations = Parallel(n_jobs=num_threads)(delayed(token_perturbations_from_triangle)
-                                                             (triangle, sourcesMap, tokenlevel_attributes, a,
-                                                              class_to_explain, lprefix, rprefix)
-                                                             for triangle in tqdm(allTriangles))
-                t_i = 0
-                for tr in tqdm(allTriangles):
-                    perturbations[t_i]['triangle'] = ' '.join(tr)
-                    t_i += 1
-            else:
-                t_i = 0
-                perturbations = []
-                for triangle in tqdm(allTriangles):
-                    try:
-                        currentPerturbations = token_perturbations_from_triangle(triangle, sourcesMap,
-                                                                                 tokenlevel_attributes, a,
-                                                                                 class_to_explain, lprefix, rprefix)
-                        currentPerturbations['triangle'] = ' '.join(triangle)
-                        perturbations.append(currentPerturbations)
-                    except Exception as e:
-                        pass
-                    t_i += 1
+            logging.debug(f'predicted depth {a}')
+    try:
+        flipped_predictions_df = pd.concat(flipped_predictions, ignore_index=True)
+    except:
+        flipped_predictions_df = pd.DataFrame(flipped_predictions)
 
-            try:
-                perturbations_df = pd.concat(perturbations, ignore_index=True)
-            except:
-                perturbations_df = pd.DataFrame(perturbations)
-            if len(perturbations_df) == 0 or 'alteredAttributes' not in perturbations_df.columns:
-                continue
-            currPerturbedAttr = perturbations_df.alteredAttributes.values
-            if a < token_combinations and not all_good:
-                predictions = predict_fn(
-                    perturbations_df.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
-                predictions = pd.concat(
-                    [predictions, perturbations_df[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
-                    axis=1)
-                all_predictions = pd.concat([all_predictions, predictions])
-                proba = predictions[['nomatch_score', 'match_score']].values
-
-                curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
-            else:
-                proba = pd.DataFrame(columns=['nomatch_score', 'match_score'])
-
-                if class_to_explain == 0:
-                    proba.loc[:, 'nomatch_score'] = np.zeros([len(perturbations_df)])
-                    proba.loc[:, 'match_score'] = np.ones([len(perturbations_df)])
-                else:
-                    proba.loc[:, 'match_score'] = np.zeros([len(perturbations_df)])
-                    proba.loc[:, 'nomatch_score'] = np.ones([len(perturbations_df)])
-
-                curr_flippedPredictions = pd.concat([perturbations_df.copy(), proba], axis=1)
-                proba = proba.values
-                all_predictions = pd.concat([all_predictions, curr_flippedPredictions])
-
-            flippedPredictions.append(curr_flippedPredictions)
-
-            ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
-            rankings.append(ranking)
-
-            if len(curr_flippedPredictions) == len(perturbations_df):
-                logging.info(f'skipped predictions at depth >= {a}')
-                all_good = True
-            else:
-                logging.debug(f'predicted depth {a}')
-        try:
-            flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
-        except:
-            flippedPredictions_df = pd.DataFrame(flippedPredictions)
-        return flippedPredictions_df, rankings, all_predictions
-
+    return flipped_predictions_df, rankings, all_predictions
 
 def process_triangle(triangle: tuple, attributes: list, class_to_explain: int, predict_fn, sourcesMap: dict,
                      lprefix: str, rprefix: str):

@@ -93,7 +93,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                                                                                               predict_fn,
                                                                                               num_triangles=num_triangles,
                                                                                               token=token, two_step_token=token,
-                                                                                              debug=True)
+                                                                                              debug=False)
 
                 latency_c = time.perf_counter() - t0
 
