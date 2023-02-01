@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from joblib import Parallel, delayed
-import itertools
 
 tqdm.__init__ = partialmethod(tqdm.__init__, disable=True)
 
@@ -60,7 +59,7 @@ def getMixedTriangles(dataset,
     return triangles, sourcesmap
 
 
-def __getRecords(sourcesMap, triangleIds, lprefix, rprefix):
+def __get_records(sourcesMap, triangleIds, lprefix, rprefix):
     triangle = []
     for sourceid_recordid in triangleIds:
         split = str(sourceid_recordid).split("@")
@@ -76,65 +75,64 @@ def __getRecords(sourcesMap, triangleIds, lprefix, rprefix):
     return triangle
 
 
-def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
+def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, max_len_attribute_sets, class_to_explain, lprefix,
                                     rprefix):
     # generate power set of attributes
-    allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
-    triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
+    all_attributes_subsets = list(_powerset(attributes, max_len_attribute_sets, max_len_attribute_sets))
+    triangle = __get_records(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
     perturbations = []
-    perturbedAttributes = []
-    droppedValues = []
-    copiedValues = []
-    for subset in allAttributesSubsets:  # iterate over the attribute power set
+    perturbed_attributes = []
+    dropped_values = []
+    copied_values = []
+    for subset in all_attributes_subsets:  # iterate over the attribute power set
         dv = []
         cv = []
-        if classToExplain == 1:
-            newRecord = triangle[0].copy()  # copy the l1 tuple
-            if not all(elem in newRecord.index.to_list() for elem in subset):
+        if class_to_explain == 1:
+            new_record = triangle[0].copy()  # copy the l1 tuple
+            if not all(elem in new_record.index.to_list() for elem in subset):
                 continue
-            perturbedAttributes.append(subset)
+            perturbed_attributes.append(subset)
             for att in subset:
-                dv.append(newRecord[att])
+                dv.append(new_record[att])
                 cv.append(triangle[2][att])
-                newRecord[att] = triangle[2][
+                new_record[att] = triangle[2][
                     att]  # copy the value for the given attribute from l2 of no-match l2, r1 pair into l1
-            perturbations.append(newRecord)  # append the new record
+            perturbations.append(new_record)  # append the new record
         else:
-            newRecord = triangle[2].copy()  # copy the l2 tuple
-            if not all(elem in newRecord.index.to_list() for elem in subset):
+            new_record = triangle[2].copy()  # copy the l2 tuple
+            if not all(elem in new_record.index.to_list() for elem in subset):
                 continue
-            perturbedAttributes.append(subset)
+            perturbed_attributes.append(subset)
             for att in subset:
-                dv.append(newRecord[att])
+                dv.append(new_record[att])
                 cv.append(triangle[0][att])
-                newRecord[att] = triangle[0][
+                new_record[att] = triangle[0][
                     att]  # copy the value for the given attribute from l1 of match l1, r1 pair into l2
-            perturbations.append(newRecord)  # append the new record
-        droppedValues.append(dv)
-        copiedValues.append(cv)
+            perturbations.append(new_record)  # append the new record
+        dropped_values.append(dv)
+        copied_values.append(cv)
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
     r2_copy = [r2] * len(perturbations_df)
     r2_df = pd.DataFrame(r2_copy, index=np.arange(len(perturbations)))
     if perturbations_df.columns[0].startswith(lprefix):
-        allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
+        all_perturbations = pd.concat([perturbations_df, r2_df], axis=1)
     else:
-        allPerturbations = pd.concat([r2_df, perturbations_df], axis=1)
-    allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    allPerturbations['alteredAttributes'] = perturbedAttributes
-    allPerturbations['droppedValues'] = droppedValues
-    allPerturbations['copiedValues'] = copiedValues
+        all_perturbations = pd.concat([r2_df, perturbations_df], axis=1)
+    all_perturbations = all_perturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
+    all_perturbations['alteredAttributes'] = perturbed_attributes
+    all_perturbations['droppedValues'] = dropped_values
+    all_perturbations['copiedValues'] = copied_values
 
-    return allPerturbations
+    return all_perturbations
 
 
-def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLenAttributeSet, classToExplain, lprefix,
-                                      rprefix, idx=None, check=False, max_combs=10, predict_fn=None, min_t=0.45,
-                                      max_t=0.55,
-                                      summarizer=None):
+def token_perturbations_from_triangle(triangle_ids, sources_map, attributes, max_len_attribute_set, class_to_explain,
+                                      lprefix, rprefix, idx=None, check=False, max_combs=10, predict_fn=None, min_t=0.45,
+                                      max_t=0.55, summarizer=None):
     all_good = False
-    triangle = __getRecords(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
-    if classToExplain == 1:
+    triangle = __get_records(sources_map, triangle_ids, lprefix, rprefix)  # get triangle values
+    if class_to_explain == 1:
         support = triangle[2].copy()
         free = triangle[0].copy()
     else:
@@ -142,9 +140,9 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
         free = triangle[2].copy()
 
     # generate power set of token-attributes
-    allAttributesSubsets = list(_powerset(attributes, maxLenAttributeSet, maxLenAttributeSet))
+    all_attributes_subsets = list(_powerset(attributes, max_len_attribute_set, max_len_attribute_set))
     filtered_attribute_sets = []
-    for att_set in allAttributesSubsets:
+    for att_set in all_attributes_subsets:
         good = True
         las = 0
         lp = -1
@@ -157,7 +155,7 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
             filtered_attribute_sets.append(att_set)
     # filtered_attribute_sets = random.sample(filtered_attribute_sets, 10)
     perturbations = []
-    perturbedAttributes = []
+    perturbed_attributes = []
     droppedValues = []
     copiedValues = []
 
@@ -180,7 +178,7 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
                     if not new_repl in repls:
                         repls.append(new_repl)
 
-        all_rt_combs = list(_powerset(repls, maxLenAttributeSet, maxLenAttributeSet))
+        all_rt_combs = list(_powerset(repls, max_len_attribute_set, max_len_attribute_set))
         filtered_combs = []
         for comb in all_rt_combs:
             naas = []
@@ -214,7 +212,7 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
                     cv.append(replacement_token)
                     affected_attributes.append(tbc)
                     ic += 1
-            if not all(newRecord == free) and len(dv) == maxLenAttributeSet:
+            if not all(newRecord == free) and len(dv) == max_len_attribute_set:
                 good = True
                 if check:
                     if predict_fn is not None:
@@ -230,45 +228,45 @@ def token_perturbations_from_triangle(triangleIds, sourcesMap, attributes, maxLe
                     droppedValues.append(dv)
                     copiedValues.append(cv)
                     perturbations.append(newRecord)
-                    perturbedAttributes.append(subset)
+                    perturbed_attributes.append(subset)
 
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
     r2_copy = [r2] * len(perturbations_df)
     r2_df = pd.DataFrame(r2_copy, index=np.arange(len(perturbations)))
-    allPerturbations = pd.DataFrame()
+    all_perturbations = pd.DataFrame()
     if len(perturbations_df) > 0:
         if perturbations_df.columns[0].startswith(lprefix):
-            allPerturbations = pd.concat([perturbations_df, r2_df], axis=1)
+            all_perturbations = pd.concat([perturbations_df, r2_df], axis=1)
         else:
-            allPerturbations = pd.concat([r2_df, perturbations_df], axis=1)
-        allPerturbations = allPerturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
-    allPerturbations['alteredAttributes'] = perturbedAttributes
-    allPerturbations['droppedValues'] = droppedValues
-    allPerturbations['copiedValues'] = copiedValues
-    allPerturbations['triangle'] = ' '.join(triangleIds)
+            all_perturbations = pd.concat([r2_df, perturbations_df], axis=1)
+        all_perturbations = all_perturbations.drop([lprefix + 'id', rprefix + 'id'], axis=1)
+    all_perturbations['alteredAttributes'] = perturbed_attributes
+    all_perturbations['droppedValues'] = droppedValues
+    all_perturbations['copiedValues'] = copiedValues
+    all_perturbations['triangle'] = ' '.join(triangle_ids)
 
-    currPerturbedAttr = allPerturbations.alteredAttributes.values
+    currPerturbedAttr = all_perturbations.alteredAttributes.values
 
     predictions = predict_fn(
-        allPerturbations.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
+        all_perturbations.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
     predictions = pd.concat(
-        [predictions, allPerturbations[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
+        [predictions, all_perturbations[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
         axis=1)
 
     proba = predictions[['nomatch_score', 'match_score']].values
 
-    curr_flippedPredictions = predictions[proba[:, classToExplain] < 0.5]
+    curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
 
-    ranking = getAttributeRanking(proba, currPerturbedAttr, classToExplain)
+    ranking = get_attribute_ranking(proba, currPerturbedAttr, class_to_explain)
 
     if len(curr_flippedPredictions) == len(perturbations_df):
-        logging.info(f'skipped predictions at depth >= {maxLenAttributeSet}')
+        logging.info(f'skipped predictions at depth >= {max_len_attribute_set}')
         all_good = True
     else:
-        logging.debug(f'predicted depth {maxLenAttributeSet}')
+        logging.debug(f'predicted depth {max_len_attribute_set}')
 
-    return allPerturbations, predictions, curr_flippedPredictions, all_good, ranking
+    return all_perturbations, predictions, curr_flippedPredictions, all_good, ranking
 
 
 def get_row_string(fr, pr):
@@ -363,64 +361,16 @@ def check_properties(triangle, sourcesMap, predict_fn):
 
 def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain, predict_fn, sourcesMap, lprefix,
                                rprefix, num_threads=-1):
-    all_good = False
-    if num_threads != 1:
-        pert_df, pred_df, cfp_df, all_good, ranking = zip(*Parallel(n_jobs=num_threads, prefer='threads')(
-            delayed(token_perturbations_from_triangle)(triangle, sourcesMap, attributes, depth, class_to_explain,
-                                                      lprefix, rprefix, predict_fn=predict_fn)
-            for triangle in tqdm(allTriangles)))
+    pert_df, pred_df, cfp_df, all_good, ranking = zip(*Parallel(n_jobs=num_threads, prefer='threads')(
+        delayed(token_perturbations_from_triangle)(triangle, sourcesMap, attributes, depth, class_to_explain,
+                                                  lprefix, rprefix, predict_fn=predict_fn)
+        for triangle in tqdm(allTriangles)))
 
-        perturbations_df = pd.concat(pert_df)
-        predictions = pd.concat(pred_df)
-        curr_flippedPredictions = pd.concat(cfp_df)
-        all_good = all(all_good)
-        ranking = functools.reduce(lambda d1, d2: {**d1, **d2}, ranking)
-        return perturbations_df, predictions, curr_flippedPredictions, all_good, ranking
-    else:
-        t_i = 0
-        perturbations = []
-        for triangle in tqdm(allTriangles):
-            try:
-                currentPerturbations = token_perturbations_from_triangle(triangle, sourcesMap, attributes, depth,
-                                                                         class_to_explain, lprefix, rprefix)
-                currentPerturbations['triangle'] = ' '.join(triangle)
-                perturbations.append(currentPerturbations)
-            except Exception as e:
-                pass
-            t_i += 1
-        if len(perturbations) == 0:
-            perturbations_df = pd.DataFrame()
-        else:
-            try:
-
-                perturbations_df = pd.concat(perturbations)
-            except:
-                perturbations_df = pd.DataFrame(perturbations)
-
-    if len(perturbations_df) == 0 or 'alteredAttributes' not in perturbations_df.columns:
-        return perturbations_df, pd.DataFrame(), pd.DataFrame(), all_good, dict()
-    currPerturbedAttr = perturbations_df.alteredAttributes.values
-
-    predictions = predict_fn(
-        perturbations_df.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
-    predictions = pd.concat(
-        [predictions, perturbations_df[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
-        axis=1)
-    # all_predictions = pd.concat([all_predictions, predictions])
-    proba = predictions[['nomatch_score', 'match_score']].values
-
-    curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
-
-    # flippedPredictions.append(curr_flippedPredictions)
-
-    ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
-    # rankings.append(ranking)
-
-    if len(curr_flippedPredictions) == len(perturbations_df):
-        logging.info(f'skipped predictions at depth >= {depth}')
-        all_good = True
-    else:
-        logging.debug(f'predicted depth {depth}')
+    perturbations_df = pd.concat(pert_df)
+    predictions = pd.concat(pred_df)
+    curr_flippedPredictions = pd.concat(cfp_df)
+    all_good = all(all_good)
+    ranking = functools.reduce(lambda d1, d2: {**d1, **d2}, ranking)
 
     return perturbations_df, predictions, curr_flippedPredictions, all_good, ranking
 
@@ -429,7 +379,7 @@ def perturb_predict_token(all_triangles: list, tokenlevel_attributes: list, clas
                           sources_map: dict, lprefix: str, rprefix: str, summarizer,
                           tf_idf_filter: bool = True, num_threads: int = -1):
     if tf_idf_filter:
-        t0 = __getRecords(sources_map, all_triangles[0], lprefix, rprefix)
+        t0 = __get_records(sources_map, all_triangles[0], lprefix, rprefix)
         fr = t0[0]
         pr = t0[1]
         row_text = get_row_string(fr, pr)
@@ -492,7 +442,7 @@ def process_triangle(triangle: tuple, attributes: list, class_to_explain: int, p
         proba = predictions[['nomatch_score', 'match_score']].values
         curr_flippedPredictions = currentTokenPerturbations[proba[:, class_to_explain] < 0.5]
         token_flippedPredictions.append(curr_flippedPredictions)
-        token_ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
+        token_ranking = get_attribute_ranking(proba, currPerturbedAttr, class_to_explain)
         token_rankings.append(token_ranking)
         predictions_list.append(predictions)
     return pd.DataFrame(predictions_list), token_flippedPredictions, token_rankings
@@ -742,7 +692,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                 proba = proba.values
 
             flippedPredictions.append(curr_flippedPredictions)
-            ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
+            ranking = get_attribute_ranking(proba, currPerturbedAttr, class_to_explain)
             rankings.append(ranking)
 
             if len(curr_flippedPredictions) == len(perturbations_df):
@@ -786,7 +736,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
         proba = predictions[['nomatch_score', 'match_score']].values
         curr_flippedPredictions = perturbations_df[proba[:, class_to_explain] < 0.5]
         flippedPredictions.append(curr_flippedPredictions)
-        ranking = getAttributeRanking(proba, currPerturbedAttr, class_to_explain)
+        ranking = get_attribute_ranking(proba, currPerturbedAttr, class_to_explain)
         rankings.append(ranking)
         try:
             flippedPredictions_df = pd.concat(flippedPredictions, ignore_index=True)
@@ -796,7 +746,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
 
 
 # for each prediction, if the original class is flipped, set the rank of the altered attributes to 1
-def getAttributeRanking(proba: np.ndarray, alteredAttributes: list, originalClass: int):
+def get_attribute_ranking(proba: np.ndarray, alteredAttributes: list, originalClass: int):
     attributeRanking = {k: 0 for k in alteredAttributes}
     for i, prob in enumerate(proba):
         if float(prob[originalClass]) < 0.5:
