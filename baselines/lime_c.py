@@ -15,7 +15,7 @@ class LimeCounterfactual(object):
 
     def __init__(self, c_fn, classifier_fn, vectorizer, threshold_classifier,
                  feature_names_full, max_features=30, class_names=['1', '0'],
-                 time_maximum=120, off_value=''):
+                 time_maximum=120, off_value='', token=False):
 
         """ Init function
 
@@ -67,6 +67,7 @@ class LimeCounterfactual(object):
         self.threshold_classifier = threshold_classifier
         self.feature_names_full = feature_names_full
         self.time_maximum = time_maximum
+        self.token = token
 
     def explanation(self, instance):
         """ Generates evidence counterfactual explanation for the instance.
@@ -125,12 +126,20 @@ class LimeCounterfactual(object):
                                       num_perturbation=100)
 
         #exp = explainer.explain_instance(instance_text, classifier, num_features=nb_active_features)
-        ell = exp.groupby('attribute')['weight'].mean().to_dict()
-        explanation_lime = []
-        for k, v in ell.items():
-            explanation_lime.append((k, v))
+        if self.token:
+            ell = exp[['attribute','weight']].to_dict()
+            explanation_lime = []
+            for k, v in ell.items():
+                explanation_lime.append((k, v))
+            explanation_lime = sorted(explanation_lime, key=lambda x: x[1], reverse=idx == 1)
+            #explanation_lime = sorted(exp, key=lambda x: x[1], reverse=idx == 1)
+        else:
+            ell = exp.groupby('attribute')['weight'].mean().to_dict()
+            explanation_lime = []
+            for k, v in ell.items():
+                explanation_lime.append((k, v))
 
-        explanation_lime = sorted(explanation_lime, key=lambda x: x[1], reverse=idx == 1)
+            explanation_lime = sorted(explanation_lime, key=lambda x: x[1], reverse=idx == 1)
         """
         indices_features_lime = []
         feature_coefficient = []

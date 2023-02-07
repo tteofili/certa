@@ -24,7 +24,7 @@ base_datadir = 'datasets/'
 
 
 def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
-             test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c):
+             test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, predict_fn_t):
     certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
     if compare:
         train_noids = train_df.copy().astype(str)
@@ -192,7 +192,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                                 'label': label, 'row': row_id, 'prediction': prediction}
                     landmarks = landmarks.append(land_row, ignore_index=True)
 
-                    if token:
+                    if not token:
                         # SHAP
                         print('shap')
                         shap_instance = test_df.iloc[idx, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
@@ -219,13 +219,16 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             instance = instance.drop([c], axis=1)
 
                     if not os.path.exists(cf_dir + '/limec.csv'):
+                        if token:
+                            continue
                         print('lime-c')
                         try:
                             t0 = time.perf_counter()
                             if token:
                                 limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5,
                                                                      to_token_df(instance), time_maximum=300,
-                                                                     class_names=['nomatch_score', 'match_score'])
+                                                                     class_names=['nomatch_score', 'match_score'],
+                                                                     token=token)
                                 limec_exp = limec_explainer.explanation(to_token_df(instance))
                             else:
                                 limec_exp = limec_explainer.explanation(instance)
@@ -241,6 +244,8 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             pass
 
                     if not os.path.exists(cf_dir + '/shapc.csv'):
+                        if token:
+                            continue
                         print('shap-c')
                         try:
                             t0 = time.perf_counter()
@@ -389,11 +394,11 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         pass
 
 
-def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
+def evaluate(mtype: str, samples: int = -1, filtered_datasets: list = [], exp_dir: str = experiments_dir,
              compare=False, da=None, num_triangles=10, token=False, eval_only=False):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
-    exp_dir = exp_dir + exp_type + '/'
+    exp_dir = exp_dir + 'all/'
     os.makedirs(exp_dir, exist_ok=True)
     for dataset in filtered_datasets:
         os.makedirs(exp_dir + dataset, exist_ok=True)
@@ -411,6 +416,18 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
         def predict_fn_c(x, **kwargs):
             return model.predict(x, **kwargs)['match_score']
 
+        def predict_fn_t(x, **kwargs):
+            sd = dict()
+            for c in x.columns:
+                at = c.split('__')
+                att = at[0]
+                tok = str(at[1])
+                old_val = ''
+                if att in sd:
+                    old_val = sd.get(att)
+                sd[att] = old_val + ' ' + tok
+            return model.predict(pd.DataFrame.from_dict(sd, orient='index').T, **kwargs)['match_score']
+
         test = pd.read_csv(datadir + '/test.csv')
         lsource = pd.read_csv(datadir + '/tableA.csv')
         rsource = pd.read_csv(datadir + '/tableB.csv')
@@ -418,349 +435,8 @@ def evaluate(mtype: str, exp_type: str, samples: int = -1, filtered_datasets: li
         test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'], [])[:samples]
         train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 
-        if 'saliency' == exp_type:
-            eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
-                          rsource, test_df, train_df, da, num_triangles, token, eval_only)
-        elif 'counterfactual' == exp_type:
-            eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-                    train_df, da, num_triangles, token, eval_only)
-        else:
-            eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
-                          rsource, test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c)
-
-
-def eval_cf(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, rsource, samples, test_df,
-            train_df, da, num_triangles, token, eval_only):
-    examples_df = pd.DataFrame()
-    certas = pd.DataFrame()
-    train_noids = train_df.copy().astype(str)
-    if 'ltable_id' in train_noids.columns and 'rtable_id' in train_noids.columns:
-        train_noids = train_df.drop(['ltable_id', 'rtable_id'], axis=1)
-    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
-    t = 10
-    for i in range(len(test_df)):
-        rand_row = test_df.iloc[i]
-        l_id = int(rand_row['ltable_id'])
-        l_tuple = lsource.iloc[l_id]
-        r_id = int(rand_row['rtable_id'])
-        r_tuple = rsource.iloc[r_id]
-
-        prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
-        class_to_explain = np.argmax(prediction)
-
-        label = rand_row["label"]
-        row_id = str(l_id) + '-' + str(r_id)
-        item = get_row(l_tuple, r_tuple)
-
-        try:
-            cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(i)
-            os.makedirs(cf_dir, exist_ok=True)
-            dest_file = cf_dir + '/certa.csv'
-            if os.path.exists(dest_file):
-                continue
-
-            # CERTA
-            print('certa')
-            t0 = time.perf_counter()
-
-            saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
-                                                                                                  predict_fn, num_triangles=num_triangles,
-                                                                                                            token=token)
-
-            latency_c = time.perf_counter() - t0
-
-            certa_row = {'summary': cf_summary, 'type': 'certa', 'latency': latency_c,
-                         'match': class_to_explain,
-                         'label': label, 'row': row_id, 'prediction': prediction}
-
-            certas = certas.append(certa_row, ignore_index=True)
-
-            counterfactual_examples.to_csv(dest_file)
-
-            if compare:
-                instance = pd.DataFrame(rand_row).transpose().astype(str)
-                for c in ['outcome', 'ltable_id', 'rtable_id']:
-                    if c in instance.columns:
-                        instance = instance.drop([c], axis=1)
-
-                if not os.path.exists(cf_dir + '/limec.csv'):
-                    print('lime-c')
-                    try:
-                        limec_explainer = LimeCounterfactual(model, predict_fn, None, 0.5,
-                                                             train_noids.columns, time_maximum=300)
-                        limec_exp = limec_explainer.explanation(instance)
-                        print(limec_exp)
-                        if limec_exp is not None:
-                            limec_exp['cf_example'].to_csv(cf_dir + '/limec.csv')
-                    except:
-                        print(traceback.format_exc())
-                        print(f'skipped item {str(i)}')
-                        pass
-
-                if not os.path.exists(cf_dir + '/shapc.csv'):
-                    print('shap-c')
-                    try:
-                        shapc_explainer = ShapCounterfactual(predict_fn, 0.5,
-                                                             train_noids.columns, time_maximum=300)
-
-                        sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
-                        print(f'{i}- shap-c:{sc_exp}')
-                        if sc_exp is not None:
-                            sc_exp['cf_example'].to_csv(cf_dir + '/shapc.csv')
-                    except:
-                        print(traceback.format_exc())
-                        print(f'skipped item {str(i)}')
-                        pass
-
-                if not os.path.exists(cf_dir + '/dice_random.csv'):
-                    print('dice_r')
-                    try:
-
-                        d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
-                                         continuous_features=[],
-                                         outcome_name='label')
-                        # random
-                        m = dice_ml.Model(model=model, backend='sklearn')
-                        exp = dice_ml.Dice(d, m, method='random')
-                        dice_exp = exp.generate_counterfactuals(instance,
-                                                                total_CFs=10, desired_class="opposite")
-                        dice_exp_df = dice_exp.cf_examples_list[0].final_cfs_df
-                        print(f'random:{i}:{dice_exp_df}')
-                        if dice_exp_df is not None:
-                            dice_exp_df.to_csv(cf_dir + '/dice_random.csv')
-                    except:
-                        print(traceback.format_exc())
-                        print(f'skipped item {str(i)}')
-                        pass
-
-            item['match'] = prediction[1]
-            item['label'] = label
-            examples_df = examples_df.append(item, ignore_index=True)
-            print(item)
-            print(i)
-        except:
-            print(traceback.format_exc())
-            print(f'skipped item {str(i)}')
-            item.head()
-    certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    examples_df.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
-    cf_eval = dict()
-    saliency_names = ['certa', 'dice_random', 'shapc', 'limec']
-    for saliency in saliency_names:
-        print(f'processing {saliency}')
-        validity = 0
-        proximity = 0
-        sparsity = 0
-        diversity = 0
-        length = 0
-        count = 1e-10
-        for i in range(samples):
-            try:
-                # get cfs
-                expl_df = pd.read_csv(exp_dir + dataset + '/' + model_name + '/' + str(i) + '/' + saliency + '.csv')
-
-                example_row = examples_df.iloc[i]
-                instance = example_row.drop(['ltable_id', 'rtable_id', 'match', 'label'])
-                score = example_row['match']
-                predicted_class = int(float(score) > 0.5)
-
-                # validity
-                validity += get_validity(model, expl_df[:t], predicted_class)
-
-                # proximity
-                proximity += get_proximity(expl_df[:t], instance)
-
-                # sparsity
-                sparsity += get_sparsity(expl_df[:t], instance)
-
-                # diversity
-                diversity += get_diversity(expl_df[:t])
-
-                length += len(expl_df)
-                count += 1
-            except:
-                pass
-        row = {'validity': validity / count, 'proximity': proximity / count,
-               'sparsity': sparsity / count, 'diversity': diversity / count,
-               'length': length / count}
-        print(f'{saliency}:{row}')
-        cf_eval[saliency] = row
-    print(f'{mtype}: cf-eval for {dataset}: {cf_eval}')
-
-
-def eval_saliency(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
-                  test_df, train_df, da, num_triangles, token, eval_only):
-    certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
-    if compare:
-        mojito = Mojito(test_df.columns,
-                        attr_to_copy='left',
-                        split_expression=" ",
-                        class_names=['no_match', 'match'],
-                        lprefix='', rprefix='',
-                        feature_selection='lasso_path')
-        landmark_explainer = Landmark(lambda x: predict_fn(x)['match_score'].values, test_df, lprefix='',
-                                      exclude_attrs=['id', 'ltable_id', 'rtable_id', 'label'], rprefix='',
-                                      split_expression=r' ')
-        shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
-                                              train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
-        landmarks = pd.DataFrame()
-        shaps = pd.DataFrame()
-        mojitos = pd.DataFrame()
-
-    if not eval_only:
-        examples = pd.DataFrame()
-        certas = pd.DataFrame()
-        for idx in range(len(test_df)):
-            rand_row = test_df.iloc[idx]
-            l_id = int(rand_row['ltable_id'])
-            l_tuple = lsource.iloc[l_id]
-            r_id = int(rand_row['rtable_id'])
-            r_tuple = rsource.iloc[r_id]
-
-            prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
-            class_to_explain = np.argmax(prediction)
-
-            label = rand_row["label"]
-            row_id = str(l_id) + '-' + str(r_id)
-            item = get_row(l_tuple, r_tuple)
-
-            try:
-                # CERTA
-                print('certa')
-                t0 = time.perf_counter()
-
-                saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
-                                                                                              num_triangles=num_triangles,
-                                                                                              token=token)
-
-                latency_c = time.perf_counter() - t0
-
-                certa_saliency = saliency_df.transpose().to_dict()[0]
-                certa_row = {'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
-                             'match': class_to_explain,
-                             'label': label, 'row': row_id, 'prediction': prediction}
-
-                certas = certas.append(certa_row, ignore_index=True)
-
-                if compare:
-                    # Mojito
-                    print('mojito')
-                    if class_to_explain == 1:
-                        t0 = time.perf_counter()
-                        mojito_exp_drop = mojito.drop(predict_fn_mojito, item,
-                                                      num_features=15,
-                                                      num_perturbation=100)
-
-                        latency_m = time.perf_counter() - t0
-                        if token:
-                            md = dict()
-                            for i in range(len(mojito_exp_drop)):
-                                row = mojito_exp_drop.iloc[i]
-                                att = row['attribute']
-                                if att not in ['id', 'rtable_id', 'ltable_id']:
-                                    md[att + '__' + row['token']] = float(row['weight'])
-                            mojito_exp = md
-                        else:
-                            mojito_exp = mojito_exp_drop.groupby('attribute')['weight'].mean().to_dict()
-                    else:
-                        t0 = time.perf_counter()
-                        mojito_exp_copy = mojito.copy(predict_fn_mojito, item,
-                                                      num_features=15,
-                                                      num_perturbation=100)
-
-                        latency_m = time.perf_counter() - t0
-                        if token:
-                            md = dict()
-                            for i in range(len(mojito_exp_copy)):
-                                row = mojito_exp_copy.iloc[i]
-                                att = row['attribute']
-                                if att not in ['id', 'rtable_id', 'ltable_id']:
-                                    md[att + '__' + row['token']] = float(row['weight'])
-                            mojito_exp = md
-                        else:
-                            mojito_exp = mojito_exp_copy.groupby('attribute')['weight'].mean().to_dict()
-
-                    if 'id' in mojito_exp:
-                        mojito_exp.pop('id', None)
-
-                    mojito_row = {'explanation': mojito_exp, 'type': 'mojito', 'latency': latency_m,
-                                  'match': class_to_explain,
-                                  'label': label, 'row': row_id, 'prediction': prediction}
-                    mojitos = mojitos.append(mojito_row, ignore_index=True)
-
-                    # landmark
-                    print('landmark')
-                    labelled_item = item.copy()
-                    labelled_item['label'] = int(label)
-                    labelled_item['id'] = idx
-
-                    t0 = time.perf_counter()
-                    land_explanation = landmark_explainer.explain(labelled_item)
-                    latency_l = time.perf_counter() - t0
-
-                    if token:
-                        ld = dict()
-                        for i in range(len(land_explanation)):
-                            row = land_explanation.iloc[i]
-                            att = row['column']
-                            if att not in ['id', 'rtable_id', 'ltable_id']:
-                                ld[att + '__' + row['word']] = float(row['impact'])
-
-                        land_exp = ld
-                    else:
-                        land_exp = land_explanation.groupby('column')['impact'].sum().to_dict()
-
-                    land_row = {'explanation': str(land_exp), 'type': 'landmark', 'latency': latency_l,
-                                'match': class_to_explain,
-                                'label': label, 'row': row_id, 'prediction': prediction}
-                    landmarks = landmarks.append(land_row, ignore_index=True)
-
-                    if not token:
-                        # SHAP
-                        print('shap')
-                        shap_instance = test_df.iloc[idx, 1:].drop(['ltable_id', 'rtable_id']).astype(str)
-
-                        t0 = time.perf_counter()
-                        shap_values = shap_explainer.shap_values(shap_instance, nsamples=10)
-
-                        latency_s = time.perf_counter() - t0
-
-                        match_shap_values = shap_values
-
-                        shap_saliency = dict()
-                        for sv in range(len(match_shap_values)):
-                            shap_saliency[train_df.columns[1 + sv]] = match_shap_values[sv]
-
-                        shap_row = {'explanation': str(shap_saliency), 'type': 'shap', 'latency': latency_s,
-                                    'match': class_to_explain,
-                                    'label': label, 'row': row_id, 'prediction': prediction}
-                        shaps = shaps.append(shap_row, ignore_index=True)
-
-                item['match'] = prediction[1]
-                item['label'] = label
-                examples = examples.append(item, ignore_index=True)
-                print(item)
-                print(idx)
-            except:
-                print(traceback.format_exc())
-                print(f'skipped item {str(idx)}')
-                item.head()
-        os.makedirs(exp_dir + dataset + '/' + model_name, exist_ok=True)
-        if compare:
-            mojitos.to_csv(exp_dir + dataset + '/' + model_name + '/mojito.csv')
-            landmarks.to_csv(exp_dir + dataset + '/' + model_name + '/landmark.csv')
-            shaps.to_csv(exp_dir + dataset + '/' + model_name + '/shap.csv')
-            saliency_names = ['certa', 'landmark', 'mojito', 'shap']
-        else:
-            saliency_names = ['certa']
-        examples.to_csv(exp_dir + dataset + '/' + model_name + '/examples.csv')
-        certas.to_csv(exp_dir + dataset + '/' + model_name + '/certa.csv')
-    else:
-        saliency_names = ['certa', 'landmark', 'mojito', 'shap']
-    faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
-    print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
-    ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
-    print(f'{mtype}: confidence indication for {dataset}: {ci}')
+        eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
+                          rsource, test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, predict_fn_t)
 
 
 if __name__ == "__main__":
@@ -771,8 +447,6 @@ if __name__ == "__main__":
                         choices=['dm', 'deeper', 'ditto'], required=True)
     parser.add_argument('--datasets', metavar='d', type=str, nargs='+', required=True,
                         help='the datasets to be used for the evaluation')
-    parser.add_argument('--exp_type', metavar='e', type=str, choices=['saliency', 'counterfactual', 'all'],
-                        help='the type of explanations to evaluate', required=True)
     parser.add_argument('--samples', metavar='s', type=int, default=-1,
                         help='no. of samples from the test set used for the evaluation')
     parser.add_argument('--compare', metavar='c', type=bool, default=False,
@@ -792,7 +466,6 @@ if __name__ == "__main__":
         base_datadir = base_datadir + '/'
     filtered_datasets = args.datasets
     mtype = args.model_type
-    exp_type = args.exp_type
     samples = args.samples
     compare = args.compare
     da = args.da
@@ -800,5 +473,5 @@ if __name__ == "__main__":
     token = args.token
     eval_only = args.eval_only
 
-    evaluate(mtype, exp_type, filtered_datasets=filtered_datasets, samples=samples, compare=compare, da=da,
+    evaluate(mtype, filtered_datasets=filtered_datasets, samples=samples, compare=compare, da=da,
              num_triangles=num_triangles, token=token, eval_only=eval_only)

@@ -229,8 +229,8 @@ class LatticeElement():
 
 def to_token_df(x:pd.DataFrame, lprefix='ltable_', rprefix='rtable_'):
     t_df = dict()
-    for c in x.index:
+    for c in x.columns:
         if str(c).startswith(lprefix) or str(c).startswith(rprefix):
-            for t in str(x[c]).split(' '):
-                t_df[c+'_'+t] = t
+            for t in str(x[c].values[0]).split(' '):
+                t_df[c + '__' + t] = t
     return pd.Series(index=t_df.keys(), data=t_df.values()).to_frame().T
