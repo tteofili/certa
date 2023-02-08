@@ -92,7 +92,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple,
                                                                                               predict_fn,
                                                                                               num_triangles=num_triangles,
-                                                                                              token=token, two_step_token=token,
+                                                                                              token=token, two_step_token=False,
                                                                                               debug=False)
 
                 latency_c = time.perf_counter() - t0
@@ -307,7 +307,10 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
             saliency_names = ['certa', 'landmark', 'mojito', 'shap']
             print(f"mojito: {mojitos['latency'].mean()}")
             print(f"landmark: {landmarks['latency'].mean()}")
-            print(f"shap: {shaps['latency'].mean()}")
+            try:
+                print(f"shap: {shaps['latency'].mean()}")
+            except:
+                pass
             try:
                 print(f"shap-c: {shapcs['latency'].mean()}")
             except:

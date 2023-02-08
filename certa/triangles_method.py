@@ -247,26 +247,28 @@ def token_perturbations_from_triangle(triangle_ids, sources_map, attributes, max
     all_perturbations['triangle'] = ' '.join(triangle_ids)
 
     currPerturbedAttr = all_perturbations.alteredAttributes.values
+    try:
+        predictions = predict_fn(
+            all_perturbations.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
+        predictions = pd.concat(
+            [predictions, all_perturbations[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
+            axis=1)
 
-    predictions = predict_fn(
-        all_perturbations.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
-    predictions = pd.concat(
-        [predictions, all_perturbations[['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle']]],
-        axis=1)
+        proba = predictions[['nomatch_score', 'match_score']].values
 
-    proba = predictions[['nomatch_score', 'match_score']].values
+        curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
 
-    curr_flippedPredictions = predictions[proba[:, class_to_explain] < 0.5]
+        ranking = get_attribute_ranking(proba, currPerturbedAttr, class_to_explain)
 
-    ranking = get_attribute_ranking(proba, currPerturbedAttr, class_to_explain)
+        if len(curr_flippedPredictions) == len(perturbations_df):
+            logging.info(f'skipped predictions at depth >= {max_len_attribute_set}')
+            all_good = True
+        else:
+            logging.debug(f'predicted depth {max_len_attribute_set}')
 
-    if len(curr_flippedPredictions) == len(perturbations_df):
-        logging.info(f'skipped predictions at depth >= {max_len_attribute_set}')
-        all_good = True
-    else:
-        logging.debug(f'predicted depth {max_len_attribute_set}')
-
-    return all_perturbations, predictions, curr_flippedPredictions, all_good, ranking
+        return all_perturbations, predictions, curr_flippedPredictions, all_good, ranking
+    except:
+        return all_perturbations, pd.DataFrame(), pd.DataFrame(), all_good, dict()
 
 
 def get_row_string(fr, pr):

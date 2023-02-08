@@ -158,9 +158,15 @@ def data2InputsUnlabel(data, tokenizer):
         table1.append(''.join(str(t1)).replace(', ', ' '))
         table2.append(''.join(str(t2)).replace(', ', ' '))
     table1 = tokenizer.texts_to_sequences(table1)
-    table1 = pad_sequences(table1, padding='post')
+    try:
+        table1 = pad_sequences(table1)
+    except:
+        pass
     table2 = tokenizer.texts_to_sequences(table2)
-    table2 = pad_sequences(table2, padding='post')
+    try:
+        table2 = pad_sequences(table2)
+    except:
+        pass
 
     return table1, table2
 
