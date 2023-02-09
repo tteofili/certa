@@ -62,6 +62,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
     if not eval_only:
         examples = pd.DataFrame()
         certas = pd.DataFrame()
+        dices = pd.DataFrame()
+        limecs = pd.DataFrame()
+        shapcs = pd.DataFrame()
 
         for idx in range(len(test_df)):
             rand_row = test_df.iloc[idx]
@@ -73,18 +76,14 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
             cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
             os.makedirs(cf_dir, exist_ok=True)
 
-
-            prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
-            class_to_explain = np.argmax(prediction)
-
             label = rand_row["label"]
             row_id = str(l_id) + '-' + str(r_id)
             item = get_row(l_tuple, r_tuple)
 
-            dices = pd.DataFrame()
-            limecs = pd.DataFrame()
-            shapcs = pd.DataFrame()
             try:
+                prediction = get_original_prediction(l_tuple, r_tuple, predict_fn)
+                class_to_explain = np.argmax(prediction)
+
                 # CERTA
                 print('certa')
                 t0 = time.perf_counter()
