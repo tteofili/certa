@@ -379,28 +379,33 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
 
 def perturb_predict_token(all_triangles: list, tokenlevel_attributes: list, class_to_explain: int, predict_fn,
                           sources_map: dict, lprefix: str, rprefix: str, summarizer,
-                          tf_idf_filter: bool = True, num_threads: int = -1):
+                          tf_idf_filter: bool = False, num_threads: int = -1):
+    t0 = __get_records(sources_map, all_triangles[0], lprefix, rprefix)
+    fr = t0[0]
+    pr = t0[1]
+    row_text = get_row_string(fr, pr)
+
     if tf_idf_filter:
-        t0 = __get_records(sources_map, all_triangles[0], lprefix, rprefix)
-        fr = t0[0]
-        pr = t0[1]
-        row_text = get_row_string(fr, pr)
         transformed_row_text = summarizer.transform(row_text.lower(), max_len=SML)
         filtered_attributes = []
         for ca in tokenlevel_attributes:
             if ca.split('__')[1].lower() in transformed_row_text:
                 filtered_attributes.append(ca)
         tokenlevel_attributes = filtered_attributes
+    else:
+        transformed_row_text = row_text
 
-    # token_combinations = max(int(len(transformed_row_text.split(' '))), 3)
-    token_combinations = 4
+    token_combinations = int(len(transformed_row_text.split(' ')))
 
     all_predictions = pd.DataFrame()
     rankings = []
     flipped_predictions = []
     # lattice stratified predictions
     all_good = False
+    len_fp = 0
     for a in range(1, token_combinations):
+        if a > 4 and len_fp > 0:
+            break
         print(f'depth-{a}')
         if all_good:
             break
@@ -408,6 +413,7 @@ def perturb_predict_token(all_triangles: list, tokenlevel_attributes: list, clas
                                                                                  class_to_explain, predict_fn, sources_map,
                                                                                  lprefix, rprefix, num_threads=num_threads)
 
+        len_fp += len(cfp_df)
         flipped_predictions.append(cfp_df)
         all_predictions = pd.concat([pred_df, all_predictions])
 

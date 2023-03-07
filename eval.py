@@ -118,6 +118,12 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                         pass
                     lidx += 1
 
+                item['match'] = prediction[1]
+                item['label'] = label
+                examples = examples.append(item, ignore_index=True)
+                print(item)
+                print(idx)
+
                 if compare:
                     # Mojito
                     print('mojito')
@@ -285,11 +291,6 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             print(f'skipped item {str(idx)}')
                             pass
 
-                item['match'] = prediction[1]
-                item['label'] = label
-                examples = examples.append(item, ignore_index=True)
-                print(item)
-                print(idx)
             except:
                 print(traceback.format_exc())
                 print(f'skipped item {str(idx)}')
