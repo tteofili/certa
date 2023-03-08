@@ -45,7 +45,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                                               train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
 
         limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5, train_noids.columns, time_maximum=300,
-                                             class_names=['nomatch_score', 'match_score'])
+                                             class_names=['nomatch_score', 'match_score'], token=token)
 
         shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, train_noids.columns, time_maximum=300)
 
@@ -225,19 +225,10 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             instance = instance.drop([c], axis=1)
 
                     if not os.path.exists(cf_dir + '/limec.csv'):
-                        if token:
-                            continue
                         print('lime-c')
                         try:
                             t0 = time.perf_counter()
-                            if token:
-                                limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5,
-                                                                     to_token_df(instance), time_maximum=300,
-                                                                     class_names=['nomatch_score', 'match_score'],
-                                                                     token=token)
-                                limec_exp = limec_explainer.explanation(to_token_df(instance))
-                            else:
-                                limec_exp = limec_explainer.explanation(instance)
+                            limec_exp = limec_explainer.explanation(instance)
                             print(limec_exp)
                             latency_lc = time.perf_counter() - t0
                             limec_row = {'latency': latency_lc}

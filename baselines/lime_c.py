@@ -114,25 +114,25 @@ class LimeCounterfactual(object):
         explainer = Mojito(instance.columns,
                         attr_to_copy='left',
                         split_expression=" ",
-                        class_names=['no_match', 'match'],
+                        class_names=['nomatch_score', 'match_score'],
                         lprefix='', rprefix='',
                         feature_selection='lasso_path')
 
         classifier = self.c_fn.predict_proba
 
-
-        exp = explainer.copy(classifier, instance,
+        if idx == 0:
+            exp = explainer.copy(classifier, instance,
                                       num_features=nb_active_features,
                                       num_perturbation=100)
+        else:
+            exp = explainer.drop(classifier, instance,
+                                 num_features=nb_active_features,
+                                 num_perturbation=100)
 
         #exp = explainer.explain_instance(instance_text, classifier, num_features=nb_active_features)
         if self.token:
-            ell = exp[['attribute','weight']].to_dict()
-            explanation_lime = []
-            for k, v in ell.items():
-                explanation_lime.append((k, v))
-            explanation_lime = sorted(explanation_lime, key=lambda x: x[1], reverse=idx == 1)
-            #explanation_lime = sorted(exp, key=lambda x: x[1], reverse=idx == 1)
+            explanation_lime = exp[['attribute','token','weight']].sort_values(by=['weight'], ascending=idx==0)
+
         else:
             ell = exp.groupby('attribute')['weight'].mean().to_dict()
             explanation_lime = []
@@ -156,6 +156,9 @@ class LimeCounterfactual(object):
             score_new = score_predicted
             k = 0
             number_perturbed = 0
+            feature_names_full_index = []
+            feature_coefficient = []
+            perturbed_instance = instance.copy()
             while ((score_new[idx] >= self.threshold_classifier) and (k != len(explanation_lime)) and (
                     time.time() - tic <= self.time_maximum) and (number_perturbed < self.max_features)):
                 number_perturbed = 0
@@ -163,16 +166,26 @@ class LimeCounterfactual(object):
                 feature_coefficient = []
                 k += 1
                 perturbed_instance = instance.copy()
-                for feature in explanation_lime[0:k]:
-                    if (feature[1] > 0 and idx == 1) or (feature[1] < 0 and idx == 0):
-                        index_feature = np.argwhere(np.array(self.feature_names_full) == feature[0])
-                        number_perturbed += 1
-                        if (len(index_feature) != 0):
-                            index_feature = index_feature[0][0]
-                            perturbed_instance.iloc[:, index_feature] = self.off_value
-                            feature_names_full_index.append(index_feature)
-                            feature_coefficient.append(feature[1])
-                score_new = self.classifier_fn(perturbed_instance)
+                if self.token:
+                    for index, row in explanation_lime.head(k).iterrows():
+                        if (row['weight'] > 0 and idx == 1) or (row['weight'] < 0 and idx == 0):
+                            number_perturbed += 1
+                            perturbed_instance[row['attribute']] = perturbed_instance[row['attribute']].astype(str).replace(row['token'], self.off_value)
+                            feature_names_full_index.append(row['attribute']+'_'+row['token'])
+                            feature_coefficient.append(row['weight'])
+                    score_new = self.classifier_fn(perturbed_instance)
+
+                else:
+                    for feature in explanation_lime[0:k]:
+                        if (feature[1] > 0 and idx == 1) or (feature[1] < 0 and idx == 0):
+                            index_feature = np.argwhere(np.array(self.feature_names_full) == feature[0])
+                            number_perturbed += 1
+                            if (len(index_feature) != 0):
+                                index_feature = index_feature[0][0]
+                                perturbed_instance.iloc[:, index_feature] = self.off_value
+                                feature_names_full_index.append(index_feature)
+                                feature_coefficient.append(feature[1])
+                    score_new = self.classifier_fn(perturbed_instance)
 
             if (score_new[idx] < self.threshold_classifier):
                 time_elapsed = time.time() - tic
