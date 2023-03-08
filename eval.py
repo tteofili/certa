@@ -333,7 +333,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         saliency_names = ['certa', 'landmark', 'mojito', 'shap']
     print('evaluating saliencies')
     try:
-        faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df)
+        faithfulness = get_faithfulness(saliency_names, model, '%s%s%s/%s' % ('', exp_dir, dataset, mtype), test_df[:samples])
         print(f'{mtype}: faithfulness for {dataset}: {faithfulness}')
         ci = get_confidence(saliency_names, exp_dir + dataset + '/' + mtype)
         print(f'{mtype}: confidence indication for {dataset}: {ci}')

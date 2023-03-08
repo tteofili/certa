@@ -522,7 +522,7 @@ class DeepERModel(ERModel):
 
         return precision, recall, fmeasure
 
-    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=['id', 'ltable_id', 'rtable_id'], **kwargs):
+    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=['id', 'ltable_id', 'rtable_id', 'label'], **kwargs):
         if isinstance(x, csr_matrix):
             x = pd.DataFrame(data=np.zeros(x.shape))
             if given_columns is not None:
