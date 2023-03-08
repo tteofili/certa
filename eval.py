@@ -2,6 +2,7 @@ import argparse
 import os
 import time
 import traceback
+from datetime import datetime
 
 import dice_ml
 import numpy as np
@@ -401,8 +402,8 @@ def evaluate(mtype: str, samples: int = -1, filtered_datasets: list = [], exp_di
              compare=False, da=None, num_triangles=10, token=False, eval_only=False):
     if not exp_dir.endswith('/'):
         exp_dir = exp_dir + '/'
-    exp_dir = exp_dir + 'all/'
-    os.makedirs(exp_dir, exist_ok=True)
+    exp_dir = exp_dir + 'all/' + datetime.now().strftime("%m/%d/%Y_%H:%M:%S") + '/'
+
     for dataset in filtered_datasets:
         os.makedirs(exp_dir + dataset, exist_ok=True)
         modeldir = 'models/saved/' + mtype + '/' + dataset

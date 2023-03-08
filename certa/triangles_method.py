@@ -181,20 +181,21 @@ def token_perturbations_from_triangle(triangle_ids, sources_map, attributes, max
         all_rt_combs = list(_powerset(repls, max_len_attribute_set, max_len_attribute_set))
         filtered_combs = []
         for comb in all_rt_combs:
+            #aff_att = None
             naas = []
             for rt in comb:
                 aspl = rt.split('__')[0]
+                #if aff_att is not None and aff_att != aspl:
+                #    continue
                 if aspl not in support.index:
                     continue
                 naas.append(aspl)
+                aff_att = aspl
             if aa == naas:
                 filtered_combs.append(comb)
 
         # filtered_combs = random.sample(filtered_combs, min(max_combs, len(filtered_combs)))
         for comb in filtered_combs:
-            naas = []
-            for rt in comb:
-                naas.append(rt.split('__')[0])
             newRecord = free.copy()
             dv = []
             cv = []
@@ -379,7 +380,7 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
 
 def perturb_predict_token(all_triangles: list, tokenlevel_attributes: list, class_to_explain: int, predict_fn,
                           sources_map: dict, lprefix: str, rprefix: str, summarizer,
-                          tf_idf_filter: bool = False, num_threads: int = -1):
+                          tf_idf_filter: bool = True, num_threads: int = -1):
     t0 = __get_records(sources_map, all_triangles[0], lprefix, rprefix)
     fr = t0[0]
     pr = t0[1]
@@ -404,7 +405,7 @@ def perturb_predict_token(all_triangles: list, tokenlevel_attributes: list, clas
     all_good = False
     len_fp = 0
     for a in range(1, token_combinations):
-        if a > 4 and len_fp > 0:
+        if a > 3 and len_fp > 0:
             break
         print(f'depth-{a}')
         if all_good:

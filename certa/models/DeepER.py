@@ -11,6 +11,7 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import SensitivityAtSpecificity, AUC
 import gensim.downloader as api
 
 
@@ -109,10 +110,10 @@ def init_DeepER_model(embedding_dim):
     # Creazione modello
     deeper_model = Model(inputs=[emb_a, emb_b], outputs=[output])
 
-    optimizer = Adam(learning_rate=0.01, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=True)
+    optimizer = Adam(learning_rate=1e-4, beta_1=0.9, beta_2=0.999,  epsilon=1e-06, amsgrad=True)
 
     # Compilazione per addestramento
-    deeper_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['mse'])
+    deeper_model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=[AUC(), 'mse'])
     deeper_model.summary()
 
     return deeper_model
