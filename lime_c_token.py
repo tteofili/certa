@@ -24,39 +24,40 @@ test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'],
 train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 train_noids = train_df.copy().astype(str)
 
-idx = 2
-rand_row = test_df.iloc[idx]
-l_id = int(rand_row['ltable_id'])
-l_tuple = lsource.iloc[l_id]
-r_id = int(rand_row['rtable_id'])
-r_tuple = rsource.iloc[r_id]
+for idx in range(10):
+    print(idx)
+    rand_row = test_df.iloc[idx]
+    l_id = int(rand_row['ltable_id'])
+    l_tuple = lsource.iloc[l_id]
+    r_id = int(rand_row['rtable_id'])
+    r_tuple = rsource.iloc[r_id]
 
-cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
-os.makedirs(cf_dir, exist_ok=True)
+    cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
+    os.makedirs(cf_dir, exist_ok=True)
 
-label = rand_row["label"]
-row_id = str(l_id) + '-' + str(r_id)
-item = get_row(l_tuple, r_tuple)
-instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id','rtable_id'], axis=1).astype(str)
+    label = rand_row["label"]
+    row_id = str(l_id) + '-' + str(r_id)
+    item = get_row(l_tuple, r_tuple)
+    instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id','rtable_id'], axis=1).astype(str)
 
-def predict_fn(x, **kwargs):
-    return model.predict(x, **kwargs)
+    def predict_fn(x, **kwargs):
+        return model.predict(x, **kwargs)
 
-def predict_fn_mojito(x):
-    return model.predict(x, mojito=True)
+    def predict_fn_mojito(x):
+        return model.predict(x, mojito=True)
 
-def predict_fn_c(x, **kwargs):
-    return model.predict(x, **kwargs)['match_score']
+    def predict_fn_c(x, **kwargs):
+        return model.predict(x, **kwargs)['match_score']
 
-cf_explanation = limec_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5, train_noids.columns, time_maximum=300,
-                                             class_names=['nomatch_score', 'match_score']).explanation(instance)
+    cf_explanation = limec_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5, train_noids.columns, time_maximum=300,
+                                                 class_names=['nomatch_score', 'match_score']).explanation(instance)
 
-print(cf_explanation)
+    print(cf_explanation)
 
 
-cf_token_explanation = limec_token_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5,
-                                                                     train_noids.columns, time_maximum=300,
-                                                                     class_names=['nomatch_score', 'match_score'],
-                                                                     token=True).explanation(instance)
+    cf_token_explanation = limec_token_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5,
+                                                                         train_noids.columns, time_maximum=300,
+                                                                         class_names=['nomatch_score', 'match_score'],
+                                                                         token=True).explanation(instance)
 
-print(cf_token_explanation)
+    print(cf_token_explanation)

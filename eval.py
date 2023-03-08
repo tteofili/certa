@@ -44,7 +44,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         shap_explainer = shap.KernelExplainer(lambda x: predict_fn(x)['match_score'].values,
                                               train_df.drop(['label'], axis=1).astype(str)[:100], link='identity')
 
-        limec_explainer = LimeCounterfactual(model, predict_fn_c, None, 0.5, train_noids.columns, time_maximum=300,
+        limec_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5, train_noids.columns, time_maximum=300,
                                              class_names=['nomatch_score', 'match_score'], token=token)
 
         shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, train_noids.columns, time_maximum=300)
