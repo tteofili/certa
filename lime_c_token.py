@@ -25,7 +25,6 @@ train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], 
 train_noids = train_df.copy().astype(str)
 
 for idx in range(10):
-    print(idx)
     rand_row = test_df.iloc[idx]
     l_id = int(rand_row['ltable_id'])
     l_tuple = lsource.iloc[l_id]
@@ -40,20 +39,8 @@ for idx in range(10):
     item = get_row(l_tuple, r_tuple)
     instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id','rtable_id'], axis=1).astype(str)
 
-    def predict_fn(x, **kwargs):
-        return model.predict(x, **kwargs)
-
     def predict_fn_mojito(x):
         return model.predict(x, mojito=True)
-
-    def predict_fn_c(x, **kwargs):
-        return model.predict(x, **kwargs)['match_score']
-
-    cf_explanation = limec_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5, train_noids.columns, time_maximum=300,
-                                                 class_names=['nomatch_score', 'match_score']).explanation(instance)
-
-    print(cf_explanation)
-
 
     cf_token_explanation = limec_token_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5,
                                                                          train_noids.columns, time_maximum=300,

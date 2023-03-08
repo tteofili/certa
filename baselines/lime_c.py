@@ -170,7 +170,7 @@ class LimeCounterfactual(object):
                     for index, row in explanation_lime.head(k).iterrows():
                         if (row['weight'] > 0 and idx == 1) or (row['weight'] < 0 and idx == 0):
                             number_perturbed += 1
-                            perturbed_instance[row['attribute']] = perturbed_instance[row['attribute']].astype(str).replace(row['token'], self.off_value)
+                            perturbed_instance[row['attribute']] = perturbed_instance[row['attribute']].astype(str).values[0].replace(row['token'], self.off_value)
                             feature_names_full_index.append(row['attribute']+'_'+row['token'])
                             feature_coefficient.append(row['weight'])
                     score_new = self.classifier_fn(perturbed_instance)
