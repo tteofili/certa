@@ -1,5 +1,5 @@
 import pandas as pd
-from baselines.minun_explainer import MinunExplainer, formulate_instance
+from baselines.minun import MinunExplainer, formulate_instance
 from certa.models.utils import get_model
 from certa.utils import merge_sources, to_token_df
 from certa.local_explain import get_original_prediction, get_row

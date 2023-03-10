@@ -67,14 +67,14 @@ class MinunExplainer(object):
         exp_result = defaultdict()
         if len(candidates) == 0: 
             print("cannot flip!")
-            return (defaultdict(),"PLACEHOLDER\tPLACEHOLDER\t1"),eval_cnt
+            return (defaultdict(), pd.DataFrame()), eval_cnt
         else:
             top_explaination = self._find_explaination(candidates)
             for idx,onum in enumerate(top_explaination[-1]):
                 if onum != 0:
                     exp_result[instance[-1][idx]] = cands4attrs[idx][onum]
             res = (exp_result, top_explaination[0])
-            return res,eval_cnt
+            return res, eval_cnt
 
 
     def _explain_permutation(self, instance, cands4attrs, k):

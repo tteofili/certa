@@ -11,6 +11,7 @@ import shap
 
 from baselines.landmark import Landmark
 from baselines.lime_c import LimeCounterfactual
+from baselines.minun import MinunExplainer, formulate_instance
 from baselines.mojito import Mojito
 from baselines.shap_c import ShapCounterfactual
 from certa.explain import CertaExplainer
@@ -25,7 +26,7 @@ base_datadir = 'datasets/'
 
 
 def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
-             test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, predict_fn_t):
+             test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, test):
     certa_explainer = CertaExplainer(lsource, rsource, data_augmentation=da)
     if compare:
         train_noids = train_df.copy().astype(str)
@@ -49,6 +50,9 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
 
         shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, train_noids.columns, time_maximum=300)
 
+        if token:
+            minun_explainer = MinunExplainer(model)
+
         d = dice_ml.Data(dataframe=test_df.drop(['ltable_id', 'rtable_id'], axis=1),
                          continuous_features=[],
                          outcome_name='label')
@@ -66,6 +70,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         dices = pd.DataFrame()
         limecs = pd.DataFrame()
         shapcs = pd.DataFrame()
+        minuns = pd.DataFrame()
 
         for idx in range(len(test_df)):
             rand_row = test_df.iloc[idx]
@@ -219,6 +224,20 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                                     'label': label, 'row': row_id, 'prediction': prediction}
                         shaps = shaps.append(shap_row, ignore_index=True)
 
+                    print('minun')
+                    if not os.path.exists(cf_dir + '/minun.csv'):
+                        if token:
+                            instance = formulate_instance(lsource, rsource, test.iloc[idx])
+                            t0 = time.perf_counter()
+                            res, _ = minun_explainer.explain(instance)
+                            latency_me = time.perf_counter() - t0
+                            minun_token_explanation = res[1]
+                            minun_row = {'latency': latency_me}
+                            minuns = minuns.append(minun_row, ignore_index=True)
+                            print(f'minun:{idx}:{minun_token_explanation}')
+                            if minun_token_explanation is not None:
+                                minun_token_explanation.to_csv(cf_dir + '/minun.csv')
+
                     instance = pd.DataFrame(rand_row).transpose().astype(str)
                     for c in ['label', 'ltable_id', 'rtable_id']:
                         if c in instance.columns:
@@ -296,6 +315,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
             shapcs.to_csv(exp_dir + dataset + '/' + model_name + '/shapc.csv')
             limecs.to_csv(exp_dir + dataset + '/' + model_name + '/limec.csv')
             dices.to_csv(exp_dir + dataset + '/' + model_name + '/dice.csv')
+            minuns.to_csv(exp_dir + dataset + '/' + model_name + '/minun.csv')
             saliency_names = ['certa', 'landmark', 'mojito', 'shap']
             print(f"mojito: {mojitos['latency'].mean()}")
             print(f"landmark: {landmarks['latency'].mean()}")
@@ -313,6 +333,10 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                 pass
             try:
                 print(f"dice: {dices['latency'].mean()}")
+            except:
+                pass
+            try:
+                print(f"minun: {minuns['latency'].mean()}")
             except:
                 pass
         else:
@@ -337,7 +361,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
     print('evaluating cfs')
     t = 10
     cf_eval = dict()
-    cf_names = ['certa', 'dice_random', 'shapc', 'limec']
+    cf_names = ['certa', 'dice_random', 'shapc', 'limec', 'minun']
     for cf_name in cf_names:
         print(f'processing {cf_name}')
         validity = 0
@@ -431,7 +455,7 @@ def evaluate(mtype: str, samples: int = -1, filtered_datasets: list = [], exp_di
         train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 
         eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito,
-                          rsource, test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, predict_fn_t)
+                          rsource, test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, test)
 
 
 if __name__ == "__main__":
