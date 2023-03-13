@@ -1,8 +1,6 @@
 import pandas as pd
 from baselines.minun import MinunExplainer, formulate_instance
 from certa.models.utils import get_model
-from certa.utils import merge_sources, to_token_df
-from certa.local_explain import get_original_prediction, get_row
 import os
 
 mtype = 'deeper'
@@ -29,5 +27,5 @@ for idx in range(10):
 
     instance = formulate_instance(lsource, rsource, test.iloc[idx])
 
-    cf_token_explanation = minun_explainer.explain(instance)
+    cf_token_explanation, _ = minun_explainer.explain(instance)
     print(cf_token_explanation)
