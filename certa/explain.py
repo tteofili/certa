@@ -161,12 +161,6 @@ class CertaExplainer(object):
                                                                                   '|'.join(['ltable_', 'rtable_'])),
                                                                               ascending=False)
 
-                        '''ld = dict()
-                        for p in range(len(powerset)):
-                            k = tuple(powerset[p])
-                            if k not in ld:
-                                ld[k] = rank[p]
-                        sorted(ld.items(), key=lambda x: len(x))'''
                         latt = lattice(powerset, rank, triangle=lattice_predictions)
                         lattices.append(latt)
                     except:

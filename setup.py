@@ -12,7 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url= 'https://github.com/tteofili/certa.git',
-    packages=['certa'],
+    packages=['certa', 'certa.models', 'certa.models.emt', 'certa.models.ditto', 'certa.metrics', 'baselines'],
     install_requires=[
           'pandas',
           'numpy',

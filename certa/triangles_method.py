@@ -171,7 +171,7 @@ def token_perturbations_from_triangle(triangle_ids, sources_map, attributes, max
             aa.append(affected_attribute)
             if affected_attribute in support.index:  # collect all possible tokens in the affected attribute to be used as replacements from the support record
                 replacement_value = support[affected_attribute]
-                replacement_tokens = str(replacement_value).split(' ')
+                replacement_tokens = list(set(str(replacement_value).split(' ')) - set(tbc.split('__')[1].split(' ')))
                 replacements[affected_attribute] = replacement_tokens
                 for rt in replacement_tokens:  # create attribute_token items for each replacement token
                     new_repl = '__'.join([affected_attribute, rt])
