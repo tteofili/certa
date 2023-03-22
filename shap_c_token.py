@@ -1,7 +1,8 @@
 import pandas as pd
+
 from baselines.shap_c import ShapCounterfactual
 from certa.models.utils import get_model
-from certa.utils import merge_sources, to_token_df
+from certa.utils import merge_sources, to_token_df, to_attr_df
 from certa.local_explain import get_original_prediction, get_row
 import os
 
@@ -24,30 +25,34 @@ test_df = merge_sources(test, 'ltable_', 'rtable_', lsource, rsource, ['label'],
 train_df = merge_sources(gt, 'ltable_', 'rtable_', lsource, rsource, ['label'], ['id'])
 train_noids = train_df.copy().astype(str)
 
-idx = 0
-rand_row = test_df.iloc[idx]
-l_id = int(rand_row['ltable_id'])
-l_tuple = lsource.iloc[l_id]
-r_id = int(rand_row['rtable_id'])
-r_tuple = rsource.iloc[r_id]
+for idx in range(10):
+    rand_row = test_df.iloc[idx]
+    l_id = int(rand_row['ltable_id'])
+    l_tuple = lsource.iloc[l_id]
+    r_id = int(rand_row['rtable_id'])
+    r_tuple = rsource.iloc[r_id]
 
-cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
-os.makedirs(cf_dir, exist_ok=True)
+    cf_dir = exp_dir + dataset + '/' + model_name + '/' + str(idx)
+    os.makedirs(cf_dir, exist_ok=True)
 
-label = rand_row["label"]
-row_id = str(l_id) + '-' + str(r_id)
-item = get_row(l_tuple, r_tuple)
-instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id','rtable_id'], axis=1).astype(str)
+    label = rand_row["label"]
+    row_id = str(l_id) + '-' + str(r_id)
+    item = get_row(l_tuple, r_tuple)
+    instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id','rtable_id'], axis=1).astype(str)
 
-def predict_fn(x, **kwargs):
-    return model.predict(x, **kwargs)
+    shapc_explainer = ShapCounterfactual(lambda x: model.predict(x)['match_score'].values, 0.5, instance.columns, time_maximum=300)
 
-def predict_fn_mojito(x):
-    return model.predict(x, mojito=True)
+    cf_explanation = shapc_explainer.explanation(instance, train_noids[:50])
+    print(f'attribute: {cf_explanation}')
 
-def predict_fn_c(x, **kwargs):
-    return model.predict(x, **kwargs)['match_score']
+    token_df = to_token_df(instance)
+    bg = pd.DataFrame()
+    bg.append(token_df)
+    for i in range(len(train_noids[:50])):
+        bg = bg.append(to_token_df(train_noids.iloc[[i]]))
 
-cf_explanation = ShapCounterfactual(predict_fn_mojito, 0.5, train_noids.columns, time_maximum=300).explanation(instance, train_noids)
+    shapc_explainer = ShapCounterfactual(lambda x: model.predict(to_attr_df(x))['match_score'].values, 0.5, bg.columns, time_maximum=300)
 
-print(cf_explanation)
+    cf_explanation = shapc_explainer.explanation(bg.iloc[[0]], bg)
+
+    print(f'token: {cf_explanation}')

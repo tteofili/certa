@@ -48,7 +48,8 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         limec_explainer = LimeCounterfactual(model, predict_fn_mojito, None, 0.5, train_noids.columns, time_maximum=300,
                                              class_names=['nomatch_score', 'match_score'], token=token)
 
-        shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, train_noids.columns, time_maximum=300)
+        shapc_explainer = ShapCounterfactual(lambda x: predict_fn(x)['match_score'].values, 0.5, train_noids.columns,
+                                             time_maximum=300)
 
         if token:
             minun_explainer = MinunExplainer(model)
@@ -266,7 +267,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                         try:
                             t0 = time.perf_counter()
                             if token:
-                                shapc_explainer = ShapCounterfactual(predict_fn_c, 0.5, to_token_df(instance),
+                                shapc_explainer = ShapCounterfactual(lambda x: predict_fn(x)['match_score'].values, 0.5, to_token_df(instance),
                                                                      time_maximum=300)
                                 sc_exp = shapc_explainer.explanation(to_token_df(instance), train_noids.apply(lambda x: ' '.join(x), axis = 1))
                             else:

@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -234,3 +235,19 @@ def to_token_df(x:pd.DataFrame, lprefix='ltable_', rprefix='rtable_'):
             for t in str(x[c].values[0]).split(' '):
                 t_df[c + '__' + t] = t
     return pd.Series(index=t_df.keys(), data=t_df.values()).to_frame().T
+
+def to_attr_df(x: pd.DataFrame, lprefix='ltable_', rprefix='rtable_'):
+    if isinstance(x, np.ndarray):
+        return x
+    t_df = dict()
+    for c in x.columns:
+        if str(c).startswith(lprefix) or str(c).startswith(rprefix):
+            attr_token = c.split('__')
+            attr = attr_token[0]
+            token = attr_token[1]
+            prev_tokens = ''
+            if attr in t_df:
+                prev_tokens = str(t_df[attr])
+            t_df[attr] = prev_tokens + ' ' + token
+    return pd.Series(index=t_df.keys(), data=t_df.values()).to_frame().T
+
