@@ -34,5 +34,5 @@ for idx in idxs:
     r_tuple = rsource.iloc[r_id]
     print(f'label:{rand_row["label"]}, prediction:{predict_fn(pd.DataFrame(rand_row).T)["match_score"].values[0]}')
     saliency_df, cf_summary, counterfactual_examples, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn, token=True, num_triangles=10)
-    saliency_df.to_csv(str(idx)+'_saliency.csv')
-    counterfactual_examples.to_csv(str(idx)+'_cf.csv')
+    saliency_df.to_csv(mtype + '_' + str(idx)+'_saliency.csv')
+    counterfactual_examples.to_csv(mtype + '_' + str(idx)+'_cf.csv')
