@@ -109,29 +109,19 @@ def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, max_len
     perturbed_attributes = []
     dropped_values = []
     copied_values = []
+
     for subset in all_attributes_subsets:  # iterate over the attribute power set
         dv = []
         cv = []
-        if class_to_explain == 1:
-            new_record = triangle[0].copy()  # copy the l1 tuple
-            if not all(elem in new_record.index.to_list() for elem in subset):
-                continue
-            perturbed_attributes.append(subset)
-            for att in subset:
-                dv.append(new_record[att])
-                cv.append(triangle[2][att])
-                new_record[att] = triangle[2][att]  # copy the value for the given attribute from l2 of no-match l2, r1 pair into l1
-            perturbations.append(new_record)  # append the new record
-        else:
-            new_record = triangle[2].copy()  # copy the l2 tuple
-            if not all(elem in new_record.index.to_list() for elem in subset):
-                continue
-            perturbed_attributes.append(subset)
-            for att in subset:
-                dv.append(new_record[att])
-                cv.append(triangle[0][att])
-                new_record[att] = triangle[0][att]  # copy the value for the given attribute from l1 of match l1, r1 pair into l2
-            perturbations.append(new_record)  # append the new record
+        new_record = triangle[0].copy()
+        if not all(elem in new_record.index.to_list() for elem in subset):
+            continue
+        perturbed_attributes.append(subset)
+        for att in subset:
+            dv.append(new_record[att])
+            cv.append(triangle[2][att])
+            new_record[att] = triangle[2][att]
+        perturbations.append(new_record)
         dropped_values.append(dv)
         copied_values.append(cv)
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
@@ -601,10 +591,7 @@ def perturb_predict_token(pair: pd.DataFrame, all_triangles: list, tokenlevel_at
                           tf_idf_filter: bool = True, num_threads: int = -1):
     fr = sources_map[0][sources_map[0].ltable_id == int(pair.ltable_id)].iloc[0]
     pr = sources_map[1][sources_map[1].rtable_id == int(pair.rtable_id)].iloc[0]
-    # t0 = __get_records(sources_map, all_triangles[0], lprefix, rprefix)
-    #
-    # fr = t0[0]
-    # pr = t0[1]
+
     row_text = get_row_string(fr, pr)
 
     if tf_idf_filter:
