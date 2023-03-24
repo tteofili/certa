@@ -103,7 +103,7 @@ class ShapCounterfactual(object):
         tic = time.time()  # start timer
 
         explainer = shap.KernelExplainer(self.classifier_fn, background, link="identity")
-        shap_values = explainer.shap_values(instance, nsamples=max(len(background),len(instance.columns))*5)
+        shap_values = explainer.shap_values(instance, nsamples=500)
 
         nb_active_feature_instance_idx = np.size(instance)
         instance_dense = np.reshape(instance, (1, len(self.feature_names_full)))
