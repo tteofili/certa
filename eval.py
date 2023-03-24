@@ -16,14 +16,13 @@ from baselines.mojito import Mojito
 from baselines.shap_c import ShapCounterfactual
 from certa.explain import CertaExplainer
 from certa.local_explain import get_original_prediction, get_row
-from certa.utils import merge_sources, to_token_df
+from certa.utils import merge_sources, to_token_df, to_attr_df
 from certa.metrics.counterfactual import get_validity, get_proximity, get_sparsity, get_diversity
 from certa.metrics.saliency import get_faithfulness, get_confidence
 from certa.models.utils import get_model
 
 experiments_dir = 'experiments/'
 base_datadir = 'datasets/'
-
 
 def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predict_fn, predict_fn_mojito, rsource,
              test_df, train_df, da, num_triangles, token, eval_only, predict_fn_c, test):
@@ -261,15 +260,23 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
                             pass
 
                     if not os.path.exists(cf_dir + '/shapc.csv'):
-                        if token:
-                            continue
                         print('shap-c')
                         try:
                             t0 = time.perf_counter()
                             if token:
-                                shapc_explainer = ShapCounterfactual(lambda x: predict_fn(x)['match_score'].values, 0.5, to_token_df(instance),
-                                                                     time_maximum=300)
-                                sc_exp = shapc_explainer.explanation(to_token_df(instance), train_noids.apply(lambda x: ' '.join(x), axis = 1))
+                                token_df = to_token_df(instance)
+                                bg = pd.DataFrame()
+                                bg.append(token_df)
+
+                                for i in range(len(train_noids[:50])):
+                                    bg = bg.append(to_token_df(train_noids.iloc[[i]]))
+
+                                shapc_explainer = ShapCounterfactual(
+                                    lambda x: model.predict(to_attr_df(x))['match_score'].values, 0.5, bg.columns,
+                                    time_maximum=6000)
+
+                                sc_exp = shapc_explainer.explanation(bg.iloc[[0]], bg)
+
                             else:
                                 sc_exp = shapc_explainer.explanation(instance, train_noids[:50])
                             latency_sc = time.perf_counter() - t0

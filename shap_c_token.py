@@ -40,14 +40,10 @@ for idx in range(10):
     item = get_row(l_tuple, r_tuple)
     instance = pd.DataFrame(rand_row).transpose().drop(['ltable_id','rtable_id'], axis=1).astype(str)
 
-    shapc_explainer = ShapCounterfactual(lambda x: model.predict(x)['match_score'].values, 0.5, instance.columns, time_maximum=300)
-
-    cf_explanation = shapc_explainer.explanation(instance, train_noids[:50])
-    print(f'attribute: {cf_explanation}')
-
     token_df = to_token_df(instance)
     bg = pd.DataFrame()
     bg.append(token_df)
+
     for i in range(len(train_noids[:50])):
         bg = bg.append(to_token_df(train_noids.iloc[[i]]))
 
