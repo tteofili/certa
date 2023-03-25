@@ -301,7 +301,10 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
 
     # generate power set of token-attributes
     if subsequences:
-        affected_ats_lists = list(ngrams(filtered_attributes, max_len_attribute_set))
+        try:
+            affected_ats_lists = list(ngrams(filtered_attributes, max_len_attribute_set))
+        except:
+            affected_ats_lists = list(_powerset(filtered_attributes, max_len_attribute_set, max_len_attribute_set))
     else:
         affected_ats_lists = list(_powerset(filtered_attributes, max_len_attribute_set, max_len_attribute_set))
 
@@ -324,7 +327,10 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
             tokens = str(support[k]).split(' ')
             tokens = [k + '__' + r for r in tokens]
             if subsequences:
-                replacements = list(ngrams(tokens, v))
+                try:
+                    replacements = list(ngrams(tokens, v))
+                except:
+                    replacements = list(_powerset(tokens, v, v))
             else:
                 replacements = list(_powerset(tokens, v, v))
             replacements_list.append(replacements)

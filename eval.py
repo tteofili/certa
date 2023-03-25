@@ -325,8 +325,14 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
             dices.to_csv(exp_dir + dataset + '/' + model_name + '/dice.csv')
             minuns.to_csv(exp_dir + dataset + '/' + model_name + '/minun.csv')
             saliency_names = ['certa', 'landmark', 'mojito', 'shap']
-            print(f"mojito: {mojitos['latency'].mean()}")
-            print(f"landmark: {landmarks['latency'].mean()}")
+            try:
+                print(f"mojito: {mojitos['latency'].mean()}")
+            except:
+                pass
+            try:
+                print(f"landmark: {landmarks['latency'].mean()}")
+            except:
+                pass
             try:
                 print(f"shap: {shaps['latency'].mean()}")
             except:
