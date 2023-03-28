@@ -289,15 +289,10 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
                                            lprefix, rprefix, predict_fn=None, subsequences: bool = True):
     all_good = False
     triangle = __get_records(sources_map, triangle_ids, lprefix, rprefix)  # get triangle values
-    # if 'rtable_id' in triangle[1].columns:
     support = triangle[2].copy()
     free = triangle[0].copy()
     prefix = support.index[0].split('_')[0]
     filtered_attributes = [a for a in attributes if a.startswith(prefix)]
-
-    # else:
-    #     support = triangle[0].copy()
-    #     free = triangle[2].copy()
 
     # generate power set of token-attributes
     if subsequences:
@@ -335,7 +330,6 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
                 replacements = list(_powerset(tokens, v, v))
             replacements_list.append(replacements)
 
-        # powerset = _powerset(replacements_list[0], len(affected_at_list), len(affected_at_list))
         if len(replacements_list) == 1:
             substitutions = replacements_list[0]
         else:
@@ -378,71 +372,6 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
                 copiedValues.append(cv)
                 perturbations.append(newRecord)
                 perturbed_attributes.append(affected_at_list)
-
-    #
-    #
-    # # iterate over the nodes of the lattice at depth 'max_len_attribute_set'
-    # for subset in affected_ats_lists:
-    #     # only consider altering the free record
-    #     if not all(elem.split('__')[0] in free.index.to_list() for elem in subset):
-    #         continue
-    #
-    #     repls = []  # list of replacement attribute_token items
-    #     aa = []  # list of affected attributes
-    #     replacements = dict()
-    #     for tbc in subset:  # iterate over the attribute:token items
-    #         affected_attribute = tbc.split('__')[0]  # attribute to be affected
-    #         aa.append(affected_attribute)
-    #         # collect all possible tokens in the affected attribute to be used as replacements from the support record
-    #         if affected_attribute in support.index:
-    #             replacement_value = support[affected_attribute]
-    #             replacement_tokens = list(set(str(replacement_value).split(' ')) - set(tbc.split('__')[1].split(' ')))
-    #             replacements[affected_attribute] = replacement_tokens
-    #             for rt in replacement_tokens:  # create attribute_token items for each replacement token
-    #                 new_repl = '__'.join([affected_attribute, rt])
-    #                 if not new_repl in repls:
-    #                     repls.append(new_repl)
-    #
-    #     all_rt_combs = list(_powerset(repls, max_len_attribute_set, max_len_attribute_set))
-    #     filtered_combs = []
-    #     for comb in all_rt_combs:
-    #         #aff_att = None
-    #         naas = []
-    #         for rt in comb:
-    #             aspl = rt.split('__')[0]
-    #             #if aff_att is not None and aff_att != aspl:
-    #             #    continue
-    #             if aspl not in support.index:
-    #                 continue
-    #             naas.append(aspl)
-    #             aff_att = aspl
-    #         if aa == naas:
-    #             filtered_combs.append(comb)
-    #
-    #     # filtered_combs = random.sample(filtered_combs, min(max_combs, len(filtered_combs)))
-    #     for comb in filtered_combs:
-    #         newRecord = free.copy()
-    #         dv = []
-    #         cv = []
-    #         affected_attributes = []
-    #         ic = 0
-    #         for tbc in subset:  # iterate over the attribute_token items
-    #             affected_attribute = tbc.split('__')[0]  # attribute to be affected
-    #             affected_token = tbc.split('__')[1]  # token to be replaced
-    #             if affected_attribute in support.index and affected_attribute in replacements \
-    #                     and len(replacements[affected_attribute]) > 0:
-    #                 replacement_token = comb[ic].split('__')[1]
-    #                 newRecord[affected_attribute] = str(newRecord[affected_attribute]).replace(affected_token,
-    #                                                                                       replacement_token)
-    #                 dv.append(affected_token)
-    #                 cv.append(replacement_token)
-    #                 affected_attributes.append(tbc)
-    #                 ic += 1
-    #         if not all(newRecord == free) and len(dv) == max_len_attribute_set:
-    #             droppedValues.append(dv)
-    #             copiedValues.append(cv)
-    #             perturbations.append(newRecord)
-    #             perturbed_attributes.append(subset)
 
     perturbations_df = pd.DataFrame(perturbations, index=np.arange(len(perturbations)))
     r2 = triangle[1].copy()
@@ -594,7 +523,7 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
 def perturb_predict_token(pair: pd.DataFrame, all_triangles: list, tokenlevel_attributes: list, class_to_explain: int,
                           predict_fn,
                           sources_map: dict, lprefix: str, rprefix: str, summarizer,
-                          tf_idf_filter: bool = True, num_threads: int = -1):
+                          tf_idf_filter: bool = False, num_threads: int = -1):
     fr = sources_map[0][sources_map[0].ltable_id == int(pair.ltable_id)].iloc[0]
     pr = sources_map[1][sources_map[1].rtable_id == int(pair.rtable_id)].iloc[0]
 

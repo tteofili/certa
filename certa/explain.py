@@ -75,8 +75,7 @@ class CertaExplainer(object):
             extended_sources = [pd.concat([self.lsource, gright_df]), pd.concat([self.rsource, gleft_df])]
             pns, pss, cf_ex, triangles = triangles_method.explain_samples(support_samples, extended_sources, predict_fn,
                                                                           lprefix, rprefix, pc, attr_length, self.summarizer,
-                                                                          persist_predictions=debug, token=token,
-                                                                          two_step_token=two_step_token)
+                                                                          persist_predictions=debug, token=token)
             cf_summary = triangles_method.cf_summary(pss)
             saliency_df = pd.DataFrame(data=[pns.values()], columns=pns.keys())
             if len(cf_ex) > 0:
