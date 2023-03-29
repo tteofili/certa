@@ -285,8 +285,7 @@ def token_perturbations_from_triangle(triangle_ids, sources_map, attributes, max
 
 
 def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes, max_len_attribute_set,
-                                           class_to_explain,
-                                           lprefix, rprefix, predict_fn=None, subsequences: bool = True):
+                                           class_to_explain, lprefix, rprefix, predict_fn, subsequences: bool = True):
     all_good = False
     triangle = __get_records(sources_map, triangle_ids, lprefix, rprefix)  # get triangle values
     support = triangle[2].copy()
@@ -361,8 +360,14 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
                 if affected_attribute in support.index and affected_attribute in subst_dict and len(
                         subst_dict[affected_attribute]) > 0:
                     replacement_token = subst_dict[affected_attribute].pop(0)
-                    newRecord[affected_attribute] = str(newRecord[affected_attribute]).replace(affected_token,
-                                                                                               replacement_token)
+                    new_record_value = ''
+                    for token in str(newRecord[affected_attribute]).split(" "):
+                        if len(new_record_value) > 0:
+                            new_record_value += ' '
+                        if token == affected_token:
+                            token = replacement_token
+                        new_record_value += token
+                    newRecord[affected_attribute] = new_record_value
                     dv.append(affected_token)
                     cv.append(replacement_token)
                     affected_attributes.append(tbc)
@@ -508,7 +513,7 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
                                rprefix, num_threads=-1):
     pert_df, pred_df, cfp_df, all_good, ranking = zip(*Parallel(n_jobs=num_threads, prefer='threads')(
         delayed(fast_token_perturbations_from_triangle)(triangle, sourcesMap, attributes, depth, class_to_explain,
-                                                        lprefix, rprefix, predict_fn=predict_fn)
+                                                        lprefix, rprefix, predict_fn)
         for triangle in tqdm(allTriangles)))
 
     perturbations_df = pd.concat(pert_df)
@@ -521,9 +526,8 @@ def lattice_stratified_process(depth, allTriangles, attributes, class_to_explain
 
 
 def perturb_predict_token(pair: pd.DataFrame, all_triangles: list, tokenlevel_attributes: list, class_to_explain: int,
-                          predict_fn,
-                          sources_map: dict, lprefix: str, rprefix: str, summarizer,
-                          tf_idf_filter: bool = False, num_threads: int = -1):
+                          predict_fn, sources_map: dict, lprefix: str, rprefix: str, summarizer,
+                          tf_idf_filter: bool = False, num_threads: int = -1, early_stop: bool = True):
     fr = sources_map[0][sources_map[0].ltable_id == int(pair.ltable_id)].iloc[0]
     pr = sources_map[1][sources_map[1].rtable_id == int(pair.rtable_id)].iloc[0]
 
@@ -548,7 +552,7 @@ def perturb_predict_token(pair: pd.DataFrame, all_triangles: list, tokenlevel_at
     all_good = False
     len_fp = 0
     for a in range(1, token_combinations):
-        if a > 3 and len_fp > 0:
+        if early_stop and a > 3 and len_fp > 0:
             break
         print(f'depth-{a}')
         if all_good:
