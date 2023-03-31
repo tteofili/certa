@@ -422,7 +422,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
         cf_eval[cf_name] = row
     print(f'{mtype}: cf-eval for {dataset}: {cf_eval}')
     try:
-        pd.DataFrame(cf_eval, colums=['metric','certa','dice_random','shapc','limec']).to_csv(f'eval_cf_{dataset}_{mtype}.csv')
+        pd.DataFrame(cf_eval, colums=['metric','certa','dice_random','shapc','limec','minun']).to_csv(f'eval_cf_{dataset}_{mtype}.csv')
     except:
         pass
 
