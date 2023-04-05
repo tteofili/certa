@@ -104,7 +104,7 @@ def eval_all(compare, dataset, exp_dir, lsource, model, model_name, mtype, predi
 
 
                 certa_saliency = saliency_df.transpose().to_dict()[0]
-                certa_row = {'summary': cf_summary, 'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
+                certa_row = {'explanation': certa_saliency, 'type': 'certa', 'latency': latency_c,
                              'match': class_to_explain,
                              'label': label, 'row': row_id, 'prediction': prediction}
 

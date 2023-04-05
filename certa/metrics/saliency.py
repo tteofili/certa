@@ -38,13 +38,7 @@ def get_confidence(saliency_names: list, base_dir: str):
             instance_tokens = []
             for _cls in classes:
                 cls_sals = []
-                explanation = saliency_df.iloc[i]['explanation']
-                attributes_dict = dict()
-                for t in explanation[1:-1].split(','):
-                    vals = t.split(':')
-                    attr = vals[0].replace(' ', '')[1:-1]
-                    score = float(vals[1].replace(' ', ''))
-                    attributes_dict[attr] = score
+                attributes_dict = eval(saliency_df.iloc[[i]]['explanation'].values[0])
                 for _token, sal in attributes_dict.items():
                     if _cls == 0:
                         instance_tokens.append(_token)
@@ -160,13 +154,7 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
             for i in range(len(saliency_df)):
                 if int(preds[i]) == 0:
                     reverse = False
-                explanation = saliency_df.iloc[i]['explanation']
-                attributes_dict = dict()
-                for t in explanation[1:-1].split(','):
-                    vals = t.split(':')
-                    attr = vals[0].replace(' ', '')[1:-1]
-                    score = float(vals[1].replace(' ', ''))
-                    attributes_dict[attr] = score
+                attributes_dict = eval(saliency_df.iloc[[i]]['explanation'].values[0])
                 if saliency == 'certa':
                     sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1),
                                                     reverse=True)
@@ -181,12 +169,12 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
                     else:
                         test_set_df_c.at[i, t[0]] = ''
             evaluation = model.evaluation(test_set_df_c)
-            eval = evaluation[2]
+            c_eval = evaluation[2]
             try:
-                eval = eval.view(-1).cpu()
+                c_eval = c_eval.view(-1).cpu()
             except:
                 pass
-            model_scores.append(eval)
+            model_scores.append(c_eval)
         auc_sal = auc(thresholds, model_scores)
         aucs[saliency] = auc_sal
     return aucs
