@@ -361,11 +361,13 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
                         subst_dict[affected_attribute]) > 0:
                     replacement_token = subst_dict[affected_attribute].pop(0)
                     new_record_value = ''
+                    replaced = False # replace only once
                     for token in str(newRecord[affected_attribute]).split(" "):
                         if len(new_record_value) > 0:
                             new_record_value += ' '
-                        if token == affected_token:
+                        if token == affected_token and not replaced:
                             token = replacement_token
+                            replaced = True
                         new_record_value += token
                     newRecord[affected_attribute] = new_record_value
                     dv.append(affected_token)
