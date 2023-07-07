@@ -2,6 +2,7 @@ import logging
 import os
 import pandas as pd
 
+from certa.models.LLMERModel import LLMERModel
 from certa.utils import merge_sources
 from certa.models.DeepER import DeepERModel
 from certa.models.bert import EMTERModel
@@ -17,6 +18,8 @@ def from_type(type: str):
         model = DeepERModel()
     elif "ditto" == type:
         model = EMTERModel()
+    elif "llm" == type:
+        model = LLMERModel()
     return model
 
 
