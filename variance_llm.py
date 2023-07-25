@@ -6,12 +6,12 @@ from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 
 os.environ['HUGGINGFACEHUB_API_TOKEN'] = ''
-os.environ['OPENAI_API_KEY'] = 'sk-'
+os.environ['OPENAI_API_KEY'] = ''
 
 lprefix = 'ltable_'
 rprefix = 'rtable_'
 perturbed_copies = True
-temperature = 0.99
+temperature = 0.5
 max_length = 512
 model_type = 'hf'
 hf_model = 'tiiuae/falcon-7b-instruct'  # other models: 'huggyllama/llama-7b', ...
@@ -73,9 +73,10 @@ for idx in range(len(test[:5])):
         r2 = er[1]
         question = prompt.format(ltuple=r1, rtuple=r2)
         print(f'{question}')
-        answer = llm(question)
-        print(f'{answer}\n')
-        results.append((r1, r2, answer))
+        for _ in range(5):
+            answer = llm(question)
+            print(f'{answer}\n')
+            results.append((r1, r2, answer))
 
 results_df = pd.DataFrame(columns=['left', 'right', 'answer'], data=results)
 results_df.to_csv('results.csv')

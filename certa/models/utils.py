@@ -20,6 +20,20 @@ def from_type(type: str):
         model = EMTERModel()
     elif "llm" == type:
         model = LLMERModel()
+    elif "chatgpt" == type:
+        model = LLMERModel(model_type='openai')
+    elif "falcon" == type:
+        model = LLMERModel(model_type='hf', hf_repo='tiiuae/falcon-7b-instruct')
+    elif "gpt-neox" == type:
+        model = LLMERModel(model_type='hf', hf_repo='EleutherAI/gpt-neox-20b')
+    elif "open-assistant" == type:
+        model = LLMERModel(model_type='hf', hf_repo='OpenAssistant/oasst-sft-1-pythia-12b')
+    elif "bllom" == type:
+        model = LLMERModel(model_type='hf', hf_repo='bigscience/bloom')
+    elif "openllama" == type:
+        model = LLMERModel(model_type='hf', hf_repo='openlm-research/open_llama_7b_v2')
+    elif "llama2" == type:
+        model = LLMERModel(model_type='hf', hf_repo='meta-llama/Llama-2-13b-hf')
     return model
 
 
