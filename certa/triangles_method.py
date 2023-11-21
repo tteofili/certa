@@ -613,7 +613,8 @@ def process_triangle(triangle: tuple, attributes: list, class_to_explain: int, p
 def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, lprefix, rprefix,
                     class_to_explain: int, attr_length: int, summarizer, check: bool = False,
                     discard_bad: bool = False, return_top: bool = False, persist_predictions: bool = False,
-                    token: bool = False, two_step_token: bool = False, use_nec: bool = True):
+                    token: bool = False, two_step_token: bool = False, use_nec: bool = True,
+                    filter_features: list = None):
     _renameColumnsWithPrefix(lprefix, sources[0])
     _renameColumnsWithPrefix(rprefix, sources[1])
 
@@ -623,6 +624,8 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
     if two_step_token:
         attributes = [col for col in list(sources[0]) if col not in [lprefix + 'id']]
         attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
+        if filter_features is not None:
+            attributes = list(set(attributes).intersection(set(filter_features)))
 
         if len(allTriangles) > 0:
             attribute_ps, _, attribute_pn = attribute_level_expl(allTriangles, attr_length, attributes,
@@ -684,6 +687,8 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
                 tokens = str(record[column].values[0]).split(' ')
                 for t in tokens:
                     attributes.append(column + '__' + t)
+        if filter_features is not None:
+            attributes = list(set(attributes).intersection(set(filter_features)))
         attr_length = len(attributes)
 
         if len(allTriangles) > 0:
@@ -697,6 +702,8 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
     else:
         attributes = [col for col in list(sources[0]) if col not in [lprefix + 'id']]
         attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
+        if filter_features is not None:
+            attributes = list(set(attributes).intersection(set(filter_features)))
 
         if len(allTriangles) > 0:
             explanation, flipped_predictions, saliency = attribute_level_expl(allTriangles, attr_length, attributes,

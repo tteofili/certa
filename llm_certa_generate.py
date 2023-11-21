@@ -7,7 +7,7 @@ from certa.utils import merge_sources
 from certa.models.utils import from_type
 
 dataset = 'beers'
-model_type = 'chatgpt'
+model_type = 'azure_openai'
 model = from_type(model_type)
 n_samples = 5
 
@@ -17,7 +17,7 @@ do_token = True
 def predict_fn(x):
     return model.predict(x)
 
-datadir = '/home/tteofili/dev/cheapER/datasets/' + dataset
+datadir = '/Users/tteofili/dev/cheapER/datasets/' + dataset
 lsource = pd.read_csv(datadir + '/tableA.csv')
 rsource = pd.read_csv(datadir + '/tableB.csv')
 gt = pd.read_csv(datadir + '/train.csv')

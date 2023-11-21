@@ -22,6 +22,7 @@ setuptools.setup(
           'transformers',
           'torch',
           'tensorflow',
+          'nltk'
       ],
     classifiers=[
         "Programming Language :: Python :: 3",
