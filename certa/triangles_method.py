@@ -99,9 +99,7 @@ def __get_records(sourcesMap, triangleIds, lprefix, rprefix):
     return triangle
 
 
-def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, max_len_attribute_sets, class_to_explain,
-                                    lprefix,
-                                    rprefix):
+def createPerturbationsFromTriangle(triangleIds, sourcesMap, attributes, max_len_attribute_sets, lprefix, rprefix):
     # generate power set of attributes
     all_attributes_subsets = list(_powerset(attributes, max_len_attribute_sets, max_len_attribute_sets))
     triangle = __get_records(sourcesMap, triangleIds, lprefix, rprefix)  # get triangle values
@@ -626,6 +624,7 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
         attributes += [col for col in list(sources[1]) if col not in [rprefix + 'id']]
         if filter_features is not None:
             attributes = list(set(attributes).intersection(set(filter_features)))
+            attr_length = len(attributes)
 
         if len(allTriangles) > 0:
             attribute_ps, _, attribute_pn = attribute_level_expl(allTriangles, attr_length, attributes,
@@ -826,7 +825,7 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                     if check and discard_bad and not transitivity:
                         continue
                     currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, a,
-                                                                           class_to_explain, lprefix, rprefix)
+                                                                           lprefix, rprefix)
                     currentPerturbations['triangle'] = ' '.join(triangle)
                     perturbations.append(currentPerturbations)
                 except:
@@ -891,9 +890,8 @@ def perturb_predict(allTriangles, attributes, check, class_to_explain, discard_b
                     allTriangles[t_i] = allTriangles[t_i] + (identity, symmetry, transitivity,)
                 if check and discard_bad and not transitivity:
                     continue
-                currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes,
-                                                                       attr_length,
-                                                                       class_to_explain, lprefix, rprefix)
+                currentPerturbations = createPerturbationsFromTriangle(triangle, sourcesMap, attributes, attr_length,
+                                                                       lprefix, rprefix)
                 perturbations.append(currentPerturbations)
             except:
                 allTriangles[t_i] = allTriangles[t_i] + (False, False, False,)
