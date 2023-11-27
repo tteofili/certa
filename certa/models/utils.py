@@ -6,14 +6,14 @@ from certa.models.LLMERModel import LLMERModel
 from certa.utils import merge_sources
 from certa.models.DeepER import DeepERModel
 from certa.models.bert import EMTERModel
-from certa.models.dm import DMERModel
+#from certa.models.dm import DMERModel
 from certa.models.ermodel import ERModel
 
 
 def from_type(type: str):
     model = ERModel()
     if "dm" == type:
-        model = DMERModel()
+        pass#model = DMERModel()
     elif "deeper" == type:
         model = DeepERModel()
     elif "ditto" == type:
@@ -28,7 +28,7 @@ def from_type(type: str):
         model = LLMERModel(model_type='hf', hf_repo='EleutherAI/gpt-neox-20b')
     elif "open-assistant" == type:
         model = LLMERModel(model_type='hf', hf_repo='OpenAssistant/oasst-sft-1-pythia-12b')
-    elif "bllom" == type:
+    elif "bloom" == type:
         model = LLMERModel(model_type='hf', hf_repo='bigscience/bloom')
     elif "openllama" == type:
         model = LLMERModel(model_type='hf', hf_repo='openlm-research/open_llama_7b_v2')

@@ -22,7 +22,12 @@ setuptools.setup(
           'transformers',
           'torch',
           'tensorflow',
-          'nltk'
+          'nltk',
+          'tensorboardX',
+          'gensim',
+          'spacy',
+          'jsonlines',
+          'deepmatcher'
       ],
     classifiers=[
         "Programming Language :: Python :: 3",

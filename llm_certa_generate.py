@@ -7,7 +7,7 @@ from certa.utils import merge_sources
 from certa.models.utils import from_type
 
 dataset = 'beers'
-model_type = 'azure_openai'
+model_type = 'chatgpt'
 model = from_type(model_type)
 n_samples = 5
 
