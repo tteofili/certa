@@ -2,21 +2,38 @@ import logging
 import os
 import pandas as pd
 
+from certa.models.LLMERModel import LLMERModel
 from certa.utils import merge_sources
 from certa.models.DeepER import DeepERModel
 from certa.models.bert import EMTERModel
-from certa.models.dm import DMERModel
+#from certa.models.dm import DMERModel
 from certa.models.ermodel import ERModel
 
 
 def from_type(type: str):
     model = ERModel()
     if "dm" == type:
-        model = DMERModel()
+        pass#model = DMERModel()
     elif "deeper" == type:
         model = DeepERModel()
     elif "ditto" == type:
         model = EMTERModel()
+    elif "llm" == type:
+        model = LLMERModel()
+    elif "chatgpt" == type:
+        model = LLMERModel(model_type='openai')
+    elif "falcon" == type:
+        model = LLMERModel(model_type='hf', hf_repo='tiiuae/falcon-7b-instruct')
+    elif "gpt-neox" == type:
+        model = LLMERModel(model_type='hf', hf_repo='EleutherAI/gpt-neox-20b')
+    elif "open-assistant" == type:
+        model = LLMERModel(model_type='hf', hf_repo='OpenAssistant/oasst-sft-1-pythia-12b')
+    elif "bloom" == type:
+        model = LLMERModel(model_type='hf', hf_repo='bigscience/bloom')
+    elif "openllama" == type:
+        model = LLMERModel(model_type='hf', hf_repo='openlm-research/open_llama_7b_v2')
+    elif "llama2" == type:
+        model = LLMERModel(model_type='hf', hf_repo='meta-llama/Llama-2-13b-hf')
     return model
 
 

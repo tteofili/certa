@@ -5,14 +5,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="CERTA",
-    version="0.0.2",
+    version="0.0.3",
     author="Tommaso Teofili",
     author_email="tommaso.teofili@gmail.com",
     description="Computing ER explanations with TriAngles",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url= 'https://github.com/tteofili/certa.git',
-    packages=['certa'],
+    packages=['certa', 'certa.models', 'certa.models.emt', 'certa.models.ditto', 'certa.metrics', 'baselines'],
     install_requires=[
           'pandas',
           'numpy',
@@ -22,6 +22,12 @@ setuptools.setup(
           'transformers',
           'torch',
           'tensorflow',
+          'nltk',
+          'tensorboardX',
+          'gensim',
+          'spacy',
+          'jsonlines',
+          'deepmatcher'
       ],
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -2,10 +2,10 @@ import logging
 import math
 import re
 from collections import Counter
-
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
-
+from joblib import Parallel, delayed
 from certa.utils import diff, get_row
 
 
@@ -44,16 +44,17 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
     r1r2['id'] = "0@" + str(r1r2[lprefix + 'id'].values[0]) + "#" + "1@" + str(r1r2[rprefix + 'id'].values[0])
 
     find_positives, support = get_support(class_to_explain, lsource, max_predict,
-                                         original_prediction, predict_fn, r1, r2, rsource,
-                                         use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
+                                          original_prediction, predict_fn, r1, r2, rsource,
+                                          use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
+
     copies_left = pd.DataFrame()
     copies_right = pd.DataFrame()
     if len(support) < num_triangles:
         try:
             copies, copies_left, copies_right = expand_copies(lprefix, lsource, r1, r2, rprefix, rsource)
             find_positives2, support2 = get_support(class_to_explain, copies_right, max_predict,
-                                              original_prediction, predict_fn, r1, r2, copies_left,
-                                              use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
+                                                    original_prediction, predict_fn, r1, r2, copies_left,
+                                                    use_w, use_q, lprefix, rprefix, num_triangles, use_all=use_all)
             if len(support2) > 0:
                 support = pd.concat([support, support2])
         except:
@@ -61,12 +62,12 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
     if len(support) > 0:
         if len(support) > num_triangles:
-            support = pd.concat([support[:int(num_triangles/2)], support[-int(num_triangles/2):]], axis=0)
+            support = pd.concat([support[:int(num_triangles / 2)], support[-int(num_triangles / 2):]], axis=0)
         else:
             logging.warning(f'could find {str(len(support))} triangles of the {str(num_triangles)} requested')
 
         support['label'] = list(map(lambda predictions: int(round(predictions)),
-                                         support.match_score.values))
+                                    support.match_score.values))
         support = support.drop(['match_score', 'nomatch_score'], axis=1)
         if class_to_explain == None:
             r1r2['label'] = np.argmax(original_prediction)
@@ -80,7 +81,8 @@ def support_predictions(r1: pd.Series, r2: pd.Series, lsource: pd.DataFrame,
 
 
 def find_candidates_predict(record, source, find_positives, predict_fn, num_candidates, lj=True, scored: bool = True,
-                            max_predict=-1, lprefix='ltable_', rprefix='rtable_', batched: bool = True):
+                            max_predict=-1, lprefix='ltable_', rprefix='rtable_', batched: bool = True,
+                            num_threads: int = -1):
     if lj:
         prefix = rprefix
         records = pd.DataFrame()
@@ -105,27 +107,27 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
 
     record_text = record_to_text(record)
     if scored:
-        samples['score'] = samples.filter(regex='^'+prefix).T.apply(lambda row: cs(record_text, record_to_text(row)))
+        samples['score'] = samples.filter(regex='^' + prefix).T.apply(lambda row: cs(record_text, record_to_text(row)))
         samples = samples.sort_values(by='score', ascending=not find_positives)
         samples = samples.drop(['score'], axis=1)
     result = pd.DataFrame()
-    batch = num_candidates * 4
-    splits = min(20, int(len(samples) / batch))
-    i = 0
     if batched:
-        while len(result) < num_candidates and i < splits:
+        batch = num_candidates * 4
+        splits = min(20, int(len(samples) / batch))
+        i = 0
+        batch_samples = []
+        while i < splits:
             start = batch * i
             end = batch * (i + 1)
-            batch_samples = samples[start:end]
-            predicted = predict_fn(batch_samples)
-            if find_positives:
-                out = predicted[predicted["match_score"] > 0.5]
-            else:
-                out = predicted[predicted["match_score"] < 0.5]
-            if len(out) > 0:
-                result = pd.concat([result, out], axis=0)
-            logging.info(f'{i}:{len(out)},{len(result)}')
+            batch_sample = samples[start:end]
+            batch_samples.append(batch_sample)
             i += 1
+
+        s_zipped = zip(Parallel(n_jobs=num_threads, prefer='threads')(
+            delayed(find_counter_predict)(bs, find_positives, predict_fn)
+            for bs in tqdm(batch_samples, disable=False)))
+        s_list = [x[0] for x in s_zipped]
+        result = pd.concat(s_list, axis=0)
     else:
         predicted = predict_fn(samples)
         if find_positives:
@@ -137,7 +139,16 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
     return result
 
 
-def record_to_text(record, ignored_columns = ['id', 'ltable_id', 'rtable_id', 'label']):
+def find_counter_predict(batch_sample, find_positives, predict_fn):
+    predicted = predict_fn(batch_sample)
+    if find_positives:
+        out = predicted[predicted["match_score"] > 0.5]
+    else:
+        out = predicted[predicted["match_score"] < 0.5]
+    return out
+
+
+def record_to_text(record, ignored_columns=['id', 'ltable_id', 'rtable_id', 'label']):
     return " ".join([str(val) for k, val in record.to_dict().items() if k not in [ignored_columns]])
 
 
@@ -169,10 +180,12 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
     else:
         findPositives = bool(0 == int(class_to_explain))
     if use_q:
-        candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates, batched=not use_all,
+        candidates4r1 = find_candidates_predict(r1, rsource, findPositives, predict_fn, num_candidates,
+                                                batched=not use_all,
                                                 lj=True, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
     if use_w:
-        candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates, batched=not use_all,
+        candidates4r2 = find_candidates_predict(r2, lsource, findPositives, predict_fn, num_candidates,
+                                                batched=not use_all,
                                                 lj=False, max_predict=max_predict, lprefix=lprefix, rprefix=rprefix)
 
     max_len = min(len(candidates4r1), len(candidates4r2))
