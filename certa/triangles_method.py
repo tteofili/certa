@@ -856,14 +856,14 @@ def lattice_stratified_attribute(all_triangles, class_to_explain, sources_map, a
 def perturb_predict(all_triangles, attributes, check, class_to_explain, discard_bad, attr_length, predict_fn,
                     sources_map, lprefix, rprefix, method="parallel", num_threads=-1):
     if method == "parallel":
-        flipped_predictions_df, rankings, all_predictions = zip(*Parallel(n_jobs=num_threads, prefer='threads')(
-            delayed(lattice_stratified_attribute)(all_triangles, class_to_explain, sources_map, attributes,
-                                                  no_combinations, lprefix, rprefix, attr_length, predict_fn)
-            for no_combinations in tqdm(range(attr_length))))
+        flipped_predictions_df, rankings, all_predictions = zip(
+            *Parallel(n_jobs=num_threads, prefer='threads')(
+                delayed(lattice_stratified_attribute)(all_triangles, class_to_explain, sources_map, attributes,
+                                                      no_combinations, lprefix, rprefix, attr_length, predict_fn)
+                for no_combinations in tqdm(range(attr_length))))
 
         all_predictions = pd.concat(list(all_predictions))
         flipped_predictions_df = pd.concat(list(flipped_predictions_df))
-        #rankings = dict((key,d[key]) for d in rankings for key in d)
         rankings = list(rankings)
         return flipped_predictions_df, rankings, all_predictions
     elif method == "monotonicity":
@@ -949,8 +949,8 @@ def perturb_predict(all_triangles, attributes, check, class_to_explain, discard_
                     all_triangles[t_i] = all_triangles[t_i] + (identity, symmetry, transitivity,)
                 if check and discard_bad and not transitivity:
                     continue
-                current_perturbations = create_perturbations_from_triangle(triangle, sources_map, attributes, attr_length,
-                                                                           lprefix, rprefix)
+                current_perturbations = create_perturbations_from_triangle(triangle, sources_map, attributes,
+                                                                           attr_length, lprefix, rprefix)
                 perturbations.append(current_perturbations)
             except:
                 all_triangles[t_i] = all_triangles[t_i] + (False, False, False,)

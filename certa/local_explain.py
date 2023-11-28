@@ -140,7 +140,12 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
 
 
 def find_counter_predict(batch_sample, find_positives, predict_fn):
-    predicted = predict_fn(batch_sample)
+    try:
+        predicted = predict_fn(batch_sample)
+    except:
+        predicted = batch_sample.copy()
+        predicted['match_score'] = 0.5
+        predicted['nomatch_score'] = 0.5
     if find_positives:
         out = predicted[predicted["match_score"] > 0.5]
     else:
