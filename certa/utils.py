@@ -28,7 +28,8 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                 r_tuple = r_tuple.drop([ic])
         new_row = get_row(l_tuple, r_tuple, lprefix=left_prefix, rprefix=right_prefix)
         new_row['label'] = row['label']
-        dataset = dataset.append(new_row, ignore_index=True)
+        dataset = pd.concat([dataset, new_row], ignore_index=True)
+
 
     if robust:
             # symmetry
@@ -40,7 +41,8 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                         if column not in ignore_column:
                             sym_new_row[prefix + column] = source.loc[id][column]
 
-                dataset = dataset.append(sym_new_row, ignore_index=True)
+                dataset = pd.concat([dataset, pd.DataFrame([sym_new_row])], ignore_index=True)
+
             except:
                 pass
 
@@ -54,7 +56,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                             lcopy_row[prefix + column] = source.loc[id][column]
 
                 lcopy_row['label'] = 1
-                dataset = dataset.append(lcopy_row, ignore_index=True)
+                dataset = pd.concat([dataset, pd.DataFrame([lcopy_row])], ignore_index=True)
             except:
                 pass
 
@@ -67,7 +69,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                             rcopy_row[prefix + column] = source.loc[id][column]
 
                 rcopy_row['label'] = 1
-                dataset = dataset.append(rcopy_row, ignore_index=True)
+                dataset = pd.concat([dataset, pd.DataFrame([rcopy_row])], ignore_index=True)
             except:
                 pass
     return dataset

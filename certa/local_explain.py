@@ -85,8 +85,7 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
                             num_threads: int = -1):
     if lj:
         prefix = rprefix
-        records = pd.DataFrame()
-        records = records.append([record] * len(source), ignore_index=True)
+        records = pd.DataFrame([record] * len(source))
         copy = source.copy()
         records.columns = list(map(lambda col: lprefix + col, records.columns))
         copy.columns = list(map(lambda col: rprefix + col, copy.columns))
@@ -95,8 +94,7 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
     else:
         prefix = lprefix
         copy = source.copy()
-        records = pd.DataFrame()
-        records = records.append([record] * len(source), ignore_index=True)
+        records = pd.DataFrame([record] * len(source))
         records.index = copy.index
         copy.columns = list(map(lambda col: lprefix + col, copy.columns))
         records.columns = list(map(lambda col: rprefix + col, records.columns))
@@ -304,7 +302,9 @@ def expand_copies(lprefix, lsource, r1, r2, rprefix, rsource):
                     new_copy['attr_name'] = r1r2c.columns[t]
                     new_copy['attr_pos'] = t
 
-                    r1r2c = r1r2c.append(new_copy, ignore_index=True)
+                    #r1r2c = r1r2c.append(new_copy, ignore_index=True)
+                    r1r2c = pd.concat([r1r2c, pd.DataFrame([new_copy])], ignore_index=True)
+
         if left:
             r1r2c['id'] = "0@" + r1r2c[lprefix + 'id'].astype(str) + "#" + "1@" + r1r2c[
                 rprefix + 'id'].astype(str)
