@@ -334,6 +334,8 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
             dv, cv, affected_attributes = [], [], []
             subst_dict = {}
             for e in subst:
+                if tuple == type(e):
+                    e = str(e[0])
                 att, tok = e.split('__')
                 if att in subst_dict:
                     subst_dict[att].append(tok)
@@ -365,7 +367,7 @@ def fast_token_perturbations_from_triangle(triangle_ids, sources_map, attributes
 
     r2 = triangle[1].copy()
     r2_df = pd.DataFrame([r2] * len(perturbations_df))
-    all_perturbations = pd.concat([perturbations_df, r2_df], axis=1)
+    all_perturbations = pd.concat([perturbations_df.reset_index(drop=True), r2_df.reset_index(drop=True)], axis=1)
     all_perturbations = all_perturbations.drop([f"{lprefix}id", f"{rprefix}id"], axis=1)
     all_perturbations['alteredAttributes'] = perturbed_attributes
     all_perturbations['droppedValues'] = droppedValues
@@ -525,23 +527,28 @@ def perturb_predict_token(pair: pd.DataFrame, all_triangles: list, tokenlevel_at
             ca for ca in tokenlevel_attributes if ca.split('__')[1].lower() in transformed_row_text
         ]
 
-    token_combinations = len(transformed_row_text.split(' ')) if tf_idf_filter else len(row_text.split(' '))
+    token_combinations = min(len(tokenlevel_attributes), len(transformed_row_text.split(' ')) if tf_idf_filter else len(row_text.split(' ')))
 
     all_predictions = pd.DataFrame()
     rankings = []
     flipped_predictions = []
     all_good = False
+    flipped = False
 
-    for a in range(1, token_combinations + 1):
-        if early_stop and a > 3 and flipped_predictions:
+    for a in range(1, token_combinations):
+        if early_stop and a > 3 and flipped:
+            print(f'{len(flipped_predictions)} flipped predictions found!')
             break
         print(f'depth-{a}')
         if all_good:
             break
 
         pert_df, pred_df, cfp_df, all_good, ranking = lattice_stratified_process(
-            a, all_triangles, tokenlevel_attributes, class_to_explain, predict_fn, sources_map, lprefix, rprefix, num_threads=num_threads
+            a, all_triangles, tokenlevel_attributes, class_to_explain, predict_fn, sources_map, lprefix, rprefix,
+            num_threads=num_threads
         )
+        if len(cfp_df) > 0:
+            flipped = True
 
         flipped_predictions.append(cfp_df)
         all_predictions = pd.concat([pred_df, all_predictions], ignore_index=True)
@@ -714,39 +721,43 @@ def explain_samples(dataset: pd.DataFrame, sources: list, predict_fn: callable, 
 
 
 def token_level_expl(pair, allTriangles, attr_length, attributes, class_to_explain, lprefix, persist_predictions,
-                     predict_fn,
-                     return_top, rprefix, sourcesMap, summarizer):
+                     predict_fn, return_top, rprefix, sourcesMap, summarizer):
     flipped_predictions, rankings, all_predictions = perturb_predict_token(pair, allTriangles, attributes,
                                                                            class_to_explain, predict_fn, sourcesMap,
                                                                            lprefix, rprefix, summarizer)
     if persist_predictions:
-        all_predictions.to_csv('predictions.csv')
+        all_predictions.to_csv(f'predictions-{attr_length}.csv')
     explanation = aggregate_rankings(rankings, len_triangles=1, attr_length=attr_length)
-    all_predictions['alteredAttributes'] = all_predictions['alteredAttributes'].astype(str).apply(
-        lambda x: x.replace("'", '').replace('(', '').replace(',)', '').replace(', ', '/').replace(')', ''))
-    perturb_count = all_predictions.groupby('alteredAttributes').size()
-    for att in explanation.index:
-        if att in perturb_count:
-            explanation[att] = explanation[att] / perturb_count[att]
-        else:
-            print(f'{att} not found in {perturb_count}')
+    if 'alteredAttributes' in all_predictions.columns:
+        all_predictions['alteredAttributes'] = all_predictions['alteredAttributes'].astype(str).apply(
+            lambda x: x.replace("'", '').replace('(', '').replace(',)', '').replace(', ', '/').replace(')', ''))
+    else:
+        print('No alteredAttributes')
+        print(all_predictions)
     flips = len(flipped_predictions)
-    saliency = dict()
-    for ranking in rankings:
-        for k, v in ranking.items():
-            for a in k:
-                if a not in attributes:
-                    saliency[a] = 0
-                    continue
-                if a not in saliency:
-                    saliency[a] = 0
-                if flips > 0:
-                    saliency[a] += v / flips
-    if len(explanation) > 0:
-        if len(flipped_predictions) > 0:
-            flipped_predictions['attr_count'] = flipped_predictions.alteredAttributes.astype(str) \
+    if flips > 0:
+        perturb_count = all_predictions.groupby('alteredAttributes').size()
+        for att in explanation.index:
+            if att in perturb_count:
+                explanation[att] = explanation[att] / perturb_count[att]
+            else:
+                print(f'{att} not found in {perturb_count}')
+                print(flipped_predictions)
+        saliency = dict()
+        for ranking in rankings:
+            for k, v in ranking.items():
+                for a in k:
+                    if a not in attributes:
+                        saliency[a] = 0
+                        continue
+                    if a not in saliency:
+                        saliency[a] = 0
+                    if flips > 0:
+                        saliency[a] += v / flips
+
+        flipped_predictions['attr_count'] = flipped_predictions.alteredAttributes.astype(str) \
                 .str.split(',').str.len()
-            flipped_predictions = flipped_predictions.sort_values(by=['attr_count'])
+        flipped_predictions = flipped_predictions.sort_values(by=['attr_count'])
         if return_top:
             series = cf_summary(explanation)
             filtered_exp = series

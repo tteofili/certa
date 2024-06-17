@@ -102,7 +102,7 @@ def generate_all(compare, dataset, exp_dir, lsource, model, model_name, predict_
                 num_triangles = 10
                 while certa_saliency is None:
                     try:
-                        saliency_df, cf_summary, cf_ex, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
+                        saliency_df, cf_summary, cf_ex, triangles, lattices, _ = certa_explainer.explain(l_tuple, r_tuple, predict_fn,
                                                                                               debug=True, num_triangles=num_triangles)
 
 

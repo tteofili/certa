@@ -40,7 +40,7 @@ for idx in range(n_samples):
     r_id = int(rand_row['rtable_id'])
     r_tuple = rsource.iloc[r_id]
     if do_attr:
-        attr_saliency_df, attr_cf_summary, attr_counterfactual_examples, attr_triangles, attr_lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn, token=False, num_triangles=10)
+        attr_saliency_df, attr_cf_summary, attr_counterfactual_examples, attr_triangles, attr_lattices, _ = certa_explainer.explain(l_tuple, r_tuple, predict_fn, token=False, num_triangles=10)
         attr_saliencies.append(attr_saliency_df)
         attr_cfs.append(attr_counterfactual_examples)
         attr_triangles_count += len(attr_triangles)
@@ -48,7 +48,7 @@ for idx in range(n_samples):
         pd.concat(attr_saliencies).to_csv('certa_attr_saliencies.csv')
         pd.concat(attr_cfs).to_csv('certa_attr_cfs.csv')
     if do_token:
-        token_saliency_df, token_cf_summary, token_counterfactual_examples, token_triangles, token_lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn, token=True, num_triangles=5)
+        token_saliency_df, token_cf_summary, token_counterfactual_examples, token_triangles, token_lattices, _ = certa_explainer.explain(l_tuple, r_tuple, predict_fn, token=True, num_triangles=5)
         token_saliencies.append(token_saliency_df)
         token_cfs.append(token_counterfactual_examples)
         token_triangles_count += len(token_triangles)

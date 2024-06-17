@@ -111,21 +111,26 @@ def find_candidates_predict(record, source, find_positives, predict_fn, num_cand
     result = pd.DataFrame()
     if batched:
         batch = num_candidates * 4
-        splits = min(20, int(len(samples) / batch))
+        default_splits = 20
+        max_splits = int(len(samples) / batch)
+        max_iters = min(max_splits, 50)
         i = 0
-        batch_samples = []
-        while i < splits:
-            start = batch * i
-            end = batch * (i + 1)
-            batch_sample = samples[start:end]
-            batch_samples.append(batch_sample)
-            i += 1
+        while len(result) < num_candidates and i < max_iters:
+            batch_samples = []
+            while i < max_splits:
+                start = batch * i
+                end = batch * (i + 1)
+                batch_sample = samples[start:end]
+                batch_samples.append(batch_sample)
+                i += 1
+                if i % default_splits == 0:
+                    break
 
-        s_zipped = zip(Parallel(n_jobs=num_threads, prefer='threads')(
-            delayed(find_counter_predict)(bs, find_positives, predict_fn)
-            for bs in tqdm(batch_samples, disable=False)))
-        s_list = [x[0] for x in s_zipped]
-        result = pd.concat(s_list, axis=0)
+            s_zipped = zip(Parallel(n_jobs=num_threads, prefer='threads')(
+                delayed(find_counter_predict)(bs, find_positives, predict_fn)
+                for bs in tqdm(batch_samples, disable=False)))
+            s_list = [x[0] for x in s_zipped]
+            result = pd.concat(s_list, axis=0)
     else:
         predicted = predict_fn(samples)
         if find_positives:
@@ -177,7 +182,7 @@ def get_support(class_to_explain, lsource, max_predict, original_prediction, pre
                 rsource, use_w, use_q, lprefix, rprefix, num_triangles, use_all: bool = False):
     candidates4r1 = pd.DataFrame()
     candidates4r2 = pd.DataFrame()
-    num_candidates = int(num_triangles / 2)
+    num_candidates = num_triangles
     if class_to_explain == None:
         findPositives = bool(original_prediction[0] > original_prediction[1])
     else:
