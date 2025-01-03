@@ -833,6 +833,10 @@ def lattice_stratified_attribute(all_triangles, class_to_explain, sources_map, a
     if len(perturbations_df) > 0 and 'alteredAttributes' in perturbations_df.columns:
         curr_perturbed_attr = perturbations_df.alteredAttributes.values
         if no_combinations != attr_length:
+            for c in ['ltable_id', 'rtable_id']:
+                if c in perturbations_df.columns:
+                    perturbations_df = perturbations_df.drop([c], axis=1)
+
             predictions = predict_fn(
                 perturbations_df.drop(['alteredAttributes', 'droppedValues', 'copiedValues', 'triangle'], axis=1))
             predictions = pd.concat(
