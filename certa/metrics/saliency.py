@@ -1,4 +1,3 @@
-import json
 import operator
 import os
 
@@ -22,7 +21,8 @@ def get_confidence(saliency_names: list, base_dir: str):
         test_scores = []
 
         saliency_df = pd.read_csv(os.path.join(base_dir, saliency + '.csv'))
-
+        if len(saliency_df) == 0:
+            continue
         predictions = saliency_df['prediction']
         class_preds = predictions.apply(lambda x: np.argmax(x))
         logits = predictions.copy()
@@ -38,8 +38,7 @@ def get_confidence(saliency_names: list, base_dir: str):
             instance_tokens = []
             for _cls in classes:
                 cls_sals = []
-                explanation = instance_saliency['explanation']
-                attributes_dict = json.loads(explanation.replace("'", "\""))
+                attributes_dict = eval(saliency_df.iloc[[i]]['explanation'].values[0])
                 for _token, sal in attributes_dict.items():
                     if _cls == 0:
                         instance_tokens.append(_token)
@@ -155,8 +154,7 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
             for i in range(len(saliency_df)):
                 if int(preds[i]) == 0:
                     reverse = False
-                explanation = saliency_df.iloc[i]['explanation']
-                attributes_dict = json.loads(explanation.replace("'", "\""))
+                attributes_dict = eval(saliency_df.iloc[[i]]['explanation'].values[0])
                 if saliency == 'certa':
                     sorted_attributes_dict = sorted(attributes_dict.items(), key=operator.itemgetter(1),
                                                     reverse=True)
@@ -165,9 +163,18 @@ def get_faithfulness(saliency_names: list, model: ERModel, base_dir: str, test_s
                                                     reverse=reverse)
                 top_k_attributes = sorted_attributes_dict[:top_k]
                 for t in top_k_attributes:
-                    test_set_df_c.at[i, t[0]] = ''
+                    split = t[0].split('__')
+                    if len(split) == 2:
+                        test_set_df_c.at[i, split[0]] = test_set_df_c.iloc[i][split[0]].replace(split[1], '')
+                    else:
+                        test_set_df_c.at[i, t[0]] = ''
             evaluation = model.evaluation(test_set_df_c)
-            model_scores.append(evaluation[2])
+            c_eval = evaluation[2]
+            try:
+                c_eval = c_eval.view(-1).cpu()
+            except:
+                pass
+            model_scores.append(c_eval)
         auc_sal = auc(thresholds, model_scores)
         aucs[saliency] = auc_sal
     return aucs

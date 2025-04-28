@@ -11,6 +11,7 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.metrics import SensitivityAtSpecificity, AUC
 import gensim.downloader as api
 
 
@@ -109,10 +110,10 @@ def init_DeepER_model(embedding_dim):
     # Creazione modello
     deeper_model = Model(inputs=[emb_a, emb_b], outputs=[output])
 
-    optimizer = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999,  epsilon=1e-07, amsgrad=False)
+    optimizer = Adam()
 
     # Compilazione per addestramento
-    deeper_model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy', 'mse'])
+    deeper_model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=[AUC(), 'mse'])
     deeper_model.summary()
 
     return deeper_model
@@ -130,8 +131,8 @@ def data2Inputs(data, tokenizer, categorical=True):
     for t1, t2, label in data:
         # Sperimentale: ordino gli attributi per lunghezza decrescente
         # Attributi con molti tokens conengono più informazioni utili 
-        table1.append(' '.join(t1).replace(', ', ' '))
-        table2.append(' '.join(t2).replace(', ', ' '))
+        table1.append(''.join(t1).replace(', ', ' '))
+        table2.append(''.join(t2).replace(', ', ' '))
         labels.append(label)
     table1 = tokenizer.texts_to_sequences(table1)
     table1 = pad_sequences(table1, padding='post')
@@ -155,12 +156,18 @@ def data2InputsUnlabel(data, tokenizer):
     for t1, t2 in data:
         # Sperimentale: ordino gli attributi per lunghezza decrescente
         # Attributi con molti tokens conengono più informazioni utili
-        table1.append(' '.join(str(t1)).replace(', ', ' '))
-        table2.append(' '.join(str(t2)).replace(', ', ' '))
+        table1.append(''.join(str(t1)).replace(', ', ' '))
+        table2.append(''.join(str(t2)).replace(', ', ' '))
     table1 = tokenizer.texts_to_sequences(table1)
-    table1 = pad_sequences(table1, padding='post')
+    try:
+        table1 = pad_sequences(table1)
+    except:
+        pass
     table2 = tokenizer.texts_to_sequences(table2)
-    table2 = pad_sequences(table2, padding='post')
+    try:
+        table2 = pad_sequences(table2)
+    except:
+        pass
 
     return table1, table2
 
@@ -177,7 +184,7 @@ def replace_last_layer(model, new_layer):
 
 # InPut: Una lista di triple [(tup1, tup2, label), ...], il modello da addestrare...
 # Output: Il modello addestrato
-def train_model_ER(data, valid, model, embeddings_model, tokenizer, pretraining=False, metric='val_mse', end='',
+def train_model_ER(data, valid, model, embeddings_model, tokenizer, pretraining=False, metric='val_loss', end='',
                    save_path=None):
     if pretraining:
         model_name = 'VinSim'
@@ -199,7 +206,7 @@ def train_model_ER(data, valid, model, embeddings_model, tokenizer, pretraining=
                          save_best_only=True)
 
     # Addestramento modello
-    param_batch_size = 16
+    param_batch_size = 32
     print('Batch size:', param_batch_size)
     model.fit([x1, x2], labels, batch_size=param_batch_size, epochs=64, validation_data=([v1, v2], vlabels),
               callbacks=[es, mc])
@@ -516,7 +523,7 @@ class DeepERModel(ERModel):
 
         return precision, recall, fmeasure
 
-    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=['id', 'ltable_id', 'rtable_id'], **kwargs):
+    def predict(self, x, given_columns=None, mojito=False, expand_dim=False, ignore_columns=['id', 'ltable_id', 'rtable_id', 'label'], **kwargs):
         if isinstance(x, csr_matrix):
             x = pd.DataFrame(data=np.zeros(x.shape))
             if given_columns is not None:

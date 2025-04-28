@@ -24,7 +24,11 @@ class Summarizer:
     """
     def __init__(self, lsource, rsource, lm):
         self.lsource = lsource
+        if 'id' in self.lsource.columns:
+            self.lsource = self.lsource.drop(['id'], axis=1)
         self.rsource = rsource
+        if 'id' in self.rsource.columns:
+            self.rsource = self.rsource.drop(['id'], axis=1)
         self.tokenizer = get_tokenizer(lm=lm)
         self.len_cache = {}
 
@@ -37,8 +41,8 @@ class Summarizer:
         Store the index and vocabulary in self.idf and self.vocab.
         """
 
-        content = self.lsource.drop(['id'], axis=1).astype(str).values.flatten().tolist()
-        content.append(self.rsource.drop(['id'], axis=1).astype(str).values.flatten().tolist())
+        content = self.lsource.astype(str).values.flatten().tolist()
+        content.append(self.rsource.astype(str).values.flatten().tolist())
         ci = 0
         for c in content:
             if isinstance(c, list):
@@ -78,7 +82,7 @@ class Summarizer:
             for token in tokens:
                 if token not in ['COL', 'VAL'] and \
                    token not in stopwords:
-                    if token in self.vocab:
+                   if token in self.vocab:
                         cnt[token] += self.idf[self.vocab[token]]
 
         for sent in [sentA, sentB]:

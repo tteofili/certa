@@ -56,13 +56,15 @@ class_to_explain = np.argmax(prediction)
 To explain the prediction using _CERTA_ :
 
 ```python
-saliency, summary, cfs, triangles, lattices = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
+saliency, summary, cfs, triangles, lattices, support_samples = certa_explainer.explain(l_tuple, r_tuple, predict_fn)
 ```
 _CERTA_ returns:
-* the saliency explanation within the _saliency_ pd.DataFrame 
-* a _summary_ containing the set of attributes that has the highest probability of sufficiency of flipping the original prediction
-* the generated counterfactual explanations within the _cfs_ pd.DataFrame 
-* the list of open _triangles_ (in form of tuples of record ids) used to generate the explanations
+* the saliency explanation within the `saliency` dataFrame 
+* a `summary` containing the set of attributes that has the highest probability of sufficiency of flipping the original prediction
+* the generated counterfactual explanations within the `cfs` dataFrame 
+* the list of open `triangles` (in form of tuples of record ids) used to generate the explanations
+* the list of lattice structures used to generate the explanations
+* the `pd.Dataframe` containing the _support samples_ for visiting open triangles
 
 # Examples
 

@@ -60,15 +60,13 @@ def wrapDm(test_df, model, given_columns=None, ignore_columns=['label', 'id', 'l
         data['id'] = np.arange(len(data))
     tmp_name = "./{}.csv".format("".join([random.choice(string.ascii_lowercase) for _ in range(10)]))
     data.to_csv(tmp_name, index=False)
-    with open(os.devnull, 'w') as devnull:
-        with contextlib.redirect_stdout(devnull):
-            data_processed = dm.data.process_unlabeled(tmp_name, trained_model=model,
+    data_processed = dm.data.process_unlabeled(tmp_name, trained_model=model,
                                                        ignore_columns=['ltable_id', 'rtable_id', 'label', 'id',
                                                                        'originalRightId', 'alteredAttributes',
                                                                        'droppedValues', 'copiedValues'])
-            predictions = model.run_prediction(data_processed, output_attributes=outputAttributes,
+    predictions = model.run_prediction(data_processed, output_attributes=outputAttributes,
                                                batch_size=batch_size)
-            out_proba = predictions['match_score'].values
+    out_proba = predictions['match_score'].values
     multi_proba = np.dstack((1 - out_proba, out_proba)).squeeze()
     os.remove(tmp_name)
     if outputAttributes:

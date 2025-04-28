@@ -3,10 +3,13 @@ Function for explaining classified instances using evidence counterfactuals.
 """
 import pandas as pd
 
+from certa.utils import to_token_df
+
 """
 Import libraries 
 """
 import shap
+import shap.maskers
 import time
 import numpy as np
 from scipy import sparse
@@ -99,15 +102,8 @@ class ShapCounterfactual(object):
 
         tic = time.time()  # start timer
 
-        # perturbing features means setting feature value to zero, so the reference values are zeroes
-        reference = np.reshape(np.zeros(np.shape(instance)[1]), (1, len(np.zeros(np.shape(instance)[1]))))
-        reference = sparse.csr_matrix(reference)
-
-        proba = self.classifier_fn(instance)
-        idx = np.argmax(proba)
-
         explainer = shap.KernelExplainer(self.classifier_fn, background, link="identity")
-        shap_values = explainer.shap_values(instance, nsamples=50, l1_reg="aic")[idx]
+        shap_values = explainer.shap_values(instance, nsamples=500)
 
         nb_active_feature_instance_idx = np.size(instance)
         instance_dense = np.reshape(instance, (1, len(self.feature_names_full)))
@@ -146,7 +142,7 @@ class ShapCounterfactual(object):
         iteration = 0
         score = self.classifier_fn(instance)[0]
         score_new = score
-        while ((score_new[idx] >= self.threshold_classifier) and (length != len(explanation_shap_sorted)) and (
+        while ((score_new >= self.threshold_classifier) and (length != len(explanation_shap_sorted)) and (
                 length < self.max_features) and ((time.time() - tic) < self.time_maximum)):
             indices_features_explanations_shap_abs_found = []
             coefficients_features_explanations_shap_abs_found = []
@@ -166,7 +162,7 @@ class ShapCounterfactual(object):
             score_new = self.classifier_fn(perturbed_instance)[0]
             iteration += 1
 
-        if ((score_new[0] < self.threshold_classifier) and (~np.isnan(output_size_shap))):
+        if ((score_new < self.threshold_classifier) and (~np.isnan(output_size_shap))):
             time_elapsed = time.time() - tic
             minimum_size_explanation = number_perturbed
             minimum_size_explanation_rel = number_perturbed / nb_active_feature_instance_idx
@@ -192,6 +188,6 @@ class ShapCounterfactual(object):
         return {'explanation set': explanation_set, 'feature coefficient set': feature_coefficient_set,
                 'number active elements': number_active_elements, 'size explanation': minimum_size_explanation,
                 'relative size explanation': minimum_size_explanation_rel, 'time elapsed': time_elapsed,
-                'original score': score[0], 'new score': score_new[0], 'difference scores': difference_scores,
+                'original score': score, 'new score': score_new, 'difference scores': difference_scores,
                 'explanation SHAP coefficients': expl_shap, 'output size shap': output_size_shap, 'cf_example':
                     cf_example}

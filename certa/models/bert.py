@@ -198,6 +198,18 @@ class EMTERModel(ERModel):
                     lrec = 'NaN'
                 if len(rrec) == 0:
                     rrec = 'NaN'
+                '''l = ''
+                r = ''
+                for c in xc.columns:
+                    if str(c).startswith('ltable'):
+                        l += str(tup[c]) + ' '
+                    else:
+                        r += str(tup[c]) + ' '
+                if len(l) == 0:
+                    l = 'NaN'
+                if len(r) == 0:
+                    r = 'NaN'
+                    '''
                 input_text = to_str(lrec, rrec, summarizer=self.summarizer, dk_injector=self.injector, max_len=max_len)
                 inputs.append(input_text)
             dataset = DittoDataset(inputs,

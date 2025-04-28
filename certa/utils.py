@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -27,7 +28,8 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                 r_tuple = r_tuple.drop([ic])
         new_row = get_row(l_tuple, r_tuple, lprefix=left_prefix, rprefix=right_prefix)
         new_row['label'] = row['label']
-        dataset = dataset.append(new_row, ignore_index=True)
+        dataset = pd.concat([dataset, new_row], ignore_index=True)
+
 
     if robust:
             # symmetry
@@ -39,7 +41,8 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                         if column not in ignore_column:
                             sym_new_row[prefix + column] = source.loc[id][column]
 
-                dataset = dataset.append(sym_new_row, ignore_index=True)
+                dataset = pd.concat([dataset, pd.DataFrame([sym_new_row])], ignore_index=True)
+
             except:
                 pass
 
@@ -53,7 +56,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                             lcopy_row[prefix + column] = source.loc[id][column]
 
                 lcopy_row['label'] = 1
-                dataset = dataset.append(lcopy_row, ignore_index=True)
+                dataset = pd.concat([dataset, pd.DataFrame([lcopy_row])], ignore_index=True)
             except:
                 pass
 
@@ -66,7 +69,7 @@ def merge_sources(table, left_prefix, right_prefix, left_source, right_source, c
                             rcopy_row[prefix + column] = source.loc[id][column]
 
                 rcopy_row['label'] = 1
-                dataset = dataset.append(rcopy_row, ignore_index=True)
+                dataset = pd.concat([dataset, pd.DataFrame([rcopy_row])], ignore_index=True)
             except:
                 pass
     return dataset
@@ -128,9 +131,7 @@ class lattice(object):
 
     def hasse(self, depth=-1, compress=False):
         graph=dict()
-        matching = []
-        non_matching = []
-        for indexS,elementS in enumerate(self.Uelements):
+        for indexS, elementS in enumerate(self.Uelements):
             graph[indexS]=[]
             for indexD,elementD in enumerate(self.Uelements):
                 if self.wrap(elementS) <= self.wrap(elementD):
@@ -150,13 +151,13 @@ class lattice(object):
             ebi = str(self.WElementByIndex(s).unwrap)
             if compress:
                 ebi = compress_text(ebi)
-            color = ''
-            if not ebi in matching:
-                if self.ranks[s] > 0.5:
-                    color = 'green'
-            if not ebi in non_matching:
-                if self.ranks[s] < 0.5:
-                    color = 'red'
+            color = 'gray'
+            if s >= len(self.ranks):
+                continue
+            elif self.ranks[s] > 0.5:
+                color = 'green'
+            elif self.ranks[s] < 0.5:
+                color = 'red'
             dotcode += "\""+ebi+"\" [color="+color+"];\n"
             for d in ds:
                 dsebi = str(self.WElementByIndex(d))
@@ -227,3 +228,28 @@ class LatticeElement():
         # a <= b if and only if b = a | b,
         a=self
         return ( a == a & b ) or ( b == a | b )
+
+
+def to_token_df(x:pd.DataFrame, lprefix='ltable_', rprefix='rtable_'):
+    t_df = dict()
+    for c in x.columns:
+        if str(c).startswith(lprefix) or str(c).startswith(rprefix):
+            for t in str(x[c].values[0]).split(' '):
+                t_df[c + '__' + t] = t
+    return pd.Series(index=t_df.keys(), data=t_df.values()).to_frame().T
+
+def to_attr_df(x: pd.DataFrame, lprefix='ltable_', rprefix='rtable_'):
+    if isinstance(x, np.ndarray):
+        return x
+    t_df = dict()
+    for c in x.columns:
+        if str(c).startswith(lprefix) or str(c).startswith(rprefix):
+            attr_token = c.split('__')
+            attr = attr_token[0]
+            token = attr_token[1]
+            prev_tokens = ''
+            if attr in t_df:
+                prev_tokens = str(t_df[attr])
+            t_df[attr] = prev_tokens + ' ' + token
+    return pd.Series(index=t_df.keys(), data=t_df.values()).to_frame().T
+
